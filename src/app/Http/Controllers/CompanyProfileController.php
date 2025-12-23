@@ -1,0 +1,118 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\CompanyRegisterRequest;
+use App\Http\Requests\CompanyProfileUpdateRequest;
+use App\Services\CompanyProfileService;
+
+class CompanyProfileController extends Controller
+{
+    /**
+     * 企業プロフィール登録画面を表示する（表示のみ）
+     */
+    public function create()
+    {
+        // 認証ユーザーを取得する（企業である前提）
+        $user = Auth::user();
+
+        // 企業ロール以外は拒否する
+        if ($user->role !== 'company') {
+            // 企業以外はアクセス禁止にする
+            abort(403);
+        }
+
+        // すでに企業プロフィールがある場合は再登録を防ぐ
+        if ($user->company()->exists()) {
+            // 企業向けのトップ（フリーランス一覧）へ戻す
+            return redirect('/company/freelancers');
+        }
+
+        // 登録フォームを返すだけ
+        return view('company.profile.create');
+    }
+
+    /**
+     * 企業プロフィールを登録する（store は Service へ委譲）
+     */
+    public function store(CompanyRegisterRequest $request, CompanyProfileService $companyProfileService)
+    {
+        // 認証ユーザーを取得する
+        $user = Auth::user();
+
+        // 企業ロール以外は拒否する
+        if ($user->role !== 'company') {
+            // 企業以外は拒否する
+            abort(403);
+        }
+
+        // すでに登録済みなら登録させない
+        if ($user->company()->exists()) {
+            // 企業向け一覧へ戻す
+            return redirect('/company/freelancers');
+        }
+
+        // バリデーションを行う（CompanyRegisterRequest に委譲）
+        $validated = $request->validated();
+
+        // 実処理を Service へ委譲する（CompanyProfileService::register）
+        $companyProfileService->register($user, $validated);
+
+        // 企業向けフリーランス一覧へ遷移する
+        return redirect('/company/freelancers')->with('success', '企業プロフィールの登録が完了しました');
+    }
+
+    /**
+     * 企業プロフィール設定画面（routes 対応のため最低限）
+     *
+     * ※設計書にはないが、web.php に存在するため画面表示だけ用意する
+     */
+    public function edit()
+    {
+        // 認証ユーザーを取得する
+        $user = Auth::user();
+
+        // 企業ロール以外は拒否する
+        if ($user->role !== 'company') {
+            abort(403);
+        }
+
+        // 設定画面のビューを返す
+        return view('company.profile.settings', [
+            // 企業プロフィールがあれば渡しておく
+            'company' => $user->company,
+        ]);
+    }
+
+    /**
+     * 企業プロフィール設定を更新する（routes 対応のため最低限）
+     *
+     * ※設計書にはないが、web.php に存在するため最低限を用意する
+     */
+    public function update(CompanyProfileUpdateRequest $request)
+    {
+        // 認証ユーザーを取得する
+        $user = Auth::user();
+
+        // 企業ロール以外は拒否する
+        if ($user->role !== 'company') {
+            abort(403);
+        }
+
+        // 企業プロフィールが無い場合は先に登録へ誘導する
+        if (!$user->company()->exists()) {
+            return redirect('/company/profile')->with('error', '先に企業プロフィールを登録してください');
+        }
+
+        // 更新用のバリデーションを行う（最低限 / FormRequest に委譲）
+        $validated = $request->validated();
+
+        // 企業プロフィールを更新する
+        $user->company->fill($validated)->save();
+
+        // 設定画面へ戻す
+        return redirect()->route('company.profile.settings')->with('success', '企業プロフィールを更新しました');
+    }
+}

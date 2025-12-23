@@ -1,0 +1,558 @@
+# ① users（共通ログイン）
+
+```php
+<?php
+
+useIlluminate\Database\Migrations\Migration;
+useIlluminate\Database\Schema\Blueprint;
+useIlluminate\Support\Facades\Schema;
+
+/**
+ * users
+ * 共通ログイン（企業 / フリーランス）
+ */
+returnnewclassextendsMigration {
+publicfunctionup():void
+    {
+Schema::create('users', function (Blueprint$table) {
+$table->id();
+
+// ログイン用メールアドレス
+$table->string('email')->unique();
+
+// ハッシュ化パスワード
+$table->string('password');
+
+// ユーザー種別
+$table->enum('role', ['company', 'freelancer']);
+
+            $table->timestamp('email_verified_at')->nullable();
+            $table->rememberToken();
+            $table->timestamps();
+        });
+    }
+
+publicfunctiondown():void
+    {
+Schema::dropIfExists('users');
+    }
+};
+
+```
+
+---
+
+# ② companies（企業プロフィール）
+
+```php
+<?php
+
+/**
+ * companies
+ * 企業プロフィール
+ */
+returnnewclassextendsMigration {
+publicfunctionup():void
+    {
+Schema::create('companies', function (Blueprint$table) {
+$table->id();
+
+$table->foreignId('user_id')
+                ->constrained('users')
+                ->cascadeOnDelete();
+
+// 企業名
+$table->string('name');
+
+// 会社概要
+$table->text('overview')->nullable();
+
+// 担当者情報
+$table->string('contact_name')->nullable();
+$table->string('department')->nullable();
+
+// 自己紹介
+$table->text('introduction')->nullable();
+
+$table->timestamps();
+        });
+    }
+
+publicfunctiondown():void
+    {
+Schema::dropIfExists('companies');
+    }
+};
+
+```
+
+---
+
+# ③ freelancers（フリーランスプロフィール：※重要修正あり）
+
+```php
+<?php
+
+/**
+ * freelancers
+ *
+ * 【重要修正】
+ * 稼働条件を以下4カラムで管理
+ * - min_hours_per_week
+ * - max_hours_per_week
+ * - hours_per_day
+ * - days_per_week
+ */
+returnnewclassextendsMigration {
+publicfunctionup():void
+    {
+Schema::create('freelancers', function (Blueprint$table) {
+$table->id();
+
+$table->foreignId('user_id')
+                ->constrained('users')
+                ->cascadeOnDelete();
+
+// 表示名
+$table->string('display_name');
+
+// 職種
+$table->string('job_title');
+
+// 自己紹介
+$table->text('bio');
+
+// ==========================
+// 稼働条件（正規化）
+// ==========================
+// 週の稼働時間（下限）
+$table->unsignedTinyInteger('min_hours_per_week');
+
+// 週の稼働時間（上限）
+$table->unsignedTinyInteger('max_hours_per_week');
+
+// 1日の稼働時間
+$table->unsignedTinyInteger('hours_per_day');
+
+// 週の稼働日数
+$table->unsignedTinyInteger('days_per_week');
+
+// ==========================
+// 働き方（自由入力）
+// ==========================
+$table->text('work_style_text');
+
+// 希望単価（下限 / 上限）
+$table->unsignedInteger('min_rate');
+$table->unsignedInteger('max_rate');
+
+// 経験企業
+$table->text('experience_companies')->nullable();
+
+// アイコン画像パス
+$table->string('icon_path');
+
+$table->timestamps();
+        });
+    }
+
+publicfunctiondown():void
+    {
+Schema::dropIfExists('freelancers');
+    }
+};
+
+```
+
+---
+
+# ④ freelancer_portfolios（ポートフォリオ）
+
+```php
+<?php
+
+/**
+ * freelancer_portfolios
+ */
+returnnewclassextendsMigration {
+publicfunctionup():void
+    {
+Schema::create('freelancer_portfolios', function (Blueprint$table) {
+$table->id();
+
+$table->foreignId('freelancer_id')
+                ->constrained('freelancers')
+                ->cascadeOnDelete();
+
+$table->string('url');
+$table->unsignedSmallInteger('sort_order')->default(0);
+
+$table->timestamps();
+        });
+    }
+
+publicfunctiondown():void
+    {
+Schema::dropIfExists('freelancer_portfolios');
+    }
+};
+
+```
+
+---
+
+# ⑤ skills / freelancer_skill（共通スキル）
+
+```php
+<?php
+
+/**
+ * skills
+ */
+returnnewclassextendsMigration {
+publicfunctionup():void
+    {
+Schema::create('skills', function (Blueprint$table) {
+$table->id();
+$table->string('name')->unique();
+$table->timestamps();
+        });
+    }
+
+publicfunctiondown():void
+    {
+Schema::dropIfExists('skills');
+    }
+};
+
+```
+
+```php
+<?php
+
+/**
+ * freelancer_skill
+ */
+returnnewclassextendsMigration {
+publicfunctionup():void
+    {
+Schema::create('freelancer_skill', function (Blueprint$table) {
+$table->id();
+
+$table->foreignId('freelancer_id')
+                ->constrained('freelancers')
+                ->cascadeOnDelete();
+
+$table->foreignId('skill_id')
+                ->constrained('skills')
+                ->cascadeOnDelete();
+
+$table->unique(['freelancer_id','skill_id']);
+$table->timestamps();
+        });
+    }
+
+publicfunctiondown():void
+    {
+Schema::dropIfExists('freelancer_skill');
+    }
+};
+
+```
+
+---
+
+# ⑥ freelancer_custom_skills（※検索対応）
+
+```php
+<?php
+
+/**
+ * freelancer_custom_skills
+ *
+ * 【修正方針】
+ * - 構造はそのまま
+ * - 検索にも使えるよう index を追加
+ */
+returnnewclassextendsMigration {
+publicfunctionup():void
+    {
+Schema::create('freelancer_custom_skills', function (Blueprint$table) {
+$table->id();
+
+$table->foreignId('freelancer_id')
+                ->constrained('freelancers')
+                ->cascadeOnDelete();
+
+// 自由入力スキル名（検索対象）
+$table->string('name');
+
+$table->unsignedSmallInteger('sort_order')->default(0);
+
+// 🔍 検索用インデックス
+$table->index('name');
+
+$table->timestamps();
+        });
+    }
+
+publicfunctiondown():void
+    {
+Schema::dropIfExists('freelancer_custom_skills');
+    }
+};
+
+```
+
+---
+
+# ⑦ jobs（案件：※報酬設計を大幅修正）
+
+```php
+<?php
+
+/**
+ * jobs
+ *
+ * 【重要修正】
+ * - 月額/案件単価 or 時給 の両対応
+ */
+returnnewclassextendsMigration {
+publicfunctionup():void
+    {
+Schema::create('jobs', function (Blueprint$table) {
+$table->id();
+
+$table->foreignId('company_id')
+                ->constrained('companies')
+                ->cascadeOnDelete();
+
+// 案件名
+$table->string('title');
+
+// 案件概要
+$table->text('description');
+
+// 必要スキル（テキスト）
+$table->text('required_skills_text')->nullable();
+
+// ==========================
+// 報酬設定
+// ==========================
+// reward_type:
+// - monthly : 月額 / 案件単価
+// - hourly  : 時給
+$table->enum('reward_type', ['monthly', 'hourly']);
+
+            // 金額レンジ（共通）
+            $table->unsignedInteger('min_rate');
+            $table->unsignedInteger('max_rate');
+
+            // 稼働条件（表示用）
+            $table->string('work_time_text');
+
+            // 0=draft / 1=publish / 2=stop
+            $table->unsignedTinyInteger('status')->default(0);
+
+            $table->timestamps();
+        });
+    }
+
+publicfunctiondown():void
+    {
+Schema::dropIfExists('jobs');
+    }
+};
+
+```
+
+---
+
+# ⑧ applications（応募）
+
+```php
+<?php
+
+/**
+ * applications
+ */
+returnnewclassextendsMigration {
+publicfunctionup():void
+    {
+Schema::create('applications', function (Blueprint$table) {
+$table->id();
+
+$table->foreignId('job_id')
+                ->constrained('jobs')
+                ->cascadeOnDelete();
+
+$table->foreignId('freelancer_id')
+                ->constrained('freelancers')
+                ->cascadeOnDelete();
+
+$table->text('message');
+
+// 0=未対応 / 1=対応中 / 2=クローズ
+$table->unsignedTinyInteger('status')->default(0);
+
+$table->unique(['job_id','freelancer_id']);
+$table->timestamps();
+        });
+    }
+
+publicfunctiondown():void
+    {
+Schema::dropIfExists('applications');
+    }
+};
+
+```
+
+---
+
+# ⑨ scouts（スカウト）
+
+```php
+<?php
+
+/**
+ * scouts
+ */
+returnnewclassextendsMigration {
+publicfunctionup():void
+    {
+Schema::create('scouts', function (Blueprint$table) {
+$table->id();
+
+$table->foreignId('company_id')
+                ->constrained('companies')
+                ->cascadeOnDelete();
+
+$table->foreignId('freelancer_id')
+                ->constrained('freelancers')
+                ->cascadeOnDelete();
+
+$table->foreignId('job_id')
+                ->nullable()
+                ->constrained('jobs')
+                ->nullOnDelete();
+
+$table->text('message');
+
+// 0=未対応 / 1=対応中 / 2=クローズ
+$table->unsignedTinyInteger('status')->default(0);
+
+$table->index(['company_id','freelancer_id','job_id']);
+$table->timestamps();
+        });
+    }
+
+publicfunctiondown():void
+    {
+Schema::dropIfExists('scouts');
+    }
+};
+
+```
+
+---
+
+# ⑩ threads（チャットスレッド）
+
+```php
+<?php
+
+/**
+ * threads
+ * 未読管理はスレッド単位
+ */
+returnnewclassextendsMigration {
+publicfunctionup():void
+    {
+Schema::create('threads', function (Blueprint$table) {
+$table->id();
+
+$table->foreignId('company_id')
+                ->constrained('companies')
+                ->cascadeOnDelete();
+
+$table->foreignId('freelancer_id')
+                ->constrained('freelancers')
+                ->cascadeOnDelete();
+
+$table->foreignId('job_id')
+                ->nullable()
+                ->constrained('jobs')
+                ->nullOnDelete();
+
+$table->enum('latest_sender_type', ['company', 'freelancer'])->nullable();
+            $table->unsignedBigInteger('latest_sender_id')->nullable();
+
+            $table->timestamp('latest_message_at')->nullable();
+
+            $table->boolean('is_unread_for_company')->default(false);
+            $table->boolean('is_unread_for_freelancer')->default(false);
+
+            $table->index(['company_id', 'freelancer_id', 'job_id']);
+            $table->timestamps();
+        });
+    }
+
+publicfunctiondown():void
+    {
+Schema::dropIfExists('threads');
+    }
+};
+
+```
+
+---
+
+# ⑪ messages（メッセージ）
+
+```php
+<?php
+
+/**
+ * messages
+ */
+returnnewclassextendsMigration {
+publicfunctionup():void
+    {
+Schema::create('messages', function (Blueprint$table) {
+$table->id();
+
+$table->foreignId('thread_id')
+                ->constrained('threads')
+                ->cascadeOnDelete();
+
+$table->enum('sender_type', ['company', 'freelancer']);
+            $table->unsignedBigInteger('sender_id');
+
+            $table->text('body');
+            $table->timestamp('sent_at');
+
+            // 自分のメッセージ削除対応
+            $table->softDeletes();
+
+            $table->timestamps();
+            $table->index(['thread_id', 'sent_at']);
+        });
+    }
+
+publicfunctiondown():void
+    {
+Schema::dropIfExists('messages');
+    }
+};
+
+```
+
+---
+
+## ✅ 次のステップ候補（おすすめ順）
+
+1. **このDB構造をER図に落とす**
+2. **jobs.reward_type を使った表示分岐仕様の整理**
+3. **検索クエリ設計（freelancers / jobs 両方）**
+4. **Seeder（ダミーデータ）設計**

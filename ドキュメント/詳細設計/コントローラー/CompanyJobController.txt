@@ -1,0 +1,290 @@
+# ✅ CompanyJobController 詳細設計（完全版）
+
+---
+
+---
+
+## ① **index（自社案件一覧：表示のみ）**
+
+### 🌱 役割
+
+企業が投稿した案件を一覧表示する。
+
+### 🎯 入口
+
+```
+GET /company/jobs
+
+```
+
+### 📤 出口
+
+- view：`company/jobs/index.blade.php`
+- 渡すデータ：
+
++----------------+------------------------------+
+| データ         | 説明                         |
++----------------+------------------------------+
+| 自社案件一覧   | company_id一致の案件         |
+| statusフィルタ | publish / draft / stopped    |
+| keyword検索    | タイトル・説明・報酬など     |
++----------------+------------------------------+
+
+### 🧠 Controller内部処理
+
+1. Auth::user() から company_id 取得
+2. company_idで案件を絞り込み取得
+3. keywordで全文検索（任意）
+4. statusフィルタ（任意）
+5. viewへ返却
+
+### 🔧 使用サービス
+
+- **なし**
+    
+    理由：DB更新なし・表示のみで完結するため。
+    
+
+---
+
+---
+
+## ② **create（案件作成画面の表示）**
+
+### 🌱 役割
+
+案件の新規作成フォームを表示。
+
+### 🎯 入口
+
+```
+GET/company/jobs/create
+
+```
+
+### 📤 出口
+
+- view：`company/jobs/create.blade.php`
+- 渡すデータ：
+
++----------------+--------------------------+
+| データ         | 用途                      |
++----------------+--------------------------+
+| 入力項目一覧   | 案件名/報酬/説明など      |
+| 初期値         | すべて空                  |
++----------------+--------------------------+
+
+### 🧠 Controller内部処理
+
+- 特にロジックなし
+- フォームを返すだけ
+
+### 🔧 使用サービス
+
+- **なし**
+
+---
+
+---
+
+## ③ **store（案件登録処理）**
+
+### 🌱 役割
+
+案件レコードをDBに登録する **入口**
+
+実処理は Service に委譲する。
+
+### 🎯 入口
+
+```
+POST /company/jobs
+payload:
+- title
+- description
+- min_rate
+- max_rate
+- work_time_text
+- required_skill
+- その他案件登録項目
+```
+
+### 🧠 Controller内部処理
+
+1. validate() 実行
+2. 認証企業取得（company_id抽出）
+3. Serviceに処理委譲
+
+```
+JobService::store($company_id,$validated)
+```
+
+Service側で行う処理例👇
+
+- jobsテーブルへINSERT
+- statusは`draft`/`publish`選択式
+- トランザクション制御
+
+### 📤 出口
+
+```
+redirect /company/jobs
+flash:「案件を登録しました」
+
+```
+
+### 🔧 使用サービス
+
+✔ **JobService::store**
+
+理由：
+
+- 企業情報との紐づけ
+- 複数テーブル/項目更新可能性
+- 状態制御（publish/draft）
+
+---
+
+---
+
+## ④ **edit（編集画面の表示）**
+
+### 🌱 役割
+
+既存案件の編集画面を表示する。
+
+### 🎯 入口
+
+```
+GET /company/jobs/{job}/edit
+
+```
+
+### 📤 出口
+
+view：`company/jobs/edit.blade.php`
+
+渡す内容👇
+
++----------------+--------------------------+
+| データ         | 内容                      |
++----------------+--------------------------+
+| job情報        | 既存値入り                |
+| 追加編集項目   | そのまま入力欄で表示      |
++----------------+--------------------------+
+
+### 🧠 Controller内部処理
+
+1. job取得
+2. company_id一致チェック
+3. view返却
+
+### 🔧 使用サービス
+
+- **なし**
+
+※DB更新なしのため。
+
+---
+
+---
+
+## ⑤ **update（案件更新・保存し直し）**
+
+### 🌱 役割
+
+案件内容を上書き保存する。
+
+保存処理は Service へ。
+
+### 🎯 入口
+
+```
+PUT /company/jobs/{job}
+
+```
+
+### 🧠 Controller内部処理
+
+1. validate()
+2. 認証企業=job.company_id一致確認
+3. Serviceへ委譲
+
+```
+JobService::update(
+   job_id,
+   validated
+)
+```
+
+Service側責務👇
+
+- jobs.update
+- status変更（publish/draft切替）
+- トランザクション
+
+### 📤 出口
+
+```
+redirect /company/jobs
+flash:「案件を更新しました」
+
+```
+
+### 🔧 使用サービス
+
+✔ **JobService::update**
+
+---
+
+---
+
+## ⑥ **destroy（案件削除処理）**
+
+### 🌱 役割
+
+自社案件の削除を行う。
+
+MVPでは物理削除 or 論理削除どちらでも可。
+
+### 🎯 入口
+
+```
+DELETE /company/jobs/{job}
+```
+
+### 🧠 Controller内部処理
+
+1. 認証企業取得
+2. company_id一致チェック
+3. job削除
+
+※単一テーブル削除のみならService不要
+
+### 📤 出口
+
+```
+redirect /company/jobs
+flash:「案件を削除しました」
+```
+
+### 🔧 使用サービス
+
+- **なし（単表削除＋副作用なしのため）**
+
+---
+
+---
+
+# 📌 CompanyJobController まとめ（表形式）
+
++----------------------+----------+------------------+------------------------+
+| Controller           | Action   | 役割             | Service                |
++----------------------+----------+------------------+------------------------+
+| CompanyJobController | index    | 一覧表示         | ❌なし                  |
+| CompanyJobController | create   | 新規作成フォーム | ❌なし                  |
+| CompanyJobController | store    | DB登録依頼       | ✔ JobService::store    |
+| CompanyJobController | edit     | 既存編集フォーム | ❌なし                  |
+| CompanyJobController | update   | 更新依頼         | ✔ JobService::update   |
+| CompanyJobController | destroy  | 削除実行         | ❌なし                  |
++----------------------+----------+------------------+------------------------+

@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <title>⑥ フリーランス 案件一覧�E�EI桁E�E�E/title>
+  <style>
+    :root{
+      --bg: #f6f7f9;
+      --surface: #ffffff;
+      --surface-2: #fbfcfe;
+      --text: #101828;
+      --muted: #475467;
+      --muted-2: #667085;
+      --border: #e6e9ef;
+      --border-2: #d9dde6;
+      --primary: #0f766e; /* teal */
+      --primary-600: #0b5f59;
+      --primary-50: #ecfdfb;
+      --danger: #c2410c;
+      --shadow: 0 10px 30px rgba(16,24,40,.06), 0 2px 8px rgba(16,24,40,.04);
+      --radius: 16px;
+      --radius-sm: 12px;
+      --focus: 0 0 0 4px rgba(15,118,110,.18);
+      --max: 1160px;
+    }
+
+    *{ box-sizing: border-box; }
+    html,body{ height: 100%; }
+    body{
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+        Arial, "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+      line-height: 1.6;
+      letter-spacing: .01em;
+    }
+    a{ color: inherit; text-decoration: none; }
+    button,input{ font: inherit; }
+
+    .skip{
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      padding: 10px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      z-index: 999;
+    }
+    .skip:focus{ left: 12px; top: 12px; outline: none; box-shadow: var(--focus), var(--shadow); }
+
+    .topbar{
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(246,247,249,.82);
+      backdrop-filter: saturate(1.2) blur(14px);
+      border-bottom: 1px solid rgba(230,233,239,.9);
+    }
+    .topbar__inner{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 14px 16px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .logo{
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: linear-gradient(140deg, var(--primary) 0%, #1f9a8c 45%, #38b2ac 100%);
+      box-shadow: 0 10px 22px rgba(15,118,110,.18);
+    }
+    .brand__meta{ min-width: 0; }
+    .brand__title{
+      font-weight: 700;
+      letter-spacing: .02em;
+      font-size: 14px;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .brand__sub{
+      font-size: 12px;
+      color: var(--muted-2);
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .nav{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px;
+      background: rgba(255,255,255,.72);
+      border: 1px solid rgba(230,233,239,.9);
+      border-radius: 999px;
+      box-shadow: 0 6px 18px rgba(16,24,40,.04);
+    }
+    .nav__link{
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-weight: 650;
+      font-size: 13px;
+      letter-spacing: .01em;
+      white-space: nowrap;
+    }
+    .nav__link:hover{ background: rgba(15,118,110,.06); color: var(--text); }
+    .nav__link:focus{ outline: none; box-shadow: var(--focus); }
+    .nav__link.is-active{
+      background: var(--primary-50);
+      color: var(--primary-600);
+      border: 1px solid rgba(15,118,110,.18);
+    }
+    .badge{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 22px;
+      height: 18px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: rgba(15,118,110,.12);
+      color: var(--primary-600);
+      font-weight: 800;
+      font-size: 12px;
+      line-height: 1;
+    }
+
+    .user{
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+    }
+    .user__chip{
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      background: rgba(255,255,255,.72);
+      border: 1px solid rgba(230,233,239,.9);
+      border-radius: 999px;
+      box-shadow: 0 6px 18px rgba(16,24,40,.04);
+    }
+    .avatar{
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      background: linear-gradient(150deg, #c7d2fe 0%, #a7f3d0 55%, #fde68a 100%);
+      border: 1px solid rgba(16,24,40,.08);
+    }
+    .user__name{
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text);
+      white-space: nowrap;
+    }
+    .user__menu{
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(16,24,40,.1);
+      background: #fff;
+      color: var(--muted);
+      font-weight: 650;
+      font-size: 12px;
+    }
+    .user__menu:hover{ border-color: rgba(15,118,110,.28); color: var(--text); }
+    .user__menu:focus{ outline: none; box-shadow: var(--focus); }
+
+    main{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 20px 16px 40px;
+    }
+    .pagehead{
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 14px;
+      margin: 10px 0 18px;
+    }
+    .pagehead__title{
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: .01em;
+    }
+    .pagehead__meta{
+      margin: 0;
+      color: var(--muted-2);
+      font-size: 13px;
+    }
+
+    .layout{
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+    .panel{
+      background: rgba(255,255,255,.86);
+      border: 1px solid rgba(230,233,239,.95);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .panel__inner{ padding: 16px; }
+    .panel__title{
+      margin: 0 0 10px;
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 800;
+      letter-spacing: .02em;
+    }
+    .help{
+      margin: 8px 0 0;
+      color: var(--muted-2);
+      font-size: 12px;
+    }
+
+    .field{
+      display: grid;
+      gap: 6px;
+      margin-top: 12px;
+    }
+    .label{
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 750;
+      letter-spacing: .01em;
+    }
+    .input, .selectlike{
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--border-2);
+      background: #fff;
+      padding: 10px 12px;
+      color: var(--text);
+      outline: none;
+      transition: box-shadow .15s ease, border-color .15s ease, transform .12s ease;
+    }
+    .input:focus{
+      border-color: rgba(15,118,110,.55);
+      box-shadow: var(--focus);
+    }
+    .input::placeholder{ color: #98a2b3; }
+
+    .toggle{
+      display: inline-flex;
+      gap: 6px;
+      padding: 6px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      border: 1px solid rgba(217,221,230,.9);
+    }
+    .toggle input{ position: absolute; opacity: 0; pointer-events: none; }
+    .toggle label{
+      cursor: pointer;
+      user-select: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-weight: 750;
+      font-size: 12px;
+      color: var(--muted);
+      border: 1px solid transparent;
+    }
+    .toggle label:hover{ background: rgba(15,118,110,.06); color: var(--text); }
+    .toggle input:focus + label{ box-shadow: var(--focus); }
+    .toggle input:checked + label{
+      background: #fff;
+      border-color: rgba(15,118,110,.18);
+      color: var(--primary-600);
+    }
+
+    .range{
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 8px;
+      align-items: center;
+    }
+    .range__sep{
+      color: var(--muted-2);
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: .03em;
+    }
+    .unit{
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted-2);
+    }
+    .btn{
+      border: 1px solid transparent;
+      background: var(--primary);
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-weight: 850;
+      letter-spacing: .01em;
+      cursor: pointer;
+      transition: transform .06s ease, box-shadow .15s ease, background .15s ease;
+      box-shadow: 0 12px 26px rgba(15,118,110,.18);
+    }
+    .btn:hover{ background: var(--primary-600); }
+    .btn:active{ transform: translateY(1px); }
+    .btn:focus{ outline: none; box-shadow: var(--focus), 0 12px 26px rgba(15,118,110,.18); }
+    .btn.secondary{
+      background: #fff;
+      color: var(--text);
+      border-color: rgba(16,24,40,.12);
+      box-shadow: none;
+    }
+    .btn.secondary:hover{ border-color: rgba(15,118,110,.28); background: rgba(15,118,110,.03); }
+
+    /* radio-driven switch */
+    #priceUnit:checked ~ .price-hourly{ display: none; }
+    #priceHourly:checked ~ .price-unit{ display: none; }
+
+    .list{
+      display: grid;
+      gap: 14px;
+    }
+    .card{
+      background: rgba(255,255,255,.9);
+      border: 1px solid rgba(230,233,239,.95);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 26px rgba(16,24,40,.05);
+      overflow: hidden;
+    }
+    .card__inner{ padding: 16px; display: grid; gap: 10px; }
+    .card__top{
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .card__title{
+      margin: 0;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: .01em;
+      line-height: 1.3;
+    }
+    .pill{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(15,118,110,.18);
+      background: rgba(15,118,110,.06);
+      color: var(--primary-600);
+      font-size: 12px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+    .pill.applied{
+      border-color: rgba(194,65,12,.18);
+      background: rgba(194,65,12,.06);
+      color: #9a3412;
+    }
+    .meta{
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .company{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-weight: 750;
+      font-size: 13px;
+    }
+    .company__dot{
+      width: 10px;
+      height: 10px;
+      border-radius: 99px;
+      background: rgba(15,118,110,.28);
+      box-shadow: 0 0 0 3px rgba(15,118,110,.10);
+    }
+    .desc{
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .tags{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tag{
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(102,112,133,.08);
+      border: 1px solid rgba(102,112,133,.14);
+      color: var(--muted);
+      font-weight: 800;
+      font-size: 12px;
+    }
+    .facts{
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(230,233,239,.95);
+      background: rgba(246,247,249,.6);
+    }
+    .fact{
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+    .fact__k{
+      color: var(--muted-2);
+      font-size: 11px;
+      font-weight: 850;
+      letter-spacing: .02em;
+    }
+    .fact__v{
+      font-weight: 900;
+      font-size: 13px;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .actions{
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 2px;
+    }
+    .actions .btn{ padding: 10px 12px; border-radius: 12px; }
+    .btn.linklike{
+      background: transparent;
+      color: var(--primary-600);
+      border: 1px solid rgba(15,118,110,.18);
+      box-shadow: none;
+    }
+    .btn.linklike:hover{ background: rgba(15,118,110,.06); }
+
+    .note{
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(15,118,110,.06);
+      border: 1px solid rgba(15,118,110,.14);
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .note b{ color: var(--text); }
+
+    @media (max-width: 980px){
+      .layout{ grid-template-columns: 1fr; }
+      .topbar__inner{ grid-template-columns: 1fr; justify-items: stretch; }
+      .user{ justify-content: flex-start; }
+      .nav{ justify-content: space-between; }
+    }
+    @media (max-width: 560px){
+      .facts{ grid-template-columns: 1fr; }
+      .actions{ flex-direction: column; align-items: stretch; }
+      .nav{ width: 100%; }
+      .nav__link{ flex: 1; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#content">本斁E��スキチE�E</a>
+
+  <header class="topbar" aria-label="フリーランス共通�EチE��ー">
+    <div class="topbar__inner">
+      <div class="brand" aria-label="サービス吁E>
+        <div class="logo" aria-hidden="true"></div>
+        <div class="brand__meta">
+          <div class="brand__title">Freelance Matching Platform</div>
+          <div class="brand__sub">フリーランス画面</div>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="ヘッダーナビゲーション">
+        <a class="nav__link is-active" href="#" aria-current="page">案件一覧</a>
+        <a class="nav__link" href="#">
+          応募した案件
+          <span class="badge" aria-label="未読 2">2</span>
+        </a>
+        <a class="nav__link" href="#">
+          スカウチE
+          <span class="badge" aria-label="未読 1">1</span>
+        </a>
+      </nav>
+
+      <div class="user" aria-label="ユーザーメニュー">
+        <div class="user__chip">
+          <div class="avatar" aria-hidden="true"></div>
+          <div class="user__name">山田 太郁E/div>
+        </div>
+        <button class="user__menu" type="button" aria-label="プロフィール設宁Eログアウト（ダミ�E�E�E>
+          メニュー
+          <span aria-hidden="true">▾</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="content">
+    <div class="pagehead" aria-label="ペ�Eジ見�EぁE>
+      <div>
+        <h1 class="pagehead__title">案件一覧</h1>
+        <p class="pagehead__meta">公開案件のみ表示�E�下書き�E停止は表示されません�E�E/p>
+      </div>
+      <div class="pagehead__meta" aria-label="検索結果件数�E�ダミ�E�E�E>6件�E�ダミ�E�E�E/div>
+    </div>
+
+    <div class="layout">
+      <aside class="panel" aria-label="検索サイドバー">
+        <div class="panel__inner">
+          <p class="panel__title">検索</p>
+
+          <div class="field">
+            <label class="label" for="kw">キーワーチE/label>
+            <input class="input" id="kw" type="search" placeholder="例：React / Laravel / UI改喁E/ PM" />
+            <p class="help">案件惁E��を横断して部刁E��致検索�E��E斁E��索イメージ�E�E/p>
+          </div>
+
+          <div class="field">
+            <div class="label">報酬レンジ</div>
+            <div class="toggle" role="tablist" aria-label="報酬入力�E種別�E�ダミ�E�E�E>
+              <input id="priceUnit" name="priceType" type="radio" checked />
+              <label for="priceUnit" role="tab" aria-selected="true">単価�E�月額など�E�E/label>
+              <input id="priceHourly" name="priceType" type="radio" />
+              <label for="priceHourly" role="tab" aria-selected="false">時給</label>
+            </div>
+
+            <div class="price-unit" aria-label="単価の下限上限">
+              <div class="range" style="margin-top:10px;">
+                <input class="input" type="text" inputmode="numeric" placeholder="下限�E�丁E��E aria-label="下限�E�丁E��E />
+                <div class="range__sep">、E/div>
+                <input class="input" type="text" inputmode="numeric" placeholder="上限�E�丁E��E aria-label="上限�E�丁E��E />
+              </div>
+              <div class="unit">例！E0 、E50�E�丁E�E�E�E/div>
+            </div>
+
+            <div class="price-hourly" aria-label="時給の下限上限">
+              <div class="range" style="margin-top:10px;">
+                <input class="input" type="text" inputmode="numeric" placeholder="下限�E��E�E�E aria-label="下限�E��E�E�E />
+                <div class="range__sep">、E/div>
+                <input class="input" type="text" inputmode="numeric" placeholder="上限�E��E�E�E aria-label="上限�E��E�E�E />
+              </div>
+              <div class="unit">例！E000 、E3500�E��E/時！E/div>
+            </div>
+          </div>
+
+          <div class="field" style="margin-top: 14px;">
+            <button class="btn" type="button" aria-label="検索�E�ダミ�E�E�E>検索</button>
+            <button class="btn secondary" type="button" aria-label="条件をクリア�E�ダミ�E�E�E>クリア</button>
+          </div>
+
+          <div class="note" aria-label="未読仕様メモ">
+            未読は<b>スレチE��単佁E/b>、Eb>最後�E送信老E��自刁E��夁E/b>なら未読として数えます（ダミ�E表示�E�、E
+          </div>
+        </div>
+      </aside>
+
+      <section class="list" aria-label="案件カード一覧">
+        <article class="card" aria-label="案件カーチE1">
+          <div class="card__inner">
+            <div class="card__top">
+              <h2 class="card__title">SaaS管琁E��面のUI改喁E��Eeact + TypeScript�E�E/h2>
+              <div class="pill">公閁E/div>
+            </div>
+            <div class="company"><span class="company__dot" aria-hidden="true"></span>株式会社モノリス</div>
+            <p class="desc">既存管琁E��面の惁E��設計見直し、コンポ�Eネント整琁E��UX向上をお願いします。デザインシスチE��導�E検討あり、E/p>
+            <div class="tags" aria-label="忁E��スキル">
+              <span class="tag">React</span><span class="tag">TypeScript</span><span class="tag">UI/UX</span><span class="tag">Figma</span>
+            </div>
+            <div class="facts" aria-label="稼働�E期間・報酬">
+              <div class="fact"><div class="fact__k">稼働時閁E/div><div class="fact__v">週10、E0時間</div></div>
+              <div class="fact"><div class="fact__k">契紁E��閁E/div><div class="fact__v">2、Eヶ朁E/div></div>
+              <div class="fact"><div class="fact__k">報酬</div><div class="fact__v">30、E0丁E/div></div>
+            </div>
+            <div class="actions">
+              <button class="btn linklike" type="button">詳細</button>
+              <button class="btn" type="button">応募</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" aria-label="案件カーチE2">
+          <div class="card__inner">
+            <div class="card__top">
+              <h2 class="card__title">Laravel APIリファクタリング�E�認証/権陁Eパフォーマンス改喁E��E/h2>
+              <div class="pill">公閁E/div>
+            </div>
+            <div class="company"><span class="company__dot" aria-hidden="true"></span>合同会社Northwind</div>
+            <p class="desc">既存APIの責務整琁E��N+1対策、バリチE�Eション・例外設計�E統一を進めたぁE��す。テストが薁E��箁E��あり、E/p>
+            <div class="tags">
+              <span class="tag">Laravel</span><span class="tag">MySQL</span><span class="tag">REST</span><span class="tag">TDD</span>
+            </div>
+            <div class="facts">
+              <div class="fact"><div class="fact__k">稼働時閁E/div><div class="fact__v">週15、E5時間</div></div>
+              <div class="fact"><div class="fact__k">契紁E��閁E/div><div class="fact__v">3ヶ朁E/div></div>
+              <div class="fact"><div class="fact__k">報酬</div><div class="fact__v">45、E5丁E/div></div>
+            </div>
+            <div class="actions">
+              <button class="btn linklike" type="button">詳細</button>
+              <button class="btn" type="button">応募</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" aria-label="案件カーチE3�E�応募済み�E�E>
+          <div class="card__inner">
+            <div class="card__top">
+              <h2 class="card__title">BtoBマ�Eケ運用ダチE��ュボ�Eド�E新規開発�E�Eext.js�E�E/h2>
+              <div class="pill applied">応募済み</div>
+            </div>
+            <div class="company"><span class="company__dot" aria-hidden="true"></span>株式会社Lighthouse</div>
+            <p class="desc">庁E��・CRMチE�Eタを統合し、KPIを見やすくするダチE��ュボ�Eドを構築します。要件整琁E��ら伴走できる方歓迎、E/p>
+            <div class="tags">
+              <span class="tag">Next.js</span><span class="tag">BI</span><span class="tag">DWH</span><span class="tag">要件定義</span>
+            </div>
+            <div class="facts">
+              <div class="fact"><div class="fact__k">稼働時閁E/div><div class="fact__v">週20時間、E/div></div>
+              <div class="fact"><div class="fact__k">契紁E��閁E/div><div class="fact__v">4ヶ朁E/div></div>
+              <div class="fact"><div class="fact__k">報酬</div><div class="fact__v">60、E0丁E/div></div>
+            </div>
+            <div class="actions">
+              <button class="btn linklike" type="button">詳細</button>
+              <button class="btn" type="button">応募済み�E�チャチE��を開く！E/button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" aria-label="案件カーチE4">
+          <div class="card__inner">
+            <div class="card__top">
+              <h2 class="card__title">業務シスチE��の画面刷新�E�Eue ↁEReact移行支援�E�E/h2>
+              <div class="pill">公閁E/div>
+            </div>
+            <div class="company"><span class="company__dot" aria-hidden="true"></span>株式会社Arbor</div>
+            <p class="desc">段階的移行で既存を壊さずに刷新します。コンポ�Eネント設計とスタイルガイド策定�E経験が活きます、E/p>
+            <div class="tags">
+              <span class="tag">React</span><span class="tag">Vue</span><span class="tag">CSS設訁E/span><span class="tag">設計レビュー</span>
+            </div>
+            <div class="facts">
+              <div class="fact"><div class="fact__k">稼働時閁E/div><div class="fact__v">週10、E5時間</div></div>
+              <div class="fact"><div class="fact__k">契紁E��閁E/div><div class="fact__v">3、Eヶ朁E/div></div>
+              <div class="fact"><div class="fact__k">報酬</div><div class="fact__v">35、E5丁E/div></div>
+            </div>
+            <div class="actions">
+              <button class="btn linklike" type="button">詳細</button>
+              <button class="btn" type="button">応募</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" aria-label="案件カーチE5">
+          <div class="card__inner">
+            <div class="card__top">
+              <h2 class="card__title">チE��インシスチE��整備（コンポ�EネンチEト�Eクン/ガイドライン�E�E/h2>
+              <div class="pill">公閁E/div>
+            </div>
+            <div class="company"><span class="company__dot" aria-hidden="true"></span>株式会社Orchid</div>
+            <p class="desc">褁E��プロダクトで一貫性が崩れてぁE��ため、トークン設計から運用まで整備します。ドキュメント重視、E/p>
+            <div class="tags">
+              <span class="tag">Design System</span><span class="tag">Figma</span><span class="tag">アクセシビリチE��</span><span class="tag">運用</span>
+            </div>
+            <div class="facts">
+              <div class="fact"><div class="fact__k">稼働時閁E/div><div class="fact__v">週8、E2時間</div></div>
+              <div class="fact"><div class="fact__k">契紁E��閁E/div><div class="fact__v">2ヶ朁E/div></div>
+              <div class="fact"><div class="fact__k">報酬</div><div class="fact__v">25、E0丁E/div></div>
+            </div>
+            <div class="actions">
+              <button class="btn linklike" type="button">詳細</button>
+              <button class="btn" type="button">応募</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" aria-label="案件カーチE6�E�応募済み�E�E>
+          <div class="card__inner">
+            <div class="card__top">
+              <h2 class="card__title">新規�Eロダクト�E要件整琁E��MVP実裁E��Earavel + Blade�E�E/h2>
+              <div class="pill applied">応募済み</div>
+            </div>
+            <div class="company"><span class="company__dot" aria-hidden="true"></span>株式会社Seabird</div>
+            <p class="desc">0ↁEの初期構築。画面遷移とチE�Eタ設計を軽く固めつつ、MVPを素早く作りたいです（運用しながら改喁E��、E/p>
+            <div class="tags">
+              <span class="tag">Laravel</span><span class="tag">Blade</span><span class="tag">要件整琁E/span><span class="tag">MVP</span>
+            </div>
+            <div class="facts">
+              <div class="fact"><div class="fact__k">稼働時閁E/div><div class="fact__v">週15、E0時間</div></div>
+              <div class="fact"><div class="fact__k">契紁E��閁E/div><div class="fact__v">2、Eヶ朁E/div></div>
+              <div class="fact"><div class="fact__k">報酬</div><div class="fact__v">40、E0丁E/div></div>
+            </div>
+            <div class="actions">
+              <button class="btn linklike" type="button">詳細</button>
+              <button class="btn" type="button">応募済み�E�チャチE��を開く！E/button>
+            </div>
+          </div>
+        </article>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
+

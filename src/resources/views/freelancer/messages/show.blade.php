@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>メッセージ - AITECH</title>
+    <style>
+        :root {
+            --header-height: 104px;       /* 80px * 1.3 */
+            --header-height-mobile: 91px; /* 70px * 1.3 */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { font-size: 97.5%; }
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #fafbfc;
+            color: #24292e;
+            line-height: 1.5;
+        }
+
+        /* Header Styles - Minimalist */
+        .header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e1e4e8;
+            padding: 0 3rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: var(--header-height);
+            position: relative;
+        }
+        .nav-links {
+            display: flex;
+            flex-direction: row;
+            gap: 3rem;
+            align-items: center;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            justify-content: center;
+        }
+        .nav-link {
+            text-decoration: none;
+            color: #586069;
+            font-weight: 500;
+            font-size: 1.1rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            transition: all 0.15s ease;
+            position: relative;
+            letter-spacing: -0.01em;
+            display: inline-flex;
+            align-items: center;
+        }
+        .nav-link.has-badge { padding-right: 3rem; }
+        .nav-link:hover { background-color: #f6f8fa; color: #24292e; }
+        .nav-link.active {
+            background-color: #0366d6;
+            color: white;
+            box-shadow: 0 2px 8px rgba(3, 102, 214, 0.3);
+        }
+        .badge {
+            background-color: #d73a49;
+            color: white;
+            border-radius: 50%;
+            padding: 0.15rem 0.45rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            min-width: 18px;
+            height: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px rgba(209, 58, 73, 0.3);
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .user-menu {
+            display: flex;
+            align-items: center;
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: none;
+            padding: 0;
+            appearance: none;
+        }
+        .user-avatar:hover { transform: scale(1.08); box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+        .user-avatar:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.25), 0 2px 8px rgba(0,0,0,0.1); }
+
+        /* Dropdown Menu */
+        .dropdown { position: relative; }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background-color: white;
+            min-width: 240px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08);
+            border-radius: 12px;
+            z-index: 1000;
+            border: 1px solid #e1e4e8;
+            margin-top: 0.5rem;
+        }
+        .dropdown.is-open .dropdown-content { display: block; }
+        .dropdown-item {
+            display: block;
+            padding: 0.875rem 1.25rem;
+            text-decoration: none;
+            color: #586069;
+            transition: all 0.15s ease;
+            border-radius: 6px;
+            margin: 0 0.25rem;
+            white-space: nowrap;
+        }
+        .dropdown-item:hover { background-color: #f6f8fa; color: #24292e; }
+        .dropdown-divider { height: 1px; background-color: #e1e4e8; margin: 0.5rem 0; }
+
+        /* Page */
+        .main-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 3rem;
+        }
+        .page-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            color: #24292e;
+            letter-spacing: -0.025em;
+        }
+        .page-subtitle {
+            color: #6a737d;
+            font-size: 1rem;
+            margin-bottom: 2.25rem;
+        }
+
+        .chat-shell {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .panel {
+            background-color: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            border: 1px solid #e1e4e8;
+            overflow: hidden;
+        }
+
+        .panel-title {
+            font-size: 1.05rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            color: #24292e;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #e1e4e8;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: all 0.15s ease;
+            background-color: #fafbfc;
+            margin-bottom: 1rem;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: #0366d6;
+            box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.1);
+            background-color: white;
+        }
+
+        .thread-list {
+            display: grid;
+            gap: 0.5rem;
+            max-height: 620px;
+            overflow: auto;
+            padding-right: 0.25rem;
+        }
+
+        .thread {
+            display: grid;
+            grid-template-columns: 44px 1fr auto;
+            gap: 0.75rem;
+            align-items: center;
+            padding: 0.75rem;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .thread:hover { background: #f6f8fa; border-color: #e1e4e8; }
+        .thread.is-active { background: #f1f8ff; border-color: #c8e1ff; }
+
+        .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: grid;
+            place-items: center;
+            color: white;
+            font-weight: 900;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+        }
+
+        .thread-main { min-width: 0; }
+        .thread-title {
+            font-weight: 900;
+            color: #24292e;
+            font-size: 0.95rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .thread-snippet {
+            color: #6a737d;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 0.15rem;
+        }
+        .thread-meta {
+            display: grid;
+            justify-items: end;
+            gap: 0.25rem;
+        }
+        .time { color: #6a737d; font-weight: 800; font-size: 0.8rem; }
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 0.4rem;
+            border-radius: 999px;
+            background: #d73a49;
+            color: white;
+            font-weight: 900;
+            font-size: 0.75rem;
+        }
+
+        /* Chat pane */
+        .chat-pane { padding: 0; }
+        .chat-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        .chat-title {
+            display: grid;
+            gap: 0.2rem;
+            min-width: 0;
+        }
+        .chat-title strong {
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: #24292e;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .chat-title span {
+            color: #6a737d;
+            font-size: 0.85rem;
+            font-weight: 800;
+        }
+
+        .btn {
+            padding: 0.7rem 1rem;
+            border-radius: 10px;
+            font-weight: 800;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+            cursor: pointer;
+            border: 1px solid #e1e4e8;
+            background: #fafbfc;
+            color: #24292e;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+        .btn:hover { background: #f6f8fa; transform: translateY(-1px); }
+
+        .messages {
+            padding: 1.5rem;
+            height: 520px;
+            overflow: auto;
+            display: grid;
+            gap: 0.85rem;
+            background: linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
+        }
+
+        .bubble-row { display: flex; align-items: flex-end; gap: 0.75rem; }
+        .bubble-row.me { justify-content: flex-end; }
+        .bubble {
+            max-width: 74%;
+            padding: 0.9rem 1rem;
+            border-radius: 14px;
+            border: 1px solid #e1e4e8;
+            background: #ffffff;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .bubble.me {
+            background: #f1f8ff;
+            border-color: #c8e1ff;
+        }
+        .bubble p { color: #24292e; font-size: 0.95rem; line-height: 1.6; }
+        .bubble small { display: block; margin-top: 0.4rem; color: #6a737d; font-weight: 800; font-size: 0.8rem; }
+
+        .composer {
+            padding: 1.25rem 1.5rem;
+            border-top: 1px solid #e1e4e8;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 0.75rem;
+            align-items: center;
+            background: #ffffff;
+        }
+        .input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #e1e4e8;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: all 0.15s ease;
+            background-color: #fafbfc;
+        }
+        .input:focus {
+            outline: none;
+            border-color: #0366d6;
+            box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.1);
+            background-color: white;
+        }
+        .send {
+            padding: 0.875rem 1.25rem;
+            border-radius: 12px;
+            font-weight: 900;
+            border: none;
+            background: #0366d6;
+            color: white;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-size: 0.95rem;
+        }
+        .send:hover { background: #0256cc; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(3, 102, 214, 0.3); }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .main-content { padding: 2rem; }
+            .chat-shell { grid-template-columns: 340px 1fr; }
+        }
+        @media (max-width: 900px) {
+            .chat-shell { grid-template-columns: 1fr; }
+            .thread-list { max-height: 360px; }
+            .messages { height: 420px; }
+        }
+        @media (max-width: 768px) {
+            .header-content { padding: 0 1.5rem; height: var(--header-height-mobile); }
+            .nav-links { gap: 1.5rem; position: static; left: auto; transform: none; justify-content: flex-start; flex-direction: row; flex-wrap: wrap; }
+            .user-menu { position: static; right: auto; top: auto; transform: none; margin-left: auto; }
+            .nav-link { padding: 0.5rem 1rem; font-size: 1rem; }
+            .main-content { padding: 1.5rem; }
+            .bubble { max-width: 90%; }
+            .composer { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <nav class="nav-links">
+                <a href="#" class="nav-link">案件一覧</a>
+                <a href="#" class="nav-link has-badge active">
+                    応募した案件
+                    <span class="badge">3</span>
+                </a>
+                <a href="#" class="nav-link has-badge">
+                    スカウト
+                    <span class="badge">1</span>
+                </a>
+            </nav>
+            <div class="user-menu">
+                <div class="dropdown" id="userDropdown">
+                    <button class="user-avatar" id="userDropdownToggle" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="userDropdownMenu">山</button>
+                    <div class="dropdown-content" id="userDropdownMenu" role="menu" aria-label="ユーザーメニュー">
+                        <a href="#" class="dropdown-item" role="menuitem">プロフィール設定</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item" role="menuitem">ログアウト</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <h1 class="page-title">応募案件チャット</h1>
+        <p class="page-subtitle">応募に関するやり取りを確認できます。開いた時点で未読が解除されます。</p>
+
+        <section class="panel chat-pane" aria-label="チャット">
+            <div class="chat-header">
+                <div class="chat-title">
+                    <strong>株式会社AITECH / ECサイト機能拡張プロジェクト</strong>
+                    <span>案件に関するやり取り</span>
+                </div>
+                <a class="btn" href="#">案件詳細</a>
+            </div>
+
+            <div class="messages" id="messages" aria-label="メッセージ一覧">
+                <div class="bubble-row">
+                    <div class="avatar" style="width:36px;height:36px;">A</div>
+                    <div class="bubble">
+                        <p>ご応募ありがとうございます。実績URL（GitHub/ポートフォリオ）を共有いただけますか？</p>
+                        <small>12/22 10:12</small>
+                    </div>
+                </div>
+
+                <div class="bubble-row me">
+                    <div class="bubble me">
+                        <p>ありがとうございます。こちらです： https://github.com/example / https://portfolio.example.com</p>
+                        <small>12/22 10:18 <span style="margin-left:0.75rem;"><button type="button" style="background:none;border:none;color:#d73a49;font-weight:900;cursor:pointer;">削除</button></span></small>
+                    </div>
+                </div>
+
+                <div class="bubble-row">
+                    <div class="avatar" style="width:36px;height:36px;">A</div>
+                    <div class="bubble">
+                        <p>確認しました。面談候補日を2〜3つお願いします。</p>
+                        <small>12/22 10:25</small>
+                    </div>
+                </div>
+            </div>
+
+            <form class="composer" action="#" method="post">
+                <input class="input" type="text" name="content" value="" placeholder="メッセージを入力…" aria-label="メッセージを入力" required>
+                <button class="send" type="submit">送信</button>
+            </form>
+        </section>
+    </main>
+
+    <script>
+        (function () {
+            const dropdown = document.getElementById('userDropdown');
+            const toggle = document.getElementById('userDropdownToggle');
+            const menu = document.getElementById('userDropdownMenu');
+            if (!dropdown || !toggle || !menu) return;
+
+            const open = () => {
+                dropdown.classList.add('is-open');
+                toggle.setAttribute('aria-expanded', 'true');
+            };
+
+            const close = () => {
+                dropdown.classList.remove('is-open');
+                toggle.setAttribute('aria-expanded', 'false');
+            };
+
+            const isOpen = () => dropdown.classList.contains('is-open');
+
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (isOpen()) close();
+                else open();
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!dropdown.contains(e.target)) close();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') close();
+            });
+        })();
+    </script>
+
+    <script>
+        (function () {
+            const el = document.getElementById('messages');
+            if (!el) return;
+            // 初期表示で最下部へ
+            el.scrollTop = el.scrollHeight;
+        })();
+    </script>
+</body>
+</html>

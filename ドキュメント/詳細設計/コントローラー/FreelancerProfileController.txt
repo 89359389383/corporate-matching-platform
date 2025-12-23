@@ -1,0 +1,158 @@
+# ✅ FreelancerProfileController 詳細設計
+
+---
+
+---
+
+## ① **create（初回プロフィール登録画面の表示）**
+
+### 🌱 役割
+
+- フリーランスがアカウント作成後、プロフィール情報を入力するための画面表示
+- DB更新はしない（表示だけ）
+
+### 🎯 入口（どんなリクエストか）
+
+```
+GET/freelancer/profile/create
+```
+
+### 📤 出口（返すもの）
+
+- プロフィール入力フォーム view
+- 表示項目（機能要件3より必要最低限で必須）
+
+👇 画面に渡すデータ例
+
+| 入力項目 | 種類 | 補足 |
+| --- | --- | --- |
+| 表示名 | text | 必須 |
+| 職種 | text or select | 必須 |
+| 自己紹介文 | textarea | 必須 |
+| 稼働可能時間・日数（4カラム） | number | min/max/week/day 全て必須 |
+| 働き方（自由入力） | textarea | 任意可だが可能なら必須寄り |
+| 希望単価（下限 / 上限） | number | integer |
+| 経験企業 | textarea | 任意 |
+| アイコン画像 | file upload | 必須 |
+
+※values は空。初回登録のため。
+
+### ⚙ Controller内部処理
+
+- 認証済みユーザー取得
+- すでにプロフィール登録済みなら一覧へリダイレクト（運用保護）
+- view 返却
+
+```php
+returnview('freelancer.profile.create');
+```
+
+### 🧩 サービス使用
+
+- なし（単純表示のみのため）
+
+---
+
+---
+
+## ② **store（プロフィール登録処理）**
+
+### 🌱 役割
+
+フリーランスの全プロフィール情報をまとめて登録する入口。
+
+※ここは必ずサービスクラスに委譲する。
+
+---
+
+### 🎯 入口（リクエスト）
+
+```
+POST /freelancer/profile
+payload:
+- display_name
+- job_title
+- bio
+- min_hours_per_week
+- max_hours_per_week
+- hours_per_day
+- days_per_week
+- work_style_text
+- min_rate
+- max_rate
+- experience_companies
+- icon (file)
+- skills[]（選択式）
+- custom_skills[]（自由記述）
+- portfolio_urls[]
+```
+
+---
+
+### 🧠 Controller内部処理
+
+1. バリデーション
+    
+    （FormRequest を利用）
+    
+2. 認証中フリーランス取得
+    
+    `$user = Auth::user()`
+    
+3. 全入力値をまとめて
+    
+    👉 **FreelancerProfileService::register()** に渡す
+    
+4. Service 内では：
+- freelancers テーブル作成
+- skills 中間テーブル登録
+- custon_skills登録
+- portfolio登録
+- トランザクションで一括保存
+
+※Controllerでは書かない。同様に議事録でサービス必須と定義済み。
+
+1. 成功時は案件一覧へ遷移
+
+---
+
+### 📤 出口（レスポンス）
+
+- 成功
+
+```
+redirect'/freelancer/jobs'
+Flash: 「プロフィール登録が完了しました」
+```
+
+- 失敗
+
+```
+バリデーションエラー返却＆元画面へ
+```
+
+---
+
+### 💡 ここ重要
+
+なぜ Controller に処理を書かずに Service 経由？
+
+理由は議事録通り：
+
+- 複数テーブルにまたぐ
+- アイコントランザクション必要
+- 後からプロフィール項目が増える
+- 巻き戻し必要な可能性
+
+→ Controller は一切ロジック持たせない。
+
+---
+
+---
+
+# 📌 FreelancerProfileController まとめ
+
+| メソッド | 役割 | 入口 | 出口 | Service使用 |
+| --- | --- | --- | --- | --- |
+| create | 入力フォーム表示のみ | GET | view返却 | 不要 |
+| store | プロフィール登録の入口 | POST | DB登録→案件一覧へ | **必須：FreelancerProfileService::register()** |

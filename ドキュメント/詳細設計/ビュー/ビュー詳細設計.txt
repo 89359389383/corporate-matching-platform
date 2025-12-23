@@ -1,0 +1,1077 @@
+# 📋 ビュー詳細設計：各ビューファイルの変数受け渡しと表示仕様
+
+---
+
+# 📋 目次
+
+1. [認証・登録系ビュー](#認証登録系ビュー)
+2. [フリーランス側ビュー](#フリーランス側ビュー)
+3. [企業側ビュー](#企業側ビュー)
+4. [共通ビュー](#共通ビュー)
+
+---
+
+# 認証・登録系ビュー
+
+## ① auth/login.blade.php（ログイン画面）
+
+### 📥 Viewが受け取る変数
+
+**変数名：なし**
+
+- このビューは変数を受け取りません
+- フォーム表示のみのため、コントローラーから変数を渡す必要がありません
+
+### 🔗 コントローラー・メソッド
+
+- **コントローラー：** `AuthController`
+- **メソッド：** `showLoginForm()`
+- **処理内容：** 特にロジックなし。フォームを返すだけ
+
+### 📤 画面での変数使用
+
+- **変数なし：** フォーム入力欄（email、password）のみ表示
+
+---
+
+## ② auth/register/freelancer.blade.php（フリーランス登録画面-1）
+
+### 📥 Viewが受け取る変数
+
+**変数名：なし**
+
+- このビューは変数を受け取りません
+- ログイン情報（email、password）の入力フォームのみのため
+
+### 🔗 コントローラー・メソッド
+
+- **コントローラー：** `AuthController`
+- **メソッド：** `showFreelancerRegister()`
+- **処理内容：** 特にロジックなし。フォームを返すだけ
+
+### 📤 画面での変数使用
+
+- **変数なし：** フォーム入力欄（email、password、password_confirmation）のみ表示
+
+---
+
+## ③ auth/register/company.blade.php（企業登録画面-1）
+
+### 📥 Viewが受け取る変数
+
+**変数名：なし**
+
+- このビューは変数を受け取りません
+- ログイン情報（email、password）の入力フォームのみのため
+
+### 🔗 コントローラー・メソッド
+
+- **コントローラー：** `AuthController`
+- **メソッド：** `showCompanyRegister()`
+- **処理内容：** 特にロジックなし。フォームを返すだけ
+
+### 📤 画面での変数使用
+
+- **変数なし：** フォーム入力欄（email、password、password_confirmation）のみ表示
+
+---
+
+# フリーランス側ビュー
+
+## ④ freelancer/profile/create.blade.php（フリーランスプロフィール登録画面）
+
+### 📥 Viewが受け取る変数
+
+**変数名：なし**
+
+- このビューは変数を受け取りません
+- 初回登録のため、すべて空のフォームを表示します
+
+### 🔗 コントローラー・メソッド
+
+- **コントローラー：** `FreelancerProfileController`
+- **メソッド：** `create()`
+- **処理内容：**
+  - 認証済みユーザー取得
+  - 既にプロフィール登録済みなら一覧へリダイレクト
+  - view返却のみ
+
+### 📤 画面での変数使用
+
+- **変数なし：** 以下の入力項目を空の状態で表示
+  - 表示名（display_name）
+  - 職種（job_title）
+  - 自己紹介文（bio）
+  - 稼働可能時間・日数（min_hours_per_week、max_hours_per_week、hours_per_day、days_per_week）
+  - 働き方（work_style_text）
+  - 希望単価（min_rate、max_rate）
+  - 経験企業（experience_companies）
+  - アイコン画像（icon）
+  - スキル（skills[]）
+  - カスタムスキル（custom_skills[]）
+  - ポートフォリオURL（portfolio_urls[]）
+
+---
+
+## ⑤ freelancer/profile/edit.blade.php（フリーランスプロフィール編集画面）
+
+### 📥 Viewが受け取る変数
+
+**変数名：`$freelancer`**
+
+- **モデル/テーブル：** `Freelancer`モデル（`freelancers`テーブル）
+- **コントローラー・メソッド：** `FreelancerProfileController::edit()`
+- **取得処理：**
+  - 認証済みユーザーから`freelancer`リレーションを取得
+  - プロフィール情報をEager Loadingで取得（skills、custom_skills、portfolios含む）
+
+**変数の内容：**
+
+- `$freelancer->id`：フリーランスID（主キー）
+- `$freelancer->display_name`：表示名（必須）
+- `$freelancer->job_title`：職種（必須）
+- `$freelancer->bio`：自己紹介文（必須）
+- `$freelancer->min_hours_per_week`：週の最小稼働時間（必須）
+- `$freelancer->max_hours_per_week`：週の最大稼働時間（必須）
+- `$freelancer->hours_per_day`：1日の稼働時間（必須）
+- `$freelancer->days_per_week`：週の稼働日数（必須）
+- `$freelancer->work_style_text`：働き方のテキスト（必須）
+- `$freelancer->min_rate`：希望単価の下限（必須）
+- `$freelancer->max_rate`：希望単価の上限（必須）
+- `$freelancer->experience_companies`：経験企業（任意、nullable）
+- `$freelancer->icon_path`：アイコン画像のパス（必須）
+- `$freelancer->skills`：共通スキルのコレクション（リレーション、多対多）
+- `$freelancer->custom_skills`：カスタムスキルのコレクション（リレーション、1対多）
+- `$freelancer->portfolios`：ポートフォリオURLのコレクション（リレーション、1対多）
+
+### 📤 画面での変数使用
+
+- **フォーム入力欄（既存値表示）：**
+  - 表示名：`$freelancer->display_name`
+  - 職種：`$freelancer->job_title`
+  - 自己紹介文：`$freelancer->bio`
+  - 稼働条件：`$freelancer->min_hours_per_week`、`$freelancer->max_hours_per_week`、`$freelancer->hours_per_day`、`$freelancer->days_per_week`
+  - 働き方：`$freelancer->work_style_text`
+  - 希望単価：`$freelancer->min_rate`、`$freelancer->max_rate`
+  - 経験企業：`$freelancer->experience_companies`
+  - アイコン画像：`$freelancer->icon_path`（プレビュー表示）
+- **スキル選択（既存選択状態）：**
+  - 共通スキル：`$freelancer->skills`をループして選択状態を表示
+  - カスタムスキル：`$freelancer->custom_skills`をループして表示
+- **ポートフォリオURL一覧：**
+  - `$freelancer->portfolios`をループしてURL一覧を表示
+
+---
+
+## ⑥ freelancer/jobs/index.blade.php（フリーランス案件一覧画面）
+
+### 📥 Viewが受け取る変数
+
+**変数名：`$jobs`**
+
+- **モデル/テーブル：** `Job`モデル（`jobs`テーブル）
+- **コントローラー・メソッド：** `FreelancerJobController::index()`
+- **取得処理：**
+  - `status = 1`（公開中）の案件のみ取得
+  - keywordパラメータがあれば全文検索（LIKE連結）
+  - 検索対象：タイトル、説明、必要スキル、報酬、稼働時間など
+  - `company`リレーションをEager Loadingで取得
+
+**変数の内容：**
+
+- `$jobs`：Jobモデルのコレクション（ページネーション対応）
+  - `$job->id`：案件ID（主キー）
+  - `$job->title`：案件タイトル（必須）
+  - `$job->description`：案件説明（必須）
+  - `$job->required_skills_text`：必要スキルテキスト（任意）
+  - `$job->reward_type`：報酬タイプ（enum: 'monthly' or 'hourly'）
+  - `$job->min_rate`：報酬の下限（必須）
+  - `$job->max_rate`：報酬の上限（必須）
+  - `$job->work_time_text`：稼働時間テキスト（必須）
+  - `$job->company`：企業情報（リレーション）
+    - `$job->company->name`：企業名
+    - `$job->company->id`：企業ID
+
+**変数名：`$keyword`（任意）**
+
+- **コントローラー・メソッド：** `FreelancerJobController::index()`
+- **取得処理：** GETクエリパラメータから取得
+- **変数の内容：**
+  - 検索キーワード（文字列、nullable）
+
+### 📤 画面での変数使用
+
+- **検索フォーム：**
+  - キーワード入力欄：`$keyword`を初期値として表示（検索後も値を保持）
+- **案件一覧表示：**
+  - 案件カード：`$jobs`をループして各案件を表示
+    - 案件名：`$job->title`
+    - 企業名：`$job->company->name`
+    - 報酬：`$job->reward_type`に応じて「`$job->min_rate`万円〜`$job->max_rate`万円」または「`$job->min_rate`円〜`$job->max_rate`円」と表示
+    - 稼働条件：`$job->work_time_text`
+    - 詳細リンク：`/freelancer/jobs/{$job->id}`へのリンク
+- **ページネーション：**
+  - `$jobs->links()`でページネーションリンクを表示
+
+---
+
+## ⑦ freelancer/jobs/show.blade.php（フリーランス案件詳細画面）
+
+### 📥 Viewが受け取る変数
+
+**変数名：`$job`**
+
+- **モデル/テーブル：** `Job`モデル（`jobs`テーブル）
+- **コントローラー・メソッド：** `FreelancerJobController::show()`
+- **取得処理：**
+  - Route Model Bindingで案件を取得
+  - `status = 1`（公開中）以外の場合は404または一覧へリダイレクト
+  - `company`リレーションをEager Loadingで取得
+
+**変数の内容：**
+
+- `$job->id`：案件ID（主キー）
+- `$job->title`：案件タイトル（必須）
+- `$job->description`：案件説明（全文、必須）
+- `$job->required_skills_text`：必要スキルテキスト（任意）
+- `$job->reward_type`：報酬タイプ（enum: 'monthly' or 'hourly'）
+- `$job->min_rate`：報酬の下限（必須）
+- `$job->max_rate`：報酬の上限（必須）
+- `$job->work_time_text`：稼働時間テキスト（必須）
+- `$job->company`：企業情報（リレーション）
+  - `$job->company->id`：企業ID
+  - `$job->company->name`：企業名
+  - `$job->company->overview`：会社概要（任意）
+  - `$job->company->introduction`：自己紹介（任意）
+
+**変数名：`$hasApplied`**
+
+- **コントローラー・メソッド：** `FreelancerJobController::show()`
+- **取得処理：**
+  - `Application::where('job_id', $job->id)->where('freelancer_id', $freelancer->id)->exists()`で判定
+  - 既に応募済みかどうかを真偽値で返す
+
+**変数の内容：**
+
+- `$hasApplied`：応募済みかどうか（boolean）
+  - `true`：既に応募済み
+  - `false`：未応募
+
+### 📤 画面での変数使用
+
+- **案件詳細表示：**
+  - 案件名：`$job->title`
+  - 企業名：`$job->company->name`
+  - 会社概要：`$job->company->overview`（存在する場合）
+  - 案件説明：`$job->description`
+  - 必要スキル：`$job->required_skills_text`
+  - 報酬：`$job->reward_type`に応じて「`$job->min_rate`万円〜`$job->max_rate`万円」または「`$job->min_rate`円〜`$job->max_rate`円」と表示
+  - 稼働条件：`$job->work_time_text`
+- **応募ボタン表示：**
+  - `$hasApplied`が`false`の場合：「応募する」ボタンを表示（`/freelancer/jobs/{$job->id}/apply`へのリンク）
+  - `$hasApplied`が`true`の場合：「応募済み（チャットを開く）」ボタンを表示（チャット画面へのリンク）
+
+---
+
+## ⑧ freelancer/applications/create.blade.php（フリーランス案件応募画面）
+
+### 📥 Viewが受け取る変数
+
+**変数名：`$job`**
+
+- **モデル/テーブル：** `Job`モデル（`jobs`テーブル）
+- **コントローラー・メソッド：** `ApplicationController::create()`
+- **取得処理：**
+  - Route Model Bindingで案件を取得
+  - 認証ユーザー取得
+  - 既応募判定（応募済みの場合は既存スレッドへリダイレクト）
+  - `company`リレーションをEager Loadingで取得
+
+**変数の内容：**
+
+- `$job->id`：案件ID（主キー）
+- `$job->title`：案件タイトル（必須）
+- `$job->company`：企業情報（リレーション）
+  - `$job->company->name`：企業名
+
+### 📤 画面での変数使用
+
+- **案件情報表示：**
+  - 案件名：`$job->title`
+  - 企業名：`$job->company->name`
+- **応募メッセージ入力欄：**
+  - textareaフォーム（変数なし、空の状態）
+  - 送信先：`POST /freelancer/jobs/{$job->id}/apply`
+
+---
+
+## ⑨ freelancer/applications/index.blade.php（フリーランス応募済案件一覧画面）
+
+### 📥 Viewが受け取る変数
+
+**変数名：`$applications`**
+
+- **モデル/テーブル：** `Application`モデル（`applications`テーブル）
+- **コントローラー・メソッド：** `FreelancerApplicationController::index()`
+- **取得処理：**
+  - 認証済みフリーランスのIDで応募を取得
+  - statusパラメータに応じてフィルタリング
+    - `status=pending`：`applications.status`が0（未対応）または1（対応中）
+    - `status=closed`：`applications.status`が2（クローズ）
+  - `job`、`company`、`thread`リレーションをEager Loadingで取得
+  - 未読判定（threadの最後の送信者が自分以外かどうか）
+
+**変数の内容：**
+
+- `$applications`：Applicationモデルのコレクション
+  - `$application->id`：応募ID（主キー）
+  - `$application->message`：応募メッセージ（必須）
+  - `$application->status`：応募ステータス（0=未対応、1=対応中、2=クローズ）
+  - `$application->created_at`：応募日時
+  - `$application->job`：案件情報（リレーション）
+    - `$application->job->id`：案件ID
+    - `$application->job->title`：案件名
+    - `$application->job->min_rate`：報酬下限
+    - `$application->job->max_rate`：報酬上限
+    - `$application->job->work_time_text`：稼働時間
+  - `$application->company`：企業情報（リレーション）
+    - `$application->company->name`：企業名
+  - `$application->thread`：スレッド情報（リレーション）
+    - `$application->thread->id`：スレッドID
+    - `$application->thread->is_unread_for_freelancer`：未読フラグ（boolean）
+
+**変数名：`$status`（任意）**
+
+- **コントローラー・メソッド：** `FreelancerApplicationController::index()`
+- **取得処理：** GETクエリパラメータから取得
+- **変数の内容：**
+  - ステータスフィルタ（'pending' or 'closed'、nullable）
+
+### 📤 画面での変数使用
+
+- **タブ表示：**
+  - 「応募中」タブ：`$status`が'pending'またはnullの場合にアクティブ
+  - 「終了」タブ：`$status`が'closed'の場合にアクティブ
+- **応募一覧表示：**
+  - 応募カード：`$applications`をループして各応募を表示
+    - 案件名：`$application->job->title`
+    - 企業名：`$application->company->name`
+    - 報酬レンジ：`$application->job->min_rate`〜`$application->job->max_rate`
+    - 稼働時間：`$application->job->work_time_text`
+    - 未読バッジ：`$application->thread->is_unread_for_freelancer`が`true`の場合に表示
+    - チャット画面リンク：`/freelancer/threads/{$application->thread->id}`へのリンク
+
+---
+
+## ⑩ freelancer/messages/show.blade.php（フリーランス応募チャット画面）
+
+### 📥 Viewが受け取る変数
+
+**変数名：`$thread`**
+
+- **モデル/テーブル：** `Thread`モデル（`threads`テーブル）
+- **コントローラー・メソッド：** `FreelancerMessageController::show()`
+- **取得処理：**
+  - Route Model Bindingでスレッドを取得
+  - 権限チェック（ログインフリーランスが当事者かどうか）
+  - `company`、`job`、`application`、`messages`リレーションをEager Loadingで取得
+  - `MessageService::markRead()`で未読解除処理を実行
+
+**変数の内容：**
+
+- `$thread->id`：スレッドID（主キー）
+- `$thread->company`：企業情報（リレーション）
+  - `$thread->company->name`：企業名
+- `$thread->job`：案件情報（リレーション、nullable）
+  - `$thread->job->title`：案件名（存在する場合）
+- `$thread->application`：応募情報（リレーション、1対1）
+  - `$thread->application->status`：応募ステータス（0=未対応、1=対応中、2=クローズ）
+  - `$thread->application->message`：応募メッセージ（最初のメッセージ）
+- `$thread->messages`：メッセージ一覧（リレーション、1対多）
+  - `$message->id`：メッセージID
+  - `$message->body`：メッセージ本文
+  - `$message->sender_type`：送信者タイプ（'company' or 'freelancer'）
+  - `$message->sender_id`：送信者ID
+  - `$message->sent_at`：送信日時
+  - `$message->deleted_at`：削除日時（nullable、ソフト削除）
+
+### 📤 画面での変数使用
+
+- **画面上部（固定情報）：**
+  - 案件名：`$thread->job->title`（存在する場合）または「案件未指定」
+  - 企業名：`$thread->company->name`
+  - 応募ステータス：`$thread->application->status`に応じて「応募中」または「終了」と表示
+- **チャット履歴表示：**
+  - 最初のメッセージ（応募文）：`$thread->application->message`を最上部に固定表示
+  - メッセージ一覧：`$thread->messages`を時系列順（`sent_at`でソート）でループ表示
+    - フリーランスのメッセージ：左寄せ、`$message->sender_type === 'freelancer'`の場合
+    - 企業のメッセージ：右寄せ、`$message->sender_type === 'company'`の場合
+    - 削除済みメッセージ：`$message->deleted_at`が存在する場合は「削除されました」と表示
+    - 削除ボタン：自分の最新メッセージのみ表示可能
+- **チャット入力欄：**
+  - `$thread->application->status`が0（未対応）または1（対応中）の場合のみ表示
+  - 送信先：`POST /threads/{$thread->id}/messages`
+
+---
+
+## ⑪ freelancer/scouts/index.blade.php（フリーランススカウト一覧画面）
+
+### 📥 Viewが受け取る変数
+
+**変数名：`$threads`**
+
+- **モデル/テーブル：** `Thread`モデル（`threads`テーブル）
+- **コントローラー・メソッド：** `FreelancerScoutController::index()`
+- **取得処理：**
+  - 認証済みフリーランスのIDでスレッドを取得
+  - `job_id = null`のスレッドのみ取得（スカウト用）
+  - `company`、`latestMessage`をEager Loadingで取得
+  - 未読判定（最新メッセージの送信者が自分以外かどうか）
+
+**変数の内容：**
+
+- `$threads`：Threadモデルのコレクション
+  - `$thread->id`：スレッドID（主キー）
+  - `$thread->company`：企業情報（リレーション）
+    - `$thread->company->name`：企業名
+    - `$thread->company->contact_name`：担当者名（任意）
+  - `$thread->messages`：メッセージ一覧（リレーション）
+    - `$thread->messages->first()->body`：初回スカウトメッセージ
+  - `$thread->latest_sender_type`：最新メッセージの送信者タイプ（'company' or 'freelancer'）
+  - `$thread->is_unread_for_freelancer`：未読フラグ（boolean）
+
+### 📤 画面での変数使用
+
+- **スカウト一覧表示：**
+  - スカウトカード：`$threads`をループして各スカウトを表示
+    - 企業名：`$thread->company->name`
+    - 担当者名：`$thread->company->contact_name`（存在する場合）
+    - 初回スカウトメッセージ：`$thread->messages->first()->body`
+    - 未読バッジ：`$thread->is_unread_for_freelancer`が`true`の場合に表示
+    - チャット画面リンク：`/freelancer/threads/{$thread->id}`へのリンク
+
+---
+
+## ⑫ freelancer/scouts/show.blade.php（フリーランススカウトチャット画面）
+
+### 📥 Viewが受け取る変数
+
+**変数名：`$thread`**
+
+- **モデル/テーブル：** `Thread`モデル（`threads`テーブル）
+- **コントローラー・メソッド：** `FreelancerMessageController::show()`
+- **取得処理：**
+  - Route Model Bindingでスレッドを取得
+  - 権限チェック（ログインフリーランスが当事者かどうか）
+  - `company`、`scout`、`messages`リレーションをEager Loadingで取得
+  - `MessageService::markRead()`で未読解除処理を実行
+
+**変数の内容：**
+
+- `$thread->id`：スレッドID（主キー）
+- `$thread->company`：企業情報（リレーション）
+  - `$thread->company->name`：企業名
+- `$thread->scout`：スカウト情報（リレーション、1対1）
+  - `$thread->scout->message`：スカウトメッセージ（最初のメッセージ）
+  - `$thread->scout->status`：スカウトステータス（0=未対応、1=対応中、2=クローズ）
+- `$thread->messages`：メッセージ一覧（リレーション、1対多）
+  - `$message->id`：メッセージID
+  - `$message->body`：メッセージ本文
+  - `$message->sender_type`：送信者タイプ（'company' or 'freelancer'）
+  - `$message->sender_id`：送信者ID
+  - `$message->sent_at`：送信日時
+  - `$message->deleted_at`：削除日時（nullable、ソフト削除）
+
+### 📤 画面での変数使用
+
+- **画面上部（固定情報）：**
+  - 企業名：`$thread->company->name`
+  - スカウトステータス：`$thread->scout->status`に応じて「対応中」または「クローズ」と表示
+- **チャット履歴表示：**
+  - 最初のメッセージ（スカウト文）：`$thread->scout->message`を最上部に固定表示
+  - メッセージ一覧：`$thread->messages`を時系列順（`sent_at`でソート）でループ表示
+    - フリーランスのメッセージ：左寄せ、`$message->sender_type === 'freelancer'`の場合
+    - 企業のメッセージ：右寄せ、`$message->sender_type === 'company'`の場合
+    - 削除済みメッセージ：`$message->deleted_at`が存在する場合は「削除されました」と表示
+    - 削除ボタン：自分の最新メッセージのみ表示可能
+- **チャット入力欄：**
+  - `$thread->scout->status`が0（未対応）または1（対応中）の場合のみ表示
+  - 送信先：`POST /threads/{$thread->id}/messages`
+
+---
+
+# 企業側ビュー
+
+## ⑬ company/profile/create.blade.php（企業プロフィール登録画面）
+
+### 📥 Viewが受け取る変数
+
+**変数名：なし**
+
+- このビューは変数を受け取りません
+- 初回登録のため、すべて空のフォームを表示します
+
+### 🔗 コントローラー・メソッド
+
+- **コントローラー：** `CompanyProfileController`
+- **メソッド：** `create()`
+- **処理内容：**
+  - 認証中企業ユーザ取得
+  - 既にプロフィールが存在する場合は編集画面または一覧画面へリダイレクト
+  - view返却のみ
+
+### 📤 画面での変数使用
+
+- **変数なし：** 以下の入力項目を空の状態で表示
+  - 企業名（name）
+  - 会社概要（overview）
+  - 担当者名（contact_name）
+  - 部署（department）
+  - 自己紹介（introduction）
+
+---
+
+## ⑭ company/profile/edit.blade.php（企業プロフィール編集画面）
+
+### 📥 Viewが受け取る変数
+
+**変数名：`$company`**
+
+- **モデル/テーブル：** `Company`モデル（`companies`テーブル）
+- **コントローラー・メソッド：** `CompanyProfileController::edit()`
+- **取得処理：**
+  - 認証済みユーザーから`company`リレーションを取得
+  - プロフィール情報を取得
+
+**変数の内容：**
+
+- `$company->id`：企業ID（主キー）
+- `$company->name`：企業名（必須）
+- `$company->overview`：会社概要（任意、nullable）
+- `$company->contact_name`：担当者名（任意、nullable）
+- `$company->department`：部署（任意、nullable）
+- `$company->introduction`：自己紹介（任意、nullable）
+
+### 📤 画面での変数使用
+
+- **フォーム入力欄（既存値表示）：**
+  - 企業名：`$company->name`
+  - 会社概要：`$company->overview`
+  - 担当者名：`$company->contact_name`
+  - 部署：`$company->department`
+  - 自己紹介：`$company->introduction`
+
+---
+
+## ⑮ company/freelancers/index.blade.php（企業フリーランス一覧画面：3カラム構成）
+
+### 📥 Viewが受け取る変数
+
+**変数名：`$freelancers`**
+
+- **モデル/テーブル：** `Freelancer`モデル（`freelancers`テーブル）
+- **コントローラー・メソッド：** `CompanyFreelancerController::index()`
+- **取得処理：**
+  - 認証済み企業ユーザ取得
+  - keywordパラメータがあれば全文検索（LIKE連結）
+  - 検索対象：表示名、職種、自己紹介、スキル、経験企業、ワークスタイル、希望単価
+  - `skills`、`custom_skills`、`portfolios`リレーションをEager Loadingで取得
+  - ページネーション対応
+
+**変数の内容：**
+
+- `$freelancers`：Freelancerモデルのコレクション
+  - `$freelancer->id`：フリーランスID（主キー）
+  - `$freelancer->display_name`：表示名（必須）
+  - `$freelancer->job_title`：職種（必須）
+  - `$freelancer->bio`：自己紹介（必須）
+  - `$freelancer->min_rate`：希望単価の下限（必須）
+  - `$freelancer->max_rate`：希望単価の上限（必須）
+  - `$freelancer->icon_path`：アイコン画像のパス（必須）
+  - `$freelancer->skills`：共通スキルのコレクション（リレーション、多対多）
+  - `$freelancer->custom_skills`：カスタムスキルのコレクション（リレーション、1対多）
+  - `$freelancer->portfolios`：ポートフォリオURLのコレクション（リレーション、1対多）
+
+**変数名：`$keyword`（任意）**
+
+- **コントローラー・メソッド：** `CompanyFreelancerController::index()`
+- **取得処理：** GETクエリパラメータから取得
+- **変数の内容：**
+  - 検索キーワード（文字列、nullable）
+
+**変数名：`$selectedFreelancer`（任意）**
+
+- **コントローラー・メソッド：** `CompanyFreelancerController::show()`経由で取得される場合あり
+- **取得処理：** 選択されたフリーランスのIDで取得
+- **変数の内容：**
+  - 選択されたフリーランスの詳細情報（Freelancerモデル）
+
+### 📤 画面での変数使用
+
+- **左カラム（検索フォーム）：**
+  - キーワード入力欄：`$keyword`を初期値として表示（検索後も値を保持）
+- **中央カラム（フリーランス一覧）：**
+  - フリーランスカード：`$freelancers`をループして各フリーランスを表示
+    - アイコン：`$freelancer->icon_path`
+    - 表示名：`$freelancer->display_name`
+    - 職種：`$freelancer->job_title`
+    - 希望単価：`$freelancer->min_rate`〜`$freelancer->max_rate`
+    - スキル：`$freelancer->skills`と`$freelancer->custom_skills`をタグ形式で表示
+    - 詳細リンク：`/company/freelancers/{$freelancer->id}`へのリンク（AJAXまたは通常リンク）
+- **右カラム（フリーランス詳細）：**
+  - `$selectedFreelancer`が存在する場合のみ表示
+    - アイコン：`$selectedFreelancer->icon_path`
+    - 表示名：`$selectedFreelancer->display_name`
+    - 職種：`$selectedFreelancer->job_title`
+    - 自己紹介：`$selectedFreelancer->bio`
+    - スキル：`$selectedFreelancer->skills`と`$selectedFreelancer->custom_skills`をタグ形式で表示
+    - 経験企業：`$selectedFreelancer->experience_companies`
+    - ワークスタイル：`$selectedFreelancer->work_style_text`
+    - 希望単価：`$selectedFreelancer->min_rate`〜`$selectedFreelancer->max_rate`
+    - ポートフォリオURL：`$selectedFreelancer->portfolios`をループしてリンク表示
+    - スカウトボタン：`/company/scouts/create?freelancer_id={$selectedFreelancer->id}`へのリンク
+- **ページネーション：**
+  - `$freelancers->links()`でページネーションリンクを表示
+
+---
+
+## ⑯ company/freelancers/show.blade.php（企業フリーランス詳細画面：右サイドバー用）
+
+### 📥 Viewが受け取る変数
+
+**変数名：`$freelancer`**
+
+- **モデル/テーブル：** `Freelancer`モデル（`freelancers`テーブル）
+- **コントローラー・メソッド：** `CompanyFreelancerController::show()`
+- **取得処理：**
+  - Route Model Bindingでフリーランスを取得
+  - 認証企業取得
+  - `skills`、`custom_skills`、`portfolios`リレーションをEager Loadingで取得
+
+**変数の内容：**
+
+- `$freelancer->id`：フリーランスID（主キー）
+- `$freelancer->display_name`：表示名（必須）
+- `$freelancer->job_title`：職種（必須）
+- `$freelancer->bio`：自己紹介（全文、必須）
+- `$freelancer->min_hours_per_week`：週の最小稼働時間（必須）
+- `$freelancer->max_hours_per_week`：週の最大稼働時間（必須）
+- `$freelancer->hours_per_day`：1日の稼働時間（必須）
+- `$freelancer->days_per_week`：週の稼働日数（必須）
+- `$freelancer->work_style_text`：働き方のテキスト（必須）
+- `$freelancer->min_rate`：希望単価の下限（必須）
+- `$freelancer->max_rate`：希望単価の上限（必須）
+- `$freelancer->experience_companies`：経験企業（任意、nullable）
+- `$freelancer->icon_path`：アイコン画像のパス（必須）
+- `$freelancer->skills`：共通スキルのコレクション（リレーション、多対多）
+- `$freelancer->custom_skills`：カスタムスキルのコレクション（リレーション、1対多）
+- `$freelancer->portfolios`：ポートフォリオURLのコレクション（リレーション、1対多）
+
+### 📤 画面での変数使用
+
+- **プロフィール詳細表示：**
+  - アイコン：`$freelancer->icon_path`
+  - 表示名：`$freelancer->display_name`
+  - 職種：`$freelancer->job_title`
+  - 自己紹介：`$freelancer->bio`
+  - スキル：`$freelancer->skills`と`$freelancer->custom_skills`をタグ形式で表示
+  - 経験企業：`$freelancer->experience_companies`
+  - ワークスタイル：`$freelancer->work_style_text`
+  - 稼働条件：週`$freelancer->min_hours_per_week`〜`$freelancer->max_hours_per_week`時間、1日`$freelancer->hours_per_day`時間、週`$freelancer->days_per_week`日
+  - 希望単価：`$freelancer->min_rate`〜`$freelancer->max_rate`
+  - ポートフォリオURL：`$freelancer->portfolios`をループしてリンク表示
+- **スカウトボタン：**
+  - `/company/scouts/create?freelancer_id={$freelancer->id}`へのリンク
+
+---
+
+## ⑰ company/scouts/create.blade.php（企業スカウト入力画面）
+
+### 📥 Viewが受け取る変数
+
+**変数名：`$freelancer`**
+
+- **モデル/テーブル：** `Freelancer`モデル（`freelancers`テーブル）
+- **コントローラー・メソッド：** `ScoutController::create()`
+- **取得処理：**
+  - GETクエリパラメータ`freelancer_id`から取得
+  - 認証チェック（companyのみ）
+  - フリーランス情報を取得
+
+**変数の内容：**
+
+- `$freelancer->id`：フリーランスID（主キー）
+- `$freelancer->display_name`：表示名（必須）
+- `$freelancer->icon_path`：アイコン画像のパス（必須）
+
+**変数名：`$job`（任意）**
+
+- **コントローラー・メソッド：** `ScoutController::create()`
+- **取得処理：** GETクエリパラメータ`job_id`が渡された場合のみ取得
+- **変数の内容：**
+  - 案件情報（Jobモデル、nullable）
+  - `$job->id`：案件ID（存在する場合）
+
+### 📤 画面での変数使用
+
+- **フリーランス情報表示：**
+  - アイコン：`$freelancer->icon_path`
+  - 表示名：`$freelancer->display_name`
+- **スカウトフォーム：**
+  - スカウトメッセージ入力欄：textareaフォーム（変数なし、空の状態）
+  - hidden input：`freelancer_id` = `$freelancer->id`
+  - hidden input：`job_id` = `$job->id`（存在する場合）
+  - 送信先：`POST /company/scouts`
+
+---
+
+## ⑱ company/scouts/index.blade.php（企業スカウト一覧画面）
+
+### 📥 Viewが受け取る変数
+
+**変数名：`$scouts`**
+
+- **モデル/テーブル：** `Scout`モデル（`scouts`テーブル）
+- **コントローラー・メソッド：** `ScoutController::index()`（推測）
+- **取得処理：**
+  - 認証済み企業のIDでスカウトを取得
+  - `freelancer`、`job`、`thread`リレーションをEager Loadingで取得
+  - 送信日時順でソート
+
+**変数の内容：**
+
+- `$scouts`：Scoutモデルのコレクション
+  - `$scout->id`：スカウトID（主キー）
+  - `$scout->message`：スカウトメッセージ（必須）
+  - `$scout->status`：スカウトステータス（0=未対応、1=対応中、2=クローズ）
+  - `$scout->created_at`：送信日時
+  - `$scout->freelancer`：フリーランス情報（リレーション）
+    - `$scout->freelancer->display_name`：フリーランス表示名
+  - `$scout->job`：案件情報（リレーション、nullable）
+    - `$scout->job->title`：案件名（存在する場合）
+  - `$scout->thread`：スレッド情報（リレーション）
+    - `$scout->thread->id`：スレッドID
+
+### 📤 画面での変数使用
+
+- **スカウト一覧表示：**
+  - スカウトカード：`$scouts`をループして各スカウトを表示
+    - フリーランス名：`$scout->freelancer->display_name`
+    - 案件名：`$scout->job->title`（存在する場合）または「案件未指定」
+    - スカウトメッセージ：`$scout->message`
+    - ステータス：`$scout->status`に応じて「未対応」「対応中」「クローズ」と表示
+    - 送信日時：`$scout->created_at`
+    - チャット画面リンク：`/company/threads/{$scout->thread->id}`へのリンク
+
+---
+
+## ⑲ company/scouts/show.blade.php（企業スカウトチャット画面）
+
+### 📥 Viewが受け取る変数
+
+**変数名：`$thread`**
+
+- **モデル/テーブル：** `Thread`モデル（`threads`テーブル）
+- **コントローラー・メソッド：** `CompanyMessageController::show()`（推測）
+- **取得処理：**
+  - Route Model Bindingでスレッドを取得
+  - 権限チェック（ログイン企業が当事者かどうか）
+  - `freelancer`、`scout`、`messages`リレーションをEager Loadingで取得
+  - `MessageService::markRead()`で未読解除処理を実行
+
+**変数の内容：**
+
+- `$thread->id`：スレッドID（主キー）
+- `$thread->freelancer`：フリーランス情報（リレーション）
+  - `$thread->freelancer->display_name`：フリーランス表示名
+- `$thread->scout`：スカウト情報（リレーション、1対1）
+  - `$thread->scout->message`：スカウトメッセージ（最初のメッセージ）
+  - `$thread->scout->status`：スカウトステータス（0=未対応、1=対応中、2=クローズ）
+- `$thread->messages`：メッセージ一覧（リレーション、1対多）
+  - `$message->id`：メッセージID
+  - `$message->body`：メッセージ本文
+  - `$message->sender_type`：送信者タイプ（'company' or 'freelancer'）
+  - `$message->sender_id`：送信者ID
+  - `$message->sent_at`：送信日時
+  - `$message->deleted_at`：削除日時（nullable、ソフト削除）
+
+### 📤 画面での変数使用
+
+- **画面上部（固定情報）：**
+  - フリーランス名：`$thread->freelancer->display_name`
+  - スカウトステータス：`$thread->scout->status`に応じて「対応中」または「クローズ」と表示
+- **チャット履歴表示：**
+  - 最初のメッセージ（スカウト文）：`$thread->scout->message`を最上部に固定表示
+  - メッセージ一覧：`$thread->messages`を時系列順（`sent_at`でソート）でループ表示
+    - 企業のメッセージ：右寄せ、`$message->sender_type === 'company'`の場合
+    - フリーランスのメッセージ：左寄せ、`$message->sender_type === 'freelancer'`の場合
+    - 削除済みメッセージ：`$message->deleted_at`が存在する場合は「削除されました」と表示
+    - 削除ボタン：自分の最新メッセージのみ表示可能
+- **チャット入力欄：**
+  - `$thread->scout->status`が0（未対応）または1（対応中）の場合のみ表示
+  - 送信先：`POST /threads/{$thread->id}/messages`
+
+---
+
+## ⑳ company/jobs/index.blade.php（企業自社案件一覧画面）
+
+### 📥 Viewが受け取る変数
+
+**変数名：`$jobs`**
+
+- **モデル/テーブル：** `Job`モデル（`jobs`テーブル）
+- **コントローラー・メソッド：** `CompanyJobController::index()`
+- **取得処理：**
+  - 認証済み企業のIDで案件を絞り込み取得
+  - keywordパラメータがあれば全文検索（LIKE連結）
+  - statusパラメータがあればフィルタリング（publish/draft/stopped）
+  - ステータスに関係なく自社案件を全て取得
+
+**変数の内容：**
+
+- `$jobs`：Jobモデルのコレクション
+  - `$job->id`：案件ID（主キー）
+  - `$job->title`：案件タイトル（必須）
+  - `$job->description`：案件説明（必須）
+  - `$job->status`：案件ステータス（0=下書き、1=公開、2=停止）
+  - `$job->reward_type`：報酬タイプ（enum: 'monthly' or 'hourly'）
+  - `$job->min_rate`：報酬の下限（必須）
+  - `$job->max_rate`：報酬の上限（必須）
+  - `$job->work_time_text`：稼働時間テキスト（必須）
+  - `$job->created_at`：作成日時
+  - `$job->updated_at`：更新日時
+
+**変数名：`$keyword`（任意）**
+
+- **コントローラー・メソッド：** `CompanyJobController::index()`
+- **取得処理：** GETクエリパラメータから取得
+- **変数の内容：**
+  - 検索キーワード（文字列、nullable）
+
+**変数名：`$status`（任意）**
+
+- **コントローラー・メソッド：** `CompanyJobController::index()`
+- **取得処理：** GETクエリパラメータから取得
+- **変数の内容：**
+  - ステータスフィルタ（'publish'、'draft'、'stopped'、nullable）
+
+### 📤 画面での変数使用
+
+- **検索・フィルタフォーム：**
+  - キーワード入力欄：`$keyword`を初期値として表示（検索後も値を保持）
+  - ステータスフィルタ：`$status`を初期値として表示（'publish'、'draft'、'stopped'）
+- **案件一覧表示：**
+  - 案件カード：`$jobs`をループして各案件を表示
+    - 案件名：`$job->title`
+    - ステータス：`$job->status`に応じて「下書き」「公開中」「停止中」と表示
+    - 報酬：`$job->reward_type`に応じて「`$job->min_rate`万円〜`$job->max_rate`万円」または「`$job->min_rate`円〜`$job->max_rate`円」と表示
+    - 稼働条件：`$job->work_time_text`
+    - 作成日時：`$job->created_at`
+    - 編集リンク：`/company/jobs/{$job->id}/edit`へのリンク
+    - 削除ボタン：`DELETE /company/jobs/{$job->id}`へのフォーム
+- **新規登録ボタン：**
+  - `/company/jobs/create`へのリンク
+- **ページネーション：**
+  - `$jobs->links()`でページネーションリンクを表示
+
+---
+
+## ㉑ company/jobs/create.blade.php（企業案件登録画面）
+
+### 📥 Viewが受け取る変数
+
+**変数名：なし**
+
+- このビューは変数を受け取りません
+- 新規作成のため、すべて空のフォームを表示します
+
+### 🔗 コントローラー・メソッド
+
+- **コントローラー：** `CompanyJobController`
+- **メソッド：** `create()`
+- **処理内容：** 特にロジックなし。フォームを返すだけ
+
+### 📤 画面での変数使用
+
+- **変数なし：** 以下の入力項目を空の状態で表示
+  - 案件名（title）
+  - 案件説明（description）
+  - 必要スキル（required_skills_text）
+  - 報酬タイプ（reward_type：'monthly' or 'hourly'）
+  - 報酬下限（min_rate）
+  - 報酬上限（max_rate）
+  - 稼働時間（work_time_text）
+  - ステータス（status：'draft' or 'publish'）
+
+---
+
+## ㉒ company/jobs/edit.blade.php（企業案件編集画面）
+
+### 📥 Viewが受け取る変数
+
+**変数名：`$job`**
+
+- **モデル/テーブル：** `Job`モデル（`jobs`テーブル）
+- **コントローラー・メソッド：** `CompanyJobController::edit()`
+- **取得処理：**
+  - Route Model Bindingで案件を取得
+  - company_id一致チェック
+  - 案件情報を取得
+
+**変数の内容：**
+
+- `$job->id`：案件ID（主キー）
+- `$job->title`：案件タイトル（必須）
+- `$job->description`：案件説明（必須）
+- `$job->required_skills_text`：必要スキルテキスト（任意）
+- `$job->reward_type`：報酬タイプ（enum: 'monthly' or 'hourly'）
+- `$job->min_rate`：報酬の下限（必須）
+- `$job->max_rate`：報酬の上限（必須）
+- `$job->work_time_text`：稼働時間テキスト（必須）
+- `$job->status`：案件ステータス（0=下書き、1=公開、2=停止）
+
+### 📤 画面での変数使用
+
+- **フォーム入力欄（既存値表示）：**
+  - 案件名：`$job->title`
+  - 案件説明：`$job->description`
+  - 必要スキル：`$job->required_skills_text`
+  - 報酬タイプ：`$job->reward_type`
+  - 報酬下限：`$job->min_rate`
+  - 報酬上限：`$job->max_rate`
+  - 稼働時間：`$job->work_time_text`
+  - ステータス：`$job->status`
+
+---
+
+## ㉓ company/applications/index.blade.php（企業応募された案件一覧画面）
+
+### 📥 Viewが受け取る変数
+
+**変数名：`$applications`**
+
+- **モデル/テーブル：** `Application`モデル（`applications`テーブル）
+- **コントローラー・メソッド：** `CompanyApplicationController::index()`（推測）
+- **取得処理：**
+  - 認証済み企業のIDで応募を取得
+  - 自社案件への応募のみ取得
+  - statusパラメータに応じてフィルタリング
+    - `status=pending`：`applications.status`が0（未対応）または1（対応中）
+    - `status=closed`：`applications.status`が2（クローズ）
+  - `job`、`freelancer`、`thread`リレーションをEager Loadingで取得
+  - 未読判定（threadの最後の送信者が自分以外かどうか）
+
+**変数の内容：**
+
+- `$applications`：Applicationモデルのコレクション
+  - `$application->id`：応募ID（主キー）
+  - `$application->message`：応募メッセージ（必須）
+  - `$application->status`：応募ステータス（0=未対応、1=対応中、2=クローズ）
+  - `$application->created_at`：応募日時
+  - `$application->job`：案件情報（リレーション）
+    - `$application->job->id`：案件ID
+    - `$application->job->title`：案件名
+  - `$application->freelancer`：フリーランス情報（リレーション）
+    - `$application->freelancer->display_name`：フリーランス表示名
+  - `$application->thread`：スレッド情報（リレーション）
+    - `$application->thread->id`：スレッドID
+    - `$application->thread->is_unread_for_company`：未読フラグ（boolean）
+
+**変数名：`$status`（任意）**
+
+- **コントローラー・メソッド：** `CompanyApplicationController::index()`（推測）
+- **取得処理：** GETクエリパラメータから取得
+- **変数の内容：**
+  - ステータスフィルタ（'pending' or 'closed'、nullable）
+
+### 📤 画面での変数使用
+
+- **タブ表示：**
+  - 「応募中」タブ：`$status`が'pending'またはnullの場合にアクティブ
+  - 「終了」タブ：`$status`が'closed'の場合にアクティブ
+- **応募一覧表示：**
+  - 応募カード：`$applications`をループして各応募を表示
+    - 案件名：`$application->job->title`
+    - フリーランス名：`$application->freelancer->display_name`
+    - 応募メッセージ：`$application->message`（一部表示）
+    - ステータス：`$application->status`に応じて「未対応」「対応中」「クローズ」と表示
+    - 未読バッジ：`$application->thread->is_unread_for_company`が`true`の場合に表示
+    - 応募日時：`$application->created_at`
+    - チャット画面リンク：`/company/threads/{$application->thread->id}`へのリンク
+
+---
+
+## ㉔ company/messages/show.blade.php（企業応募チャット画面）
+
+### 📥 Viewが受け取る変数
+
+**変数名：`$thread`**
+
+- **モデル/テーブル：** `Thread`モデル（`threads`テーブル）
+- **コントローラー・メソッド：** `CompanyMessageController::show()`（推測）
+- **取得処理：**
+  - Route Model Bindingでスレッドを取得
+  - 権限チェック（ログイン企業が当事者かどうか）
+  - `freelancer`、`job`、`application`、`messages`リレーションをEager Loadingで取得
+  - `MessageService::markRead()`で未読解除処理を実行
+
+**変数の内容：**
+
+- `$thread->id`：スレッドID（主キー）
+- `$thread->freelancer`：フリーランス情報（リレーション）
+  - `$thread->freelancer->display_name`：フリーランス表示名
+- `$thread->job`：案件情報（リレーション、nullable）
+  - `$thread->job->title`：案件名（存在する場合）
+- `$thread->application`：応募情報（リレーション、1対1）
+  - `$thread->application->status`：応募ステータス（0=未対応、1=対応中、2=クローズ）
+  - `$thread->application->message`：応募メッセージ（最初のメッセージ）
+- `$thread->messages`：メッセージ一覧（リレーション、1対多）
+  - `$message->id`：メッセージID
+  - `$message->body`：メッセージ本文
+  - `$message->sender_type`：送信者タイプ（'company' or 'freelancer'）
+  - `$message->sender_id`：送信者ID
+  - `$message->sent_at`：送信日時
+  - `$message->deleted_at`：削除日時（nullable、ソフト削除）
+
+### 📤 画面での変数使用
+
+- **画面上部（固定情報）：**
+  - 案件名：`$thread->job->title`（存在する場合）または「案件未指定」
+  - フリーランス名：`$thread->freelancer->display_name`
+  - 応募ステータス：`$thread->application->status`に応じて「未対応」「対応中」「クローズ」と表示
+- **チャット履歴表示：**
+  - 最初のメッセージ（応募文）：`$thread->application->message`を最上部に固定表示
+  - メッセージ一覧：`$thread->messages`を時系列順（`sent_at`でソート）でループ表示
+    - 企業のメッセージ：右寄せ、`$message->sender_type === 'company'`の場合
+    - フリーランスのメッセージ：左寄せ、`$message->sender_type === 'freelancer'`の場合
+    - 削除済みメッセージ：`$message->deleted_at`が存在する場合は「削除されました」と表示
+    - 削除ボタン：自分の最新メッセージのみ表示可能
+- **チャット入力欄：**
+  - `$thread->application->status`が0（未対応）または1（対応中）の場合のみ表示
+  - 送信先：`POST /threads/{$thread->id}/messages`
+
+---
+
+# 📌 ビュー詳細設計まとめ
+
+## 共通パターン
+
+1. **一覧画面：** コレクション変数（`$jobs`、`$freelancers`、`$applications`など）を受け取り、ループで表示
+2. **詳細画面：** 単一モデル変数（`$job`、`$freelancer`、`$thread`など）を受け取り、詳細情報を表示
+3. **フォーム画面：** 新規作成時は変数なし、編集時は既存データを変数で受け取る
+4. **検索・フィルタ：** `$keyword`、`$status`などのクエリパラメータを変数で受け取り、フォームの初期値として使用
+
+## 変数の取得パターン
+
+1. **Route Model Binding：** `show()`、`edit()`メソッドで使用
+2. **認証ユーザーから取得：** `Auth::user()`からリレーション経由で取得
+3. **クエリパラメータ：** GETリクエストから取得
+4. **Eager Loading：** リレーションを事前に読み込んでN+1問題を回避
+
+## 表示パターン
+
+1. **一覧表示：** コレクションをループしてカード形式で表示
+2. **詳細表示：** 単一モデルの各プロパティを個別に表示
+3. **条件分岐：** `$hasApplied`、`$status`などの真偽値やステータスで表示を切り替え
+4. **リレーション表示：** `$job->company->name`のようにリレーション経由でデータを表示
+

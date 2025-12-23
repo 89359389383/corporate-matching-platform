@@ -58,6 +58,8 @@ class Kernel extends HttpKernel
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
+        // 繝輔Μ繝ｼ繝ｩ繝ｳ繧ｹ縺ｮ縺ｿ繧｢繧ｯ繧ｻ繧ｹ蜿ｯ閭ｽ縺ｫ縺吶ｋ・・ole='freelancer'繧呈Φ螳夲ｼ・        'freelancer' => \App\Http\Middleware\EnsureFreelancerRole::class,
+        // 莨∵･ｭ縺ｮ縺ｿ繧｢繧ｯ繧ｻ繧ｹ蜿ｯ閭ｽ縺ｫ縺吶ｋ・・ole='company'繧呈Φ螳夲ｼ・        'company' => \App\Http\Middleware\EnsureCompanyRole::class,
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class,
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,

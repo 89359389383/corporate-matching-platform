@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>案件一覧 - フリーランスマッチングプラットフォーム（デザインV3）</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+            background: linear-gradient(135deg, #f8f9fc 0%, #ede7f6 100%);
+            color: #37474f;
+            line-height: 1.6;
+        }
+
+        /* ヘッダー */
+        .header {
+            background: linear-gradient(135deg, #5e35b1 0%, #7e57c2 100%);
+            box-shadow: 0 4px 24px rgba(94, 53, 177, 0.25);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 64px;
+            height: 72px;
+            max-width: 1920px;
+            margin: 0 auto;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 64px;
+            align-items: center;
+        }
+
+        .nav-item {
+            color: #f3e5f5;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 600;
+            padding: 10px 22px;
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255,255,255,0.12);
+            transform: translateY(-1px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.15) 100%);
+            box-shadow: 0 4px 16px rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .badge {
+            position: absolute;
+            top: -3px;
+            right: 4px;
+            background: linear-gradient(135deg, #ff4081 0%, #f50057 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 3px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            min-width: 20px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(245, 0, 87, 0.5);
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .user-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #ce93d8 0%, #ba68c8 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+            cursor: pointer;
+            border: 2px solid rgba(255,255,255,0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 16px rgba(186, 104, 200, 0.4);
+        }
+
+        .user-icon:hover {
+            transform: scale(1.08) rotate(3deg);
+            box-shadow: 0 6px 20px rgba(186, 104, 200, 0.5);
+        }
+
+        /* メインコンテンツ */
+        .main-container {
+            display: flex;
+            max-width: 1920px;
+            margin: 0 auto;
+            min-height: calc(100vh - 72px);
+        }
+
+        /* サイドバー */
+        .sidebar {
+            width: 360px;
+            background: linear-gradient(135deg, #ffffff 0%, #faf9fc 100%);
+            padding: 40px 32px;
+            box-shadow: 4px 0 20px rgba(94, 53, 177, 0.08);
+            border-right: 1px solid #ede7f6;
+        }
+
+        .sidebar-title {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #5e35b1 0%, #7e57c2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 3px solid transparent;
+            border-image: linear-gradient(to right, #5e35b1, #7e57c2);
+            border-image-slice: 1;
+            letter-spacing: 0.8px;
+        }
+
+        .search-section {
+            margin-bottom: 36px;
+        }
+
+        .search-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #5e35b1;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e1bee7;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #7e57c2;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(126, 87, 194, 0.12);
+            transform: translateY(-1px);
+        }
+
+        .reward-type-selector {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .reward-type-btn {
+            flex: 1;
+            padding: 13px;
+            border: 2px solid #e1bee7;
+            background: white;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #9575cd;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .reward-type-btn.active {
+            border-color: transparent;
+            background: linear-gradient(135deg, #ede7f6 0%, #e1bee7 100%);
+            color: #5e35b1;
+            box-shadow: 0 4px 12px rgba(94, 53, 177, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .reward-range {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .reward-range input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e1bee7;
+            border-radius: 12px;
+            font-size: 14px;
+            background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+        }
+
+        .reward-range input:focus {
+            outline: none;
+            border-color: #7e57c2;
+            background: white;
+            transform: translateY(-1px);
+        }
+
+        .reward-range span {
+            color: #9575cd;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .search-btn {
+            width: 100%;
+            padding: 17px;
+            background: linear-gradient(135deg, #5e35b1 0%, #7e57c2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 6px 20px rgba(94, 53, 177, 0.35);
+            letter-spacing: 0.8px;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 28px rgba(94, 53, 177, 0.45);
+        }
+
+        .search-btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* コンテンツエリア */
+        .content-area {
+            flex: 1;
+            padding: 48px 56px;
+        }
+
+        .content-header {
+            margin-bottom: 40px;
+        }
+
+        .content-header h1 {
+            font-size: 32px;
+            background: linear-gradient(135deg, #5e35b1 0%, #7e57c2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+        }
+
+        .content-header p {
+            color: #9575cd;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        /* 案件カード */
+        .jobs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(520px, 1fr));
+            gap: 32px;
+        }
+
+        .job-card {
+            background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
+            border-radius: 16px;
+            padding: 34px;
+            box-shadow: 0 4px 20px rgba(94, 53, 177, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid #f3e5f5;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .job-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #5e35b1 0%, #7e57c2 50%, #9575cd 100%);
+            transform: scaleX(0);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .job-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .job-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 40px rgba(94, 53, 177, 0.25);
+            border-color: #e1bee7;
+        }
+
+        .job-header {
+            margin-bottom: 24px;
+        }
+
+        .job-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #4a148c;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            letter-spacing: 0.3px;
+        }
+
+        .company-name {
+            color: #9575cd;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .job-description {
+            color: #616161;
+            font-size: 14px;
+            line-height: 1.8;
+            margin-bottom: 24px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .job-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .skill-tag {
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+            color: #5e35b1;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid #e1bee7;
+            transition: all 0.3s ease;
+        }
+
+        .skill-tag:hover {
+            background: linear-gradient(135deg, #e1bee7 0%, #ce93d8 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(94, 53, 177, 0.2);
+        }
+
+        .job-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f5fa 0%, #f3e5f5 100%);
+            border-radius: 12px;
+            border: 1px solid #e1bee7;
+        }
+
+        .detail-item {
+            font-size: 13px;
+        }
+
+        .detail-label {
+            color: #9575cd;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .detail-value {
+            color: #4a148c;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .job-reward {
+            font-size: 26px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ff4081 0%, #f50057 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 24px;
+            text-align: right;
+            letter-spacing: 0.5px;
+        }
+
+        .job-actions {
+            display: flex;
+            gap: 14px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-detail {
+            background: white;
+            color: #7e57c2;
+            border: 2px solid #7e57c2;
+        }
+
+        .btn-detail:hover {
+            background: linear-gradient(135deg, #7e57c2 0%, #9575cd 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(126, 87, 194, 0.35);
+        }
+
+        .btn-apply {
+            background: linear-gradient(135deg, #5e35b1 0%, #7e57c2 100%);
+            color: white;
+            box-shadow: 0 6px 16px rgba(94, 53, 177, 0.35);
+        }
+
+        .btn-apply:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(94, 53, 177, 0.45);
+        }
+
+        .btn-apply:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-applied {
+            background: linear-gradient(135deg, #90a4ae 0%, #78909c 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(120, 144, 156, 0.3);
+        }
+
+        .btn-applied:hover {
+            background: linear-gradient(135deg, #78909c 0%, #607d8b 100%);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header class="header">
+        <div class="header-container">
+            <nav class="header-nav">
+                <a href="#" class="nav-item active">案件一覧</a>
+                <a href="#" class="nav-item">
+                    応募した案件
+                    <span class="badge">3</span>
+                </a>
+                <a href="#" class="nav-item">
+                    スカウト
+                    <span class="badge">5</span>
+                </a>
+            </nav>
+            <div class="user-menu">
+                <div class="user-icon">山</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- サイドバー -->
+        <aside class="sidebar">
+            <h2 class="sidebar-title">案件を絞り込む</h2>
+            
+            <div class="search-section">
+                <label class="search-label">キーワード検索</label>
+                <input type="text" class="search-input" placeholder="案件名、スキル、企業名などで検索">
+            </div>
+
+            <div class="search-section">
+                <label class="search-label">報酬レンジ</label>
+                <div class="reward-type-selector">
+                    <button class="reward-type-btn active">単価</button>
+                    <button class="reward-type-btn">時給</button>
+                </div>
+                <div class="reward-range">
+                    <input type="number" placeholder="下限" min="0">
+                    <span>〜</span>
+                    <input type="number" placeholder="上限" min="0">
+                </div>
+            </div>
+
+            <button class="search-btn">検索</button>
+        </aside>
+
+        <!-- コンテンツエリア -->
+        <main class="content-area">
+            <div class="content-header">
+                <h1>案件一覧</h1>
+                <p>全248件の案件が見つかりました</p>
+            </div>
+
+            <div class="jobs-grid">
+                <!-- 案件カード1 -->
+                <div class="job-card">
+                    <div class="job-header">
+                        <h3 class="job-title">Webアプリケーション開発エンジニア募集</h3>
+                        <p class="company-name">株式会社テクノロジーソリューションズ</p>
+                    </div>
+                    <p class="job-description">
+                        自社サービスの新規機能開発をお任せします。React/TypeScript/Node.jsを使用した開発経験のある方を募集しています。リモートワーク可能で、柔軟な働き方が実現できます。
+                    </p>
+                    <div class="job-skills">
+                        <span class="skill-tag">React</span>
+                        <span class="skill-tag">TypeScript</span>
+                        <span class="skill-tag">Node.js</span>
+                        <span class="skill-tag">AWS</span>
+                    </div>
+                    <div class="job-details">
+                        <div class="detail-item">
+                            <div class="detail-label">稼働時間</div>
+                            <div class="detail-value">週20〜30時間</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">契約期間</div>
+                            <div class="detail-value">3〜6ヶ月</div>
+                        </div>
+                    </div>
+                    <div class="job-reward">¥500,000 〜 ¥700,000</div>
+                    <div class="job-actions">
+                        <button class="btn btn-detail">詳細</button>
+                        <button class="btn btn-apply">応募する</button>
+                    </div>
+                </div>
+
+                <!-- 案件カード2 -->
+                <div class="job-card">
+                    <div class="job-header">
+                        <h3 class="job-title">モバイルアプリUI/UXデザイナー</h3>
+                        <p class="company-name">株式会社デザインスタジオ</p>
+                    </div>
+                    <p class="job-description">
+                        ヘルスケア関連のモバイルアプリのUI/UXデザインをお願いします。Figmaを使用したデザイン制作、プロトタイプ作成、開発チームとの連携が主な業務となります。
+                    </p>
+                    <div class="job-skills">
+                        <span class="skill-tag">Figma</span>
+                        <span class="skill-tag">UI/UX</span>
+                        <span class="skill-tag">プロトタイピング</span>
+                    </div>
+                    <div class="job-details">
+                        <div class="detail-item">
+                            <div class="detail-label">稼働時間</div>
+                            <div class="detail-value">週15〜25時間</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">契約期間</div>
+                            <div class="detail-value">2〜4ヶ月</div>
+                        </div>
+                    </div>
+                    <div class="job-reward">¥400,000 〜 ¥600,000</div>
+                    <div class="job-actions">
+                        <button class="btn btn-detail">詳細</button>
+                        <button class="btn btn-apply">応募する</button>
+                    </div>
+                </div>
+
+                <!-- 案件カード3 -->
+                <div class="job-card">
+                    <div class="job-header">
+                        <h3 class="job-title">データ分析・機械学習エンジニア</h3>
+                        <p class="company-name">株式会社AIイノベーション</p>
+                    </div>
+                    <p class="job-description">
+                        顧客データの分析および機械学習モデルの構築をお任せします。Python、scikit-learn、TensorFlowなどを使用した実務経験がある方を歓迎します。
+                    </p>
+                    <div class="job-skills">
+                        <span class="skill-tag">Python</span>
+                        <span class="skill-tag">機械学習</span>
+                        <span class="skill-tag">TensorFlow</span>
+                        <span class="skill-tag">SQL</span>
+                    </div>
+                    <div class="job-details">
+                        <div class="detail-item">
+                            <div class="detail-label">稼働時間</div>
+                            <div class="detail-value">週30〜40時間</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">契約期間</div>
+                            <div class="detail-value">6ヶ月〜</div>
+                        </div>
+                    </div>
+                    <div class="job-reward">¥700,000 〜 ¥900,000</div>
+                    <div class="job-actions">
+                        <button class="btn btn-detail">詳細</button>
+                        <button class="btn btn-applied">応募済み（チャットを開く）</button>
+                    </div>
+                </div>
+
+                <!-- 案件カード4 -->
+                <div class="job-card">
+                    <div class="job-header">
+                        <h3 class="job-title">バックエンドエンジニア（PHP/Laravel）</h3>
+                        <p class="company-name">株式会社Webサービス開発</p>
+                    </div>
+                    <p class="job-description">
+                        ECサイトのバックエンド開発をお願いします。PHP/Laravelでの開発経験が3年以上ある方、データベース設計ができる方を優遇します。
+                    </p>
+                    <div class="job-skills">
+                        <span class="skill-tag">PHP</span>
+                        <span class="skill-tag">Laravel</span>
+                        <span class="skill-tag">MySQL</span>
+                        <span class="skill-tag">Docker</span>
+                    </div>
+                    <div class="job-details">
+                        <div class="detail-item">
+                            <div class="detail-label">稼働時間</div>
+                            <div class="detail-value">週25〜35時間</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">契約期間</div>
+                            <div class="detail-value">4〜6ヶ月</div>
+                        </div>
+                    </div>
+                    <div class="job-reward">¥550,000 〜 ¥750,000</div>
+                    <div class="job-actions">
+                        <button class="btn btn-detail">詳細</button>
+                        <button class="btn btn-apply">応募する</button>
+                    </div>
+                </div>
+
+                <!-- 案件カード5 -->
+                <div class="job-card">
+                    <div class="job-header">
+                        <h3 class="job-title">インフラエンジニア（AWS運用・構築）</h3>
+                        <p class="company-name">株式会社クラウドソリューション</p>
+                    </div>
+                    <p class="job-description">
+                        AWSを使用したインフラの設計・構築・運用をお願いします。Terraform、CI/CDの経験がある方を歓迎します。24時間体制のオンコール対応はありません。
+                    </p>
+                    <div class="job-skills">
+                        <span class="skill-tag">AWS</span>
+                        <span class="skill-tag">Terraform</span>
+                        <span class="skill-tag">Docker</span>
+                        <span class="skill-tag">CI/CD</span>
+                    </div>
+                    <div class="job-details">
+                        <div class="detail-item">
+                            <div class="detail-label">稼働時間</div>
+                            <div class="detail-value">週20〜30時間</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">契約期間</div>
+                            <div class="detail-value">3ヶ月〜</div>
+                        </div>
+                    </div>
+                    <div class="job-reward">¥600,000 〜 ¥800,000</div>
+                    <div class="job-actions">
+                        <button class="btn btn-detail">詳細</button>
+                        <button class="btn btn-apply">応募する</button>
+                    </div>
+                </div>
+
+                <!-- 案件カード6 -->
+                <div class="job-card">
+                    <div class="job-header">
+                        <h3 class="job-title">フロントエンドエンジニア（Vue.js）</h3>
+                        <p class="company-name">株式会社モダンテクノロジー</p>
+                    </div>
+                    <p class="job-description">
+                        Vue.js/Nuxt.jsを使用したWebアプリケーションのフロントエンド開発をお願いします。UI/UXにこだわりを持って開発できる方を歓迎します。
+                    </p>
+                    <div class="job-skills">
+                        <span class="skill-tag">Vue.js</span>
+                        <span class="skill-tag">Nuxt.js</span>
+                        <span class="skill-tag">JavaScript</span>
+                        <span class="skill-tag">CSS</span>
+                    </div>
+                    <div class="job-details">
+                        <div class="detail-item">
+                            <div class="detail-label">稼働時間</div>
+                            <div class="detail-value">週15〜25時間</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">契約期間</div>
+                            <div class="detail-value">2〜3ヶ月</div>
+                        </div>
+                    </div>
+                    <div class="job-reward">¥450,000 〜 ¥650,000</div>
+                    <div class="job-actions">
+                        <button class="btn btn-detail">詳細</button>
+                        <button class="btn btn-apply">応募する</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,211 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\JobRequest;
+use App\Models\Job;
+use App\Services\JobService;
+
+class CompanyJobController extends Controller
+{
+    /**
+     * 自社案件一覧を表示する（企業側）
+     */
+    public function index(Request $request)
+    {
+        // 認証ユーザーを取得する
+        $user = Auth::user();
+
+        // 企業以外は拒否する
+        if ($user->role !== 'company') {
+            abort(403);
+        }
+
+        // 企業プロフィールを取得する（company_id の起点）
+        $company = $user->company;
+
+        // 企業プロフィール未登録なら先に登録へ誘導する
+        if ($company === null) {
+            return redirect('/company/profile')->with('error', '先に企業プロフィールを登録してください');
+        }
+
+        // フィルタ用のクエリを取得する（status/keyword は任意）
+        $status = $request->query('status');
+        $keyword = $request->query('keyword');
+
+        // 自社案件のみ対象にする
+        $query = Job::query()->where('company_id', $company->id);
+
+        // status フィルタがある場合に絞り込む
+        if (is_string($status) && $status !== '') {
+            // 画面仕様に合わせて文字列ステータスを数値ステータスへ変換する
+            $statusMap = [
+                'draft' => Job::STATUS_DRAFT,
+                'publish' => Job::STATUS_PUBLISHED,
+                'stopped' => Job::STATUS_STOPPED,
+            ];
+
+            // 既知の値だけを採用する
+            if (array_key_exists($status, $statusMap)) {
+                $query->where('status', $statusMap[$status]);
+            }
+        }
+
+        // keyword がある場合、全体検索（LIKE連結）する
+        if (is_string($keyword) && $keyword !== '') {
+            $query->where(function ($q) use ($keyword) {
+                // タイトルにヒットさせる
+                $q->where('title', 'like', '%' . $keyword . '%')
+                    // 説明文にヒットさせる
+                    ->orWhere('description', 'like', '%' . $keyword . '%')
+                    // 報酬種別にヒットさせる
+                    ->orWhere('reward_type', 'like', '%' . $keyword . '%')
+                    // 必須スキルにヒットさせる
+                    ->orWhere('required_skills_text', 'like', '%' . $keyword . '%')
+                    // 稼働条件にヒットさせる
+                    ->orWhere('work_time_text', 'like', '%' . $keyword . '%');
+            });
+        }
+
+        // 自社案件一覧をページングして取得する
+        $jobs = $query->orderByDesc('id')->paginate(20)->withQueryString();
+
+        // 一覧ビューを返す
+        return view('company.jobs.index', [
+            // 表示用データ
+            'jobs' => $jobs,
+            // フィルタ保持用
+            'status' => $status,
+            // フィルタ保持用
+            'keyword' => $keyword,
+        ]);
+    }
+
+    /**
+     * 案件作成フォームを表示する（企業側）
+     */
+    public function create()
+    {
+        // 認証ユーザーを取得する
+        $user = Auth::user();
+
+        // 企業以外は拒否する
+        if ($user->role !== 'company') {
+            abort(403);
+        }
+
+        // フォームビューを返すだけ（ロジックなし）
+        return view('company.jobs.create');
+    }
+
+    /**
+     * 案件を登録する（store は Service に委譲）
+     */
+    public function store(JobRequest $request, JobService $jobService)
+    {
+        // 認証ユーザーを取得する
+        $user = Auth::user();
+
+        // 企業以外は拒否する
+        if ($user->role !== 'company') {
+            abort(403);
+        }
+
+        // 企業プロフィールを取得する（company_id の起点）
+        $company = $user->company;
+
+        // 企業プロフィール未登録なら先に登録へ誘導する
+        if ($company === null) {
+            return redirect('/company/profile')->with('error', '先に企業プロフィールを登録してください');
+        }
+
+        // 入力をバリデーションする（FormRequest に委譲）
+        $validated = $request->validated();
+
+        // Service に保存処理を委譲する（JobService::store）
+        $jobService->store($company->id, $validated);
+
+        // 一覧へ戻して完了メッセージを表示する
+        return redirect('/company/jobs')->with('success', '案件を登録しました');
+    }
+
+    /**
+     * 案件編集フォームを表示する（企業側）
+     */
+    public function edit(Job $job)
+    {
+        // 認証ユーザーを取得する
+        $user = Auth::user();
+
+        // 企業以外は拒否する
+        if ($user->role !== 'company') {
+            abort(403);
+        }
+
+        // 自社案件かどうかをチェックする（company_id一致）
+        if ($user->company === null || $job->company_id !== $user->company->id) {
+            // 自社以外の案件は編集できない
+            abort(403);
+        }
+
+        // 編集ビューを返す
+        return view('company.jobs.edit', [
+            'job' => $job,
+        ]);
+    }
+
+    /**
+     * 案件を更新する（update は Service に委譲）
+     */
+    public function update(JobRequest $request, Job $job, JobService $jobService)
+    {
+        // 認証ユーザーを取得する
+        $user = Auth::user();
+
+        // 企業以外は拒否する
+        if ($user->role !== 'company') {
+            abort(403);
+        }
+
+        // 自社案件かどうかをチェックする
+        if ($user->company === null || $job->company_id !== $user->company->id) {
+            abort(403);
+        }
+
+        // 入力をバリデーションする（FormRequest に委譲）
+        $validated = $request->validated();
+
+        // Service に更新処理を委譲する（JobService::update）
+        $jobService->update($job, $validated);
+
+        // 一覧へ戻して完了メッセージを表示する
+        return redirect('/company/jobs')->with('success', '案件を更新しました');
+    }
+
+    /**
+     * 案件を削除する（destroy は単純削除のため Service 不要）
+     */
+    public function destroy(Job $job)
+    {
+        // 認証ユーザーを取得する
+        $user = Auth::user();
+
+        // 企業以外は拒否する
+        if ($user->role !== 'company') {
+            abort(403);
+        }
+
+        // 自社案件かどうかをチェックする
+        if ($user->company === null || $job->company_id !== $user->company->id) {
+            abort(403);
+        }
+
+        // 案件を削除する（MVPでは物理削除）
+        $job->delete();
+
+        // 一覧へ戻して完了メッセージを表示する
+        return redirect('/company/jobs')->with('success', '案件を削除しました');
+    }
+}

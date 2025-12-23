@@ -1,0 +1,230 @@
+# ✨ 第1回：AuthController の詳細設計
+
+（共通ログイン・登録関連）
+
+🔹前提
+
+- フリーランス・企業共通ログイン
+- role により遷移先が分岐
+- バリデーションは FormRequest を使用
+- プロフィール登録は別 controller
+
+---
+
+---
+
+# #️⃣ AuthController
+
+---
+
+---
+
+## ① **showLoginForm（ログイン画面表示）**
+
+### 🌱 役割
+
+ログインフォームを表示するだけ。
+
+※認証処理はしない。
+
+### 🎯 入口（リクエスト）
+
+```
+GET /login
+```
+
+### 📤 出口（レスポンス内容）
+
+- login.blade.php を返す
+- 入力欄：
+    - email
+    - password
+- リンク
+    - パスワードリセット
+    - フリーランス新規登録
+    - 企業新規登録
+
+### ⚙ Controller内部処理
+
+- 特にロジックなし
+
+### 📌 サービス使用
+
+- なし（DB更新・複雑処理なし）
+
+---
+
+---
+
+## ② **login（認証処理）**
+
+### 🌱 役割
+
+ログイン要求を受け、認証判定して遷移させる。
+
+### 🎯 入口
+
+```
+POST /login
+payload:
+- email
+- password
+```
+
+### 🧠 Controller内部処理
+
+- バリデーション（LoginRequest）
+- Auth::attempt で認証
+- 成功時
+    - `User.role` に応じて遷移
+        - freelancer → `/freelancer/jobs`
+        - company → `/company/**freelancers**`
+- 失敗時
+    - エラー返してログイン画面へ
+
+### 📤 出口
+
+- 成功 → role別トップページへリダイレクト
+- 失敗 → 元画面＋error
+
+### サービス使用
+
+- なし（単純認証）
+
+---
+
+---
+
+## ③ **showFreelancerRegister（登録画面1表示）**
+
+### 🌱 役割
+
+フリーランス初回登録フォーム表示
+
+（ログイン情報のみ）
+
+### 🎯 入口
+
+```
+GET /register/freelancer
+```
+
+### 📤 出口
+
+- freelancer登録フォームblade返却
+- email/password/password_confirmation
+
+### サービス使用
+
+- なし
+
+---
+
+---
+
+## ④ **storeFreelancer（登録処理1）**
+
+### 🌱 役割
+
+ログイン用Userレコードを作成し、
+
+成功したらプロフィール登録（登録画面2）へ遷移する入口。
+
+### 🎯 入口
+
+```
+POST /register/freelancer
+payload:
+- email
+- password
+- password_confirmation
+```
+
+### 🧠 Controller内部処理
+
+- バリデーション（RegisterRequest）
+- User::create(role=freelancer)
+- loginさせる
+- redirect `/freelancer/profile/create`
+
+### 📤 出口
+
+- 成功→プロフィール登録画面
+- 失敗→元画面
+
+### サービス
+
+- なし（Userだけ、更新副作用が小さい）
+
+---
+
+---
+
+## ⑤ **showCompanyRegister（登録画面1表示）**
+
+### 🎯 入口
+
+```
+GET /register/company
+```
+
+📤出口
+
+- 企業用ログイン情報登録フォーム
+
+---
+
+---
+
+## ⑥ **storeCompany（登録処理1）**
+
+### 🎯 入口
+
+```
+POST /register/company
+payload:
+- email
+- password
+```
+
+### 🧠 Controller内部処理
+
+- User::create(role=company)
+- login
+- redirect `/company/profile/create`
+
+---
+
+---
+
+## ⑦ **logout（ログアウト処理）**
+
+### 🎯 入口
+
+```
+POST /logout
+```
+
+### 🧠 Controller内部処理
+
+- Auth::logout()
+- Session破棄
+- redirect `/login`
+
+---
+
+---
+
+---
+
+# 📌 AuthControllerまとめ
+
+| メソッド | 役割 | 入口 | 出口 | Service要否 |
+| --- | --- | --- | --- | --- |
+| showLoginForm | ログイン画面返す | GET | view | 不要 |
+| login | 認証実行し遷移判断 | POST | ロール別リダイレクト | 不要 |
+| showFreelancerRegister | ログイン情報登録表示 | GET | view | 不要 |
+| storeFreelancer | User作成・ログイン | POST | プロフィールへ遷移 | 不要 |
+| showCompanyRegister | 企業登録画面表示 | GET | view | 不要 |
+| storeCompany | User作成 | POST | プロフィールへ遷移 | 不要 |
+| logout | セッション終了 | POST | loginへ戻る | 不要 |

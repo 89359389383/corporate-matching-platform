@@ -1,0 +1,98 @@
+# ✅ CompanyApplicationController（応募された案件一覧：企業側）詳細設計
+
+企業側が「自社案件に応募された一覧」を確認するためのController。
+
+※チャット表示やステータス更新は `CompanyMessageController@show` 側に寄せる（機能フロー #25 の仕様に合わせる）
+
+---
+
+---
+
+# ① index（応募された案件一覧表示）
+
+### 🌱 役割
+
+- 自社案件に届いた応募（applications）を一覧表示する
+- ステータスで「応募中 / 終了」をタブ切替する
+- 各応募カードに未読バッジを表示する（thread単位）
+
+---
+
+### 🎯 入口
+
+```
+GET /company/applications?status=pending
+GET /company/applications?status=closed
+```
+
+※ `status` パラメータにより表示を切替
+
+---
+
+### 📤 出口
+
+```
+company/applications/index.blade.php
+```
+
+表示内容（機能フローより）
+
++----------------------+----------------------------------------------+
+| 表示内容             | 詳細                                          |
++----------------------+----------------------------------------------+
+| 案件名               | job.title                                      |
+| 応募したフリーランス | freelancer.display_name / アイコン等           |
+| 応募メッセージ（抜粋）| application.message（先頭N文字など）            |
+| 応募ステータス       | applications.status（応募中 / 終了）            |
+| 未読バッジ           | thread が未読なら表示（latest_sender_type参照） |
+| チャット導線         | thread へ遷移（CompanyMessageController@show）  |
++----------------------+----------------------------------------------+
+
+---
+
+### 🧠 Controller内部処理
+
+1. 認証ユーザ取得（企業）
+2. `status` を判定して対象の応募を絞り込み
+
+```
+pending → applications.status in (未対応 / 対応中)
+closed  → applications.status = クローズ
+```
+
+3. 自社（company_id）に紐づく応募のみ取得
+4. 表示に必要なリレーションを Eager Loading
+   - job
+   - freelancer
+   - thread
+5. 未読判定（thread単位）
+
+仕様（機能フロー / PDF）👇
+
+**「最後の送信者が自分（company）以外なら未読」**
+
+例：
+- `latest_sender_type != 'company'` のスレッド → 未読バッジ表示
+
+6. view へ返却
+
+---
+
+### 🧩 なぜService不要？
+
+- 一覧表示のみ（DB更新なし）
+- 絞り込み + Eager Loading + 未読表示判定はControllerで完結可能
+
+---
+
+---
+
+# 📌 CompanyApplicationController まとめ（表形式）
+
++----------+--------------------------+-------------------------------+----------------+--------------+
+| メソッド | 役割                     | 入口                          | 出口           | Service使用  |
++----------+--------------------------+-------------------------------+----------------+--------------+
+| index    | 応募された案件一覧表示   | GET /company/applications      | view返却       | ❌不要       |
++----------+--------------------------+-------------------------------+----------------+--------------+
+
+
