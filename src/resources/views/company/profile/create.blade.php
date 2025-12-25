@@ -15,7 +15,6 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
             min-height: 100vh;
-            overflow: hidden;
             position: relative;
             color: #0f172a;
         }
@@ -42,9 +41,9 @@
             z-index: 1;
             min-height: 100vh;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
-            padding: 20px;
+            padding: 40px 20px;
         }
 
         /* カード */
@@ -319,10 +318,6 @@
 
     <div class="container">
         <div class="register-card">
-            <div class="logo" aria-label="AITECH">
-                <span class="logo-text">AITECH</span>
-                <span class="logo-badge">PROFILE</span>
-            </div>
             <div class="page-title">企業プロフィール登録</div>
 
             @if (session('success'))

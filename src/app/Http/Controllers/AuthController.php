@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
@@ -103,10 +104,74 @@ class AuthController extends Controller
     /**
      * 企業登録画面を表示する（表示のみ）
      */
-    public function showCompanyRegister()
+    public function showCompanyRegister(Request $request)
     {
+        // メソッド開始ログ
+        Log::info('showCompanyRegister: メソッド開始', [
+            'method' => 'showCompanyRegister',
+            'timestamp' => now()->toDateTimeString(),
+        ]);
+
+        // リクエスト情報のログ
+        Log::info('showCompanyRegister: リクエスト情報', [
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'url' => $request->fullUrl(),
+            'method' => $request->method(),
+            'referer' => $request->header('referer'),
+            'query_params' => $request->query(),
+            'request_headers' => $request->headers->all(),
+        ]);
+
+        // セッション情報のログ
+        $sessionData = [];
+        if ($request->hasSession()) {
+            try {
+                $sessionData = [
+                    'session_id' => $request->session()->getId(),
+                    'session_exists' => true,
+                    'session_data_keys' => $request->session()->all() ? array_keys($request->session()->all()) : [],
+                    'csrf_token' => $request->session()->token(),
+                ];
+            } catch (\Exception $e) {
+                $sessionData = [
+                    'session_exists' => true,
+                    'error' => 'セッション情報の取得に失敗しました: ' . $e->getMessage(),
+                ];
+            }
+        } else {
+            $sessionData = [
+                'session_exists' => false,
+            ];
+        }
+        Log::info('showCompanyRegister: セッション情報', $sessionData);
+
+        // 認証状態のログ
+        $isAuthenticated = Auth::check();
+        $user = Auth::user();
+        Log::info('showCompanyRegister: 認証状態', [
+            'is_authenticated' => $isAuthenticated,
+            'user_id' => $user ? $user->id : null,
+            'user_email' => $user ? $user->email : null,
+            'user_role' => $user ? $user->role : null,
+        ]);
+
+        // ビュー返却前のログ
+        Log::info('showCompanyRegister: ビュー返却前', [
+            'view_name' => 'auth.register.company',
+        ]);
+
         // 企業登録画面のBladeを返すだけ
-        return view('auth.register.company');
+        $view = view('auth.register.company');
+
+        // ビュー返却後のログ
+        Log::info('showCompanyRegister: メソッド終了', [
+            'method' => 'showCompanyRegister',
+            'timestamp' => now()->toDateTimeString(),
+            'view_returned' => true,
+        ]);
+
+        return $view;
     }
 
     /**

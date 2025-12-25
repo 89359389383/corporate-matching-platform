@@ -29,8 +29,8 @@ class Handler extends ExceptionHandler
         // ログインユーザー情報
         $user = Auth::check() ? [
             'id' => Auth::user()->id,
-            'name' => Auth::user()->name,
             'email' => Auth::user()->email,
+            'role' => Auth::user()->role,
         ] : 'Guest';
 
         // **エラー時のログ（重要な情報のみ記録）**
