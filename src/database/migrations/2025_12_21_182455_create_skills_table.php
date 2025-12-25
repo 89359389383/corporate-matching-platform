@@ -17,9 +17,11 @@ class CreateSkillsTable extends Migration
             // ID
             $table->id();
             
-            // スキル吁E            $table->string('name')->unique();
+            // スキル名
+            $table->string('name')->unique();
             
-            // 作�E日時�E更新日晁E            $table->timestamps();
+            // 作成日時・更新日時
+            $table->timestamps();
         });
     }
 

@@ -17,35 +17,46 @@ class CreateFreelancersTable extends Migration
             // ID
             $table->id();
 
-            // ユーザーID�E�外部キー�E�E            $table->foreignId('user_id')
+            // ユーザーID（外部キー）
+            $table->foreignId('user_id')
                 ->constrained('users')
                 ->cascadeOnDelete();
 
-            // 表示吁E            $table->string('display_name');
+            // 表示名
+            $table->string('display_name');
 
             // 職種
             $table->string('job_title')->nullable();
 
-            // 自己紹仁E            $table->text('bio');
+            // 自己紹介
+            $table->text('bio');
 
             // ==========================
-            // 稼働条件�E�正規化�E�E            // ==========================
-            // 週の稼働時間（下限�E�E            $table->unsignedTinyInteger('min_hours_per_week');
+            // 稼働条件（正規化）
+            // ==========================
+            // 週の稼働時間（下限）
+            $table->unsignedTinyInteger('min_hours_per_week');
 
-            // 週の稼働時間（上限�E�E            $table->unsignedTinyInteger('max_hours_per_week');
+            // 週の稼働時間（上限）
+            $table->unsignedTinyInteger('max_hours_per_week');
 
-            // 1日の稼働時閁E            $table->unsignedTinyInteger('hours_per_day');
+            // 1日の稼働時間
+            $table->unsignedTinyInteger('hours_per_day');
 
             // 週の稼働日数
             $table->unsignedTinyInteger('days_per_week');
 
             // ==========================
-            // 働き方�E��E由入力！E            // ==========================
-            // 働き方の説昁E            $table->text('work_style_text')->nullable();
+            // 働き方（自由入力）
+            // ==========================
+            // 働き方の説明
+            $table->text('work_style_text')->nullable();
 
-            // 希望単価�E�下限�E�E            $table->unsignedInteger('min_rate');
+            // 希望単価（下限）
+            $table->unsignedInteger('min_rate');
             
-            // 希望単価�E�上限�E�E            $table->unsignedInteger('max_rate');
+            // 希望単価（上限）
+            $table->unsignedInteger('max_rate');
 
             // 経験企業
             $table->text('experience_companies')->nullable();
@@ -53,7 +64,8 @@ class CreateFreelancersTable extends Migration
             // アイコン画像パス
             $table->string('icon_path')->nullable();
             
-            // 作�E日時�E更新日晁E            $table->timestamps();
+            // 作成日時・更新日時
+            $table->timestamps();
         });
     }
 

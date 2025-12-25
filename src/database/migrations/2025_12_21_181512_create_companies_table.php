@@ -17,22 +17,28 @@ class CreateCompaniesTable extends Migration
             // ID
             $table->id();
             
-            // ユーザーID�E�外部キー�E�E            $table->foreignId('user_id')
+            // ユーザーID（外部キー）
+            $table->foreignId('user_id')
                 ->constrained('users')
                 ->cascadeOnDelete();
 
-            // 企業吁E            $table->string('name');
+            // 企業名
+            $table->string('name');
 
-            // 会社概要E            $table->text('overview')->nullable();
+            // 会社概要
+            $table->text('overview')->nullable();
 
-            // 拁E��老E��
+            // 連絡先名
             $table->string('contact_name')->nullable();
             
-            // 部署吁E            $table->string('department')->nullable();
+            // 部署名
+            $table->string('department')->nullable();
 
-            // 自己紹仁E            $table->text('introduction')->nullable();
+            // 自己紹介
+            $table->text('introduction')->nullable();
             
-            // 作�E日時�E更新日晁E            $table->timestamps();
+            // 作成日時・更新日時
+            $table->timestamps();
         });
     }
 

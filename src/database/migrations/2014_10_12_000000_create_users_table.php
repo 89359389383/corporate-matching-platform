@@ -20,16 +20,20 @@ class CreateUsersTable extends Migration
             // メールアドレス
             $table->string('email')->unique();
             
-            // メール認証日晁E            $table->timestamp('email_verified_at')->nullable();
+            // メール認証日時
+            $table->timestamp('email_verified_at')->nullable();
             
-            // パスワーチE            $table->string('password');
+            // パスワード
+            $table->string('password');
             
-            // ロール�E�企業/フリーランサー�E�E            $table->enum('role', ['company', 'freelancer']);
+            // ロール（企業/フリーランサー）
+            $table->enum('role', ['company', 'freelancer']);
             
-            // ログイン記�E用ト�Eクン
+            // ログイン記憶用トークン
             $table->rememberToken();
             
-            // 作�E日時�E更新日晁E            $table->timestamps();
+            // 作成日時・更新日時
+            $table->timestamps();
         });
     }
 

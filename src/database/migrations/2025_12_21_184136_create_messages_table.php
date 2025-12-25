@@ -17,24 +17,31 @@ class CreateMessagesTable extends Migration
             // ID
             $table->id();
 
-            // スレチE��ID�E�外部キー�E�E            $table->foreignId('thread_id')
+            // スレッドID（外部キー）
+            $table->foreignId('thread_id')
                 ->constrained('threads')
                 ->cascadeOnDelete();
 
-            // 送信老E�Eタイプ（企業/フリーランサー�E�E            $table->enum('sender_type', ['company', 'freelancer']);
+            // 送信者のタイプ（企業/フリーランサー）
+            $table->enum('sender_type', ['company', 'freelancer']);
             
-            // 送信老E�EID
+            // 送信者のID
             $table->unsignedBigInteger('sender_id');
 
-            // メチE��ージ本斁E            $table->text('body');
+            // メッセージ本文
+            $table->text('body');
             
-            // 送信日晁E            $table->timestamp('sent_at');
+            // 送信日時
+            $table->timestamp('sent_at');
 
-            // ソフトチE��ート（�E刁E�EメチE��ージ削除対応！E            $table->softDeletes();
+            // ソフトデリート（論理削除メッセージ削除対応）
+            $table->softDeletes();
 
-            // インチE��クス�E�スレチE��IDと送信日時�E絁E��合わせ！E            $table->index(['thread_id', 'sent_at']);
+            // インデックス：スレッドIDと送信日時の組み合わせ
+            $table->index(['thread_id', 'sent_at']);
             
-            // 作�E日時�E更新日晁E            $table->timestamps();
+            // 作成日時・更新日時
+            $table->timestamps();
         });
     }
 

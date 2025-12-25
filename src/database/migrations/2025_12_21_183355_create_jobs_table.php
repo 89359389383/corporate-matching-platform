@@ -17,19 +17,25 @@ class CreateJobsTable extends Migration
             // ID
             $table->id();
 
-            // 企業ID�E�外部キー�E�E            $table->foreignId('company_id')
+            // 企業ID（外部キー）
+            $table->foreignId('company_id')
                 ->constrained('companies')
                 ->cascadeOnDelete();
 
-            // 案件吁E            $table->string('title');
+            // 案件名
+            $table->string('title');
 
-            // 案件概要E            $table->text('description');
+            // 案件概要
+            $table->text('description');
 
-            // 忁E��スキル�E�テキスト！E            $table->text('required_skills_text')->nullable();
+            // 必須スキル（テキスト）
+            $table->text('required_skills_text')->nullable();
 
             // ==========================
-            // 報酬設宁E            // ==========================
-            // 報酬タイプ！Eonthly: 月顁E案件単価、hourly: 時給�E�E            $table->enum('reward_type', ['monthly', 'hourly']);
+            // 報酬設定
+            // ==========================
+            // 報酬タイプ：monthly: 月額/案件単価、hourly: 時給
+            $table->enum('reward_type', ['monthly', 'hourly']);
 
             // 最低単価
             $table->unsignedInteger('min_rate');
@@ -37,11 +43,14 @@ class CreateJobsTable extends Migration
             // 最高単価
             $table->unsignedInteger('max_rate');
 
-            // 稼働条件�E�表示用�E�E            $table->string('work_time_text');
+            // 稼働条件（表示用）
+            $table->string('work_time_text');
 
-            // スチE�Eタス�E�E:下書ぁE/ 1:公開中 / 2:停止中�E�E            $table->unsignedTinyInteger('status')->default(0);
+            // ステータス：0:下書き / 1:公開中 / 2:停止中
+            $table->unsignedTinyInteger('status')->default(0);
             
-            // 作�E日時�E更新日晁E            $table->timestamps();
+            // 作成日時・更新日時
+            $table->timestamps();
         });
     }
 

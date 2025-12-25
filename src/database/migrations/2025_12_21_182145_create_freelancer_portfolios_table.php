@@ -17,16 +17,19 @@ class CreateFreelancerPortfoliosTable extends Migration
             // ID
             $table->id();
 
-            // フリーランサーID�E�外部キー�E�E            $table->foreignId('freelancer_id')
+            // フリーランサーID（外部キー）
+            $table->foreignId('freelancer_id')
                 ->constrained('freelancers')
                 ->cascadeOnDelete();
 
-            // ポ�EトフォリオURL
+            // ポートフォリオURL
             $table->string('url');
             
-            // 表示頁E��E            $table->unsignedSmallInteger('sort_order')->default(0);
+            // 表示順
+            $table->unsignedSmallInteger('sort_order')->default(0);
             
-            // 作�E日時�E更新日晁E            $table->timestamps();
+            // 作成日時・更新日時
+            $table->timestamps();
         });
     }
 

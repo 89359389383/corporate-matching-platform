@@ -17,22 +17,27 @@ class CreateApplicationsTable extends Migration
             // ID
             $table->id();
 
-            // 案件ID�E�外部キー�E�E            $table->foreignId('job_id')
+            // 案件ID（外部キー）
+            $table->foreignId('job_id')
                 ->constrained('jobs')
                 ->cascadeOnDelete();
 
-            // フリーランサーID�E�外部キー�E�E            $table->foreignId('freelancer_id')
+            // フリーランサーID（外部キー）
+            $table->foreignId('freelancer_id')
                 ->constrained('freelancers')
                 ->cascadeOnDelete();
 
-            // 応募メチE��ージ
+            // 応募メッセージ
             $table->text('message');
 
-            // スチE�Eタス�E�E:未対忁E/ 1:対応中 / 2:クローズ�E�E            $table->unsignedTinyInteger('status')->default(0);
+            // ステータス：0:未対応 / 1:対応中 / 2:クローズ
+            $table->unsignedTinyInteger('status')->default(0);
 
-            // ユニ�Eク制紁E��案件とフリーランサーの絁E��合わせ！E            $table->unique(['job_id', 'freelancer_id']);
+            // ユニーク制約：案件とフリーランサーの組み合わせ
+            $table->unique(['job_id', 'freelancer_id']);
             
-            // 作�E日時�E更新日晁E            $table->timestamps();
+            // 作成日時・更新日時
+            $table->timestamps();
         });
     }
 

@@ -17,17 +17,21 @@ class CreateFreelancerSkillTable extends Migration
             // ID
             $table->id();
 
-            // フリーランサーID�E�外部キー�E�E            $table->foreignId('freelancer_id')
+            // フリーランサーID（外部キー）
+            $table->foreignId('freelancer_id')
                 ->constrained('freelancers')
                 ->cascadeOnDelete();
 
-            // スキルID�E�外部キー�E�E            $table->foreignId('skill_id')
+            // スキルID（外部キー）
+            $table->foreignId('skill_id')
                 ->constrained('skills')
                 ->cascadeOnDelete();
 
-            // ユニ�Eク制紁E��フリーランサーとスキルの絁E��合わせ！E            $table->unique(['freelancer_id', 'skill_id']);
+            // ユニーク制約：フリーランサーとスキルの組み合わせ
+            $table->unique(['freelancer_id', 'skill_id']);
             
-            // 作�E日時�E更新日晁E            $table->timestamps();
+            // 作成日時・更新日時
+            $table->timestamps();
         });
     }
 

@@ -5,178 +5,417 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>企業プロフィール登録 - AITECH</title>
     <style>
-        :root { --header-height: 104px; --header-height-mobile: 91px; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { font-size: 130%; }
+        /* リセット & ベース */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background-color: #fafbfc;
-            color: #24292e;
-            line-height: 1.5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+            color: #0f172a;
         }
-        .header {
-            background-color: #ffffff;
-            border-bottom: 1px solid #e1e4e8;
-            padding: 0 3rem;
-            position: sticky;
+
+        /* 背景デザイン - 薄い青色ベース */
+        .background {
+            position: fixed;
             top: 0;
-            z-index: 100;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(ellipse at top left, rgba(219, 234, 254, 0.75) 0%, transparent 55%),
+                radial-gradient(ellipse at bottom right, rgba(186, 230, 253, 0.55) 0%, transparent 55%),
+                radial-gradient(ellipse at center, rgba(224, 242, 254, 0.45) 0%, transparent 70%),
+                linear-gradient(135deg, #eff6ff 0%, #dbeafe 20%, #bae6fd 45%, #e0f2fe 70%, #f0f9ff 100%);
+            overflow: hidden;
+            z-index: 0;
         }
-        .header-content {
-            max-width: 1600px;
-            margin: 0 auto;
+
+        /* コンテナ */
+        .container {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            height: var(--header-height);
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* カード */
+        .register-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(24px) saturate(180%);
+            border-radius: 12px;
+            padding: 40px 64px;
+            width: 100%;
+            max-width: 720px;
+            box-shadow:
+                0 25px 70px rgba(30, 136, 229, 0.18),
+                0 10px 40px rgba(3, 169, 244, 0.10),
+                0 0 100px rgba(255, 255, 255, 0.35),
+                inset 0 1px 1px rgba(255, 255, 255, 1),
+                inset 0 -1px 1px rgba(30, 136, 229, 0.08);
+            position: relative;
+            animation: cardFadeIn 0.6s ease-out, glow 5s ease-in-out infinite;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+        }
+
+        @keyframes cardFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes glow {
+
+            0%,
+            100% {
+                box-shadow:
+                    0 25px 70px rgba(30, 136, 229, 0.18),
+                    0 10px 40px rgba(3, 169, 244, 0.10),
+                    0 0 100px rgba(255, 255, 255, 0.35),
+                    inset 0 1px 1px rgba(255, 255, 255, 1),
+                    inset 0 -1px 1px rgba(30, 136, 229, 0.08);
+            }
+
+            50% {
+                box-shadow:
+                    0 30px 80px rgba(30, 136, 229, 0.24),
+                    0 15px 50px rgba(3, 169, 244, 0.16),
+                    0 0 120px rgba(255, 255, 255, 0.45),
+                    0 0 40px rgba(100, 181, 246, 0.16),
+                    inset 0 1px 1px rgba(255, 255, 255, 1),
+                    inset 0 -1px 1px rgba(30, 136, 229, 0.10);
+            }
+        }
+
+        /* ロゴ */
+        .logo {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            margin-bottom: 18px;
+            gap: 10px;
+        }
+
+        .logo-text {
+            font-weight: 900;
+            font-size: 22px;
+            letter-spacing: 0.5px;
+            color: #0b1220;
+        }
+
+        .logo-badge {
+            background: #0b1220;
+            color: #fff;
+            padding: 2px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 800;
+            font-style: italic;
+        }
+
+        .page-title {
+            text-align: center;
+            font-weight: 900;
+            font-size: 16px;
+            color: #0f172a;
+            margin-bottom: 18px;
+        }
+
+        /* 成功/エラー */
+        .success-box {
+            background: rgba(16, 185, 129, 0.10);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            color: #065f46;
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+
+        .error-box {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.20);
+            color: #7f1d1d;
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+
+        /* フォーム */
+        .register-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
             position: relative;
         }
-        .nav-links {
+
+        .label {
+            display: block;
+            font-size: 13px;
+            font-weight: 900;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            background: #fff;
+            outline: none;
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-input::placeholder,
+        .form-textarea::placeholder {
+            color: #bdbdbd;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            border-color: #1e88e5;
+            box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
+        }
+
+        .form-input.is-invalid,
+        .form-textarea.is-invalid {
+            border-color: rgba(239, 68, 68, 0.8);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.10);
+        }
+
+        .error-message {
+            display: block;
+            margin-top: 6px;
+            font-size: 13px;
+            font-weight: 800;
+            color: #dc2626;
+        }
+
+        .help {
+            margin-top: 6px;
+            font-size: 12px;
+            font-weight: 800;
+            color: #64748b;
+        }
+
+        /* ボタン */
+        .btn-row {
             display: flex;
-            gap: 2rem;
-            align-items: center;
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            justify-content: center;
+            gap: 12px;
+            margin-top: 8px;
             flex-wrap: wrap;
         }
-        .nav-link {
+
+        .btn {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
             text-decoration: none;
-            color: #586069;
-            font-weight: 500;
-            font-size: 1.05rem;
-            padding: 0.75rem 1.25rem;
-            border-radius: 8px;
-            transition: all 0.15s ease;
-            position: relative;
-            letter-spacing: -0.01em;
             display: inline-flex;
             align-items: center;
-            white-space: nowrap;
+            justify-content: center;
         }
-        .nav-link.has-badge { padding-right: 3rem; }
-        .nav-link:hover { background-color: #f6f8fa; color: #24292e; }
-        .nav-link.active { background-color: #0366d6; color: white; box-shadow: 0 2px 8px rgba(3, 102, 214, 0.3); }
-        .badge {
-            background-color: #d73a49; color: white; border-radius: 999px;
-            padding: 0.15rem 0.5rem; font-size: 0.7rem; font-weight: 700;
-            min-width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center;
-            box-shadow: 0 1px 3px rgba(209, 58, 73, 0.3);
-            position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
-        }
-        .user-menu { display: flex; align-items: center; position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
-        .user-avatar {
-            width: 36px; height: 36px; border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-weight: 700; cursor: pointer; transition: all 0.15s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border: none; padding: 0; appearance: none;
-        }
-        .user-avatar:hover { transform: scale(1.08); box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
-        .dropdown { position: relative; }
-        .dropdown-content {
-            display: none; position: absolute; right: 0; top: 100%;
-            background-color: white; min-width: 240px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08);
-            border-radius: 12px; z-index: 1000; border: 1px solid #e1e4e8; margin-top: 0.5rem;
-        }
-        .dropdown.is-open .dropdown-content { display: block; }
-        .dropdown-item {
-            display: block; padding: 0.875rem 1.25rem; text-decoration: none; color: #586069;
-            transition: all 0.15s ease; border-radius: 6px; margin: 0.25rem; white-space: nowrap;
-        }
-        .dropdown-item:hover { background-color: #f6f8fa; color: #24292e; }
-        .dropdown-divider { height: 1px; background-color: #e1e4e8; margin: 0.5rem 0; }
 
-        .main-content { max-width: 1100px; margin: 0 auto; padding: 3rem; }
-        .page-title { font-size: 2rem; font-weight: 900; margin-bottom: 1.5rem; letter-spacing: -0.025em; }
-        .panel {
-            background-color: white; border-radius: 16px; padding: 2rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
-            border: 1px solid #e1e4e8;
+        .btn-primary {
+            background: linear-gradient(135deg, #1e88e5 0%, #1976d2 100%);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.25);
         }
-        .field { margin-bottom: 1.25rem; }
-        .field label { display: block; font-weight: 900; margin-bottom: 0.75rem; color: #586069; font-size: 0.9rem; }
-        .input, .textarea {
-            width: 100%;
-            padding: 0.875rem 1rem;
-            border: 2px solid #e1e4e8;
-            border-radius: 10px;
-            font-size: 0.95rem;
-            transition: all 0.15s ease;
-            background-color: #fafbfc;
-        }
-        .textarea { min-height: 140px; resize: vertical; }
-        .input:focus, .textarea:focus { outline: none; border-color: #0366d6; box-shadow: 0 0 0 3px rgba(3,102,214,0.1); background-color: #fff; }
-        .help { margin-top: 0.5rem; color: #6a737d; font-weight: 800; font-size: 0.85rem; }
-        .btn-row { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.25rem; flex-wrap: wrap; }
-        .btn {
-            padding: 0.875rem 1.75rem; border-radius: 10px; font-weight: 900;
-            text-decoration: none; display: inline-flex; align-items: center; justify-content: center;
-            transition: all 0.15s ease; cursor: pointer; border: none; font-size: 0.95rem; white-space: nowrap;
-        }
-        .btn-primary { background-color: #0366d6; color: #fff; }
-        .btn-primary:hover { background-color: #0256cc; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(3,102,214,0.3); }
-        .btn-secondary { background-color: #586069; color: #fff; }
-        .btn-secondary:hover { background-color: #4c5561; transform: translateY(-1px); }
 
-        @media (max-width: 920px) {
-            .header-content { height: var(--header-height-mobile); }
-            .nav-links { position: static; left: auto; transform: none; justify-content: flex-start; }
-            .user-menu { position: static; transform: none; margin-left: auto; }
-            .main-content { padding: 1.5rem; }
-            .btn-row .btn { width: 100%; }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+            box-shadow: 0 6px 16px rgba(30, 136, 229, 0.32);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: rgba(15, 23, 42, 0.08);
+            color: #0f172a;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(15, 23, 42, 0.12);
+            transform: translateY(-1px);
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 900px) {
+            .register-card {
+                padding: 40px 32px;
+                max-width: 720px;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .register-card {
+                padding: 32px 24px;
+            }
+
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .register-card {
+                max-width: 100%;
+                padding: 28px 20px;
+            }
+
+            .form-input,
+            .form-textarea {
+                padding: 10px 14px;
+                font-size: 13px;
+            }
+
+            .btn {
+                font-size: 13px;
+                padding: 12px 20px;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="background"></div>
 
-    <main class="main-content">
-        <h1 class="page-title">企業プロフィール登録</h1>
-        <div class="panel">
-            <form action="#" method="post">
-                <div class="field">
-                    <label for="companyName">企業名（必須）</label>
-                    <input id="companyName" class="input" type="text" placeholder="例: 株式会社AITECH" required>
+    <div class="container">
+        <div class="register-card">
+            <div class="logo" aria-label="AITECH">
+                <span class="logo-text">AITECH</span>
+                <span class="logo-badge">PROFILE</span>
+            </div>
+            <div class="page-title">企業プロフィール登録</div>
+
+            @if (session('success'))
+            <div class="success-box">
+                {{ session('success') }}
+            </div>
+            @endif
+
+            @if (session('error'))
+            <div class="error-box">
+                {{ session('error') }}
+            </div>
+            @endif
+
+            <form class="register-form" method="POST" action="{{ route('company.profile.store') }}">
+                @csrf
+
+                <div class="form-group">
+                    <label class="label" for="company_name">企業名（必須）</label>
+                    <input
+                        id="company_name"
+                        type="text"
+                        name="company_name"
+                        value="{{ old('company_name') }}"
+                        class="form-input @error('company_name') is-invalid @enderror"
+                        placeholder="例: 株式会社AITECH"
+                        required>
+                    @error('company_name')
+                    <span class="error-message">{{ $message }}</span>
+                    @enderror
                 </div>
-                <div class="field">
-                    <label for="overview">会社概要（任意）</label>
-                    <textarea id="overview" class="textarea" placeholder="事業内容や特徴など"></textarea>
+
+                <div class="form-group">
+                    <label class="label" for="overview">会社概要（任意）</label>
+                    <textarea
+                        id="overview"
+                        name="overview"
+                        class="form-textarea @error('overview') is-invalid @enderror"
+                        placeholder="事業内容や特徴など（2000文字以内）">{{ old('overview') }}</textarea>
+                    @error('overview')
+                    <span class="error-message">{{ $message }}</span>
+                    @enderror
                 </div>
-                <div class="field">
-                    <label for="contact">担当者名 / 部署（任意）</label>
-                    <input id="contact" class="input" type="text" placeholder="例: 山田 / 開発部">
+
+                <div class="two-col">
+                    <div class="form-group">
+                        <label class="label" for="contact_name">担当者名（任意）</label>
+                        <input
+                            id="contact_name"
+                            type="text"
+                            name="contact_name"
+                            value="{{ old('contact_name') }}"
+                            class="form-input @error('contact_name') is-invalid @enderror"
+                            placeholder="例: 山田 太郎">
+                        @error('contact_name')
+                        <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label class="label" for="department">部署（任意）</label>
+                        <input
+                            id="department"
+                            type="text"
+                            name="department"
+                            value="{{ old('department') }}"
+                            class="form-input @error('department') is-invalid @enderror"
+                            placeholder="例: 開発部">
+                        @error('department')
+                        <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
                 </div>
-                <div class="field">
-                    <label for="intro">自己紹介（任意）</label>
-                    <textarea id="intro" class="textarea" placeholder="フリーランスに伝えたいこと（募集背景/働き方など）"></textarea>
+
+                <div class="form-group">
+                    <label class="label" for="introduction">自己紹介（任意）</label>
+                    <textarea
+                        id="introduction"
+                        name="introduction"
+                        class="form-textarea @error('introduction') is-invalid @enderror"
+                        placeholder="フリーランスに伝えたいこと（募集背景/働き方など・2000文字以内）">{{ old('introduction') }}</textarea>
+                    @error('introduction')
+                    <span class="error-message">{{ $message }}</span>
+                    @enderror
                     <div class="help">登録後は「プロフィール設定」から更新できます</div>
                 </div>
+
                 <div class="btn-row">
-                    <a class="btn btn-secondary" href="#">キャンセル</a>
+                    <a class="btn btn-secondary" href="{{ url()->previous() }}">戻る</a>
                     <button class="btn btn-primary" type="submit">登録</button>
                 </div>
             </form>
         </div>
-    </main>
-
-    <script>
-        (function () {
-            const dropdown = document.getElementById('userDropdown');
-            const toggle = document.getElementById('userDropdownToggle');
-            const menu = document.getElementById('userDropdownMenu');
-            if (!dropdown || !toggle || !menu) return;
-            const open = () => { dropdown.classList.add('is-open'); toggle.setAttribute('aria-expanded', 'true'); };
-            const close = () => { dropdown.classList.remove('is-open'); toggle.setAttribute('aria-expanded', 'false'); };
-            const isOpen = () => dropdown.classList.contains('is-open');
-            toggle.addEventListener('click', (e) => { e.stopPropagation(); isOpen() ? close() : open(); });
-            document.addEventListener('click', (e) => { if (!dropdown.contains(e.target)) close(); });
-            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
-        })();
-    </script>
+    </div>
 </body>
 </html>

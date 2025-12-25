@@ -17,27 +17,33 @@ class CreateScoutsTable extends Migration
             // ID
             $table->id();
 
-            // 企業ID�E�外部キー�E�E            $table->foreignId('company_id')
+            // 企業ID（外部キー）
+            $table->foreignId('company_id')
                 ->constrained('companies')
                 ->cascadeOnDelete();
 
-            // フリーランサーID�E�外部キー�E�E            $table->foreignId('freelancer_id')
+            // フリーランサーID（外部キー）
+            $table->foreignId('freelancer_id')
                 ->constrained('freelancers')
                 ->cascadeOnDelete();
 
-            // 案件ID�E�外部キー、任意！E            $table->foreignId('job_id')
+            // 案件ID（外部キー、任意）
+            $table->foreignId('job_id')
                 ->nullable()
                 ->constrained('jobs')
                 ->nullOnDelete();
 
-            // スカウトメチE��ージ
+            // スカウトメッセージ
             $table->text('message');
 
-            // スチE�Eタス�E�E:未対忁E/ 1:対応中 / 2:クローズ�E�E            $table->unsignedTinyInteger('status')->default(0);
+            // ステータス：0:未対応 / 1:対応中 / 2:クローズ
+            $table->unsignedTinyInteger('status')->default(0);
 
-            // インチE��クス�E�企業、フリーランサー、案件の絁E��合わせ！E            $table->index(['company_id', 'freelancer_id', 'job_id']);
+            // インデックス：企業、フリーランサー、案件の組み合わせ
+            $table->index(['company_id', 'freelancer_id', 'job_id']);
             
-            // 作�E日時�E更新日晁E            $table->timestamps();
+            // 作成日時・更新日時
+            $table->timestamps();
         });
     }
 

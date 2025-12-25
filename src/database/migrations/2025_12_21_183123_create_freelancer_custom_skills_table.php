@@ -17,18 +17,22 @@ class CreateFreelancerCustomSkillsTable extends Migration
             // ID
             $table->id();
 
-            // フリーランサーID�E�外部キー�E�E            $table->foreignId('freelancer_id')
+            // フリーランサーID（外部キー）
+            $table->foreignId('freelancer_id')
                 ->constrained('freelancers')
                 ->cascadeOnDelete();
 
-            // 自由入力スキル名（検索対象�E�E            $table->string('name');
+            // 自由入力スキル名（検索対象）
+            $table->string('name');
 
-            // 表示頁E��E            $table->unsignedSmallInteger('sort_order')->default(0);
+            // 表示順
+            $table->unsignedSmallInteger('sort_order')->default(0);
 
-            // 🔍 検索用インチE��クス
+            // 🔍 検索用インデックス
             $table->index('name');
             
-            // 作�E日時�E更新日晁E            $table->timestamps();
+            // 作成日時・更新日時
+            $table->timestamps();
         });
     }
 
