@@ -22,13 +22,13 @@ class JobRequest extends FormRequest
             'description' => ['required', 'string', 'max:5000'],
             // 必須スキル（任意）
             'required_skills_text' => ['nullable', 'string', 'max:2000'],
-            // 報酬種別（任意）
-            'reward_type' => ['nullable', 'string', 'max:50'],
-            // 報酬レンジ（任意）
-            'min_rate' => ['nullable', 'integer', 'min:0'],
-            'max_rate' => ['nullable', 'integer', 'min:0'],
-            // 稼働条件（任意）
-            'work_time_text' => ['nullable', 'string', 'max:2000'],
+            // 報酬種別（必須）
+            'reward_type' => ['required', 'string', 'in:monthly,hourly'],
+            // 報酬レンジ（必須）
+            'min_rate' => ['required', 'integer', 'min:0'],
+            'max_rate' => ['required', 'integer', 'min:0', 'gte:min_rate'],
+            // 稼働条件（必須）
+            'work_time_text' => ['required', 'string', 'max:2000'],
             // ステータス（必須）
             'status' => ['required', 'integer', 'in:' . Job::STATUS_DRAFT . ',' . Job::STATUS_PUBLISHED . ',' . Job::STATUS_STOPPED],
         ];
@@ -48,15 +48,20 @@ class JobRequest extends FormRequest
             'required_skills_text.string' => '必須スキルは文字列で入力してください。',
             'required_skills_text.max' => '必須スキルは2000文字以内で入力してください。',
 
-            'reward_type.string' => '報酬種別は文字列で入力してください。',
-            'reward_type.max' => '報酬種別は50文字以内で入力してください。',
+            'reward_type.required' => '報酬タイプを選択してください。',
+            'reward_type.string' => '報酬タイプは文字列で入力してください。',
+            'reward_type.in' => '報酬タイプは「月額/案件単価」または「時給」を選択してください。',
 
-            'min_rate.integer' => '報酬下限は整数で入力してください。',
-            'min_rate.min' => '報酬下限は0以上で入力してください。',
+            'min_rate.required' => '最低単価を入力してください。',
+            'min_rate.integer' => '最低単価は整数で入力してください。',
+            'min_rate.min' => '最低単価は0以上で入力してください。',
 
-            'max_rate.integer' => '報酬上限は整数で入力してください。',
-            'max_rate.min' => '報酬上限は0以上で入力してください。',
+            'max_rate.required' => '最高単価を入力してください。',
+            'max_rate.integer' => '最高単価は整数で入力してください。',
+            'max_rate.min' => '最高単価は0以上で入力してください。',
+            'max_rate.gte' => '最高単価は最低単価以上で入力してください。',
 
+            'work_time_text.required' => '稼働条件を入力してください。',
             'work_time_text.string' => '稼働条件は文字列で入力してください。',
             'work_time_text.max' => '稼働条件は2000文字以内で入力してください。',
 

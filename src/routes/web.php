@@ -131,6 +131,9 @@ Route::middleware(['auth', 'company'])->group(function () {
     // 案件 更新
     Route::match(['put', 'patch'], '/company/jobs/{job}', [CompanyJobController::class, 'update'])->name('company.jobs.update');
 
+    // 案件ステータス更新
+    Route::patch('/company/jobs/{job}/status', [CompanyJobController::class, 'updateStatus'])->name('company.jobs.status.update');
+
     // 案件削除
     Route::delete('/company/jobs/{job}', [CompanyJobController::class, 'destroy'])->name('company.jobs.destroy');
 

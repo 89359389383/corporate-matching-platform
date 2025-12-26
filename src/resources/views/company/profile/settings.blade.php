@@ -141,18 +141,21 @@
     <header class="header">
         <div class="header-content">
             <nav class="nav-links">
-                <a href="#" class="nav-link">フリーランス一覧</a>
-                <a href="#" class="nav-link">案件一覧</a>
-                <a href="#" class="nav-link has-badge">応募された案件 <span class="badge">3</span></a>
-                <a href="#" class="nav-link has-badge">スカウト <span class="badge">1</span></a>
+                <a href="{{ route('company.freelancers.index') }}" class="nav-link">フリーランス一覧</a>
+                <a href="{{ route('company.jobs.index') }}" class="nav-link">案件一覧</a>
+                <a href="{{ route('company.applications.index') }}" class="nav-link has-badge">応募された案件 <span class="badge">3</span></a>
+                <a href="{{ route('company.scouts.index') }}" class="nav-link has-badge">スカウト <span class="badge">1</span></a>
             </nav>
             <div class="user-menu">
                 <div class="dropdown" id="userDropdown">
                     <button class="user-avatar" id="userDropdownToggle" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="userDropdownMenu">企</button>
                     <div class="dropdown-content" id="userDropdownMenu" role="menu" aria-label="ユーザーメニュー">
-                        <a href="#" class="dropdown-item" role="menuitem">プロフィール設定</a>
+                        <a href="{{ route('company.profile.settings') }}" class="dropdown-item" role="menuitem">プロフィール設定</a>
                         <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item" role="menuitem">ログアウト</a>
+                        <form method="POST" action="{{ route('auth.logout') }}" style="display: inline;">
+                            @csrf
+                            <button type="submit" class="dropdown-item" role="menuitem" style="width: 100%; text-align: left; background: none; border: none; padding: 0.875rem 1.25rem; color: #586069; cursor: pointer; font-size: inherit; font-family: inherit;">ログアウト</button>
+                        </form>
                     </div>
                 </div>
             </div>

@@ -100,6 +100,7 @@
             border: 1px solid #e1e4e8;
         }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.25rem; }
         .field { margin-bottom: 1.25rem; }
         .field label { display: block; font-weight: 900; margin-bottom: 0.75rem; color: #586069; font-size: 0.9rem; }
         .input, .textarea, .select {
@@ -131,6 +132,7 @@
             .user-menu { position: static; transform: none; margin-left: auto; }
             .main-content { padding: 1.5rem; }
             .grid { grid-template-columns: 1fr; }
+            .grid-3 { grid-template-columns: 1fr; }
             .btn-row .btn { width: 100%; }
         }
         @media (max-width: 1200px) {
@@ -144,18 +146,21 @@
     <header class="header">
         <div class="header-content">
             <nav class="nav-links">
-                <a href="#" class="nav-link">フリーランス一覧</a>
-                <a href="#" class="nav-link active">案件一覧</a>
-                <a href="#" class="nav-link has-badge">応募された案件 <span class="badge">3</span></a>
-                <a href="#" class="nav-link has-badge">スカウト <span class="badge">1</span></a>
+                <a href="{{ route('company.freelancers.index') }}" class="nav-link">フリーランス一覧</a>
+                <a href="{{ route('company.jobs.index') }}" class="nav-link active">案件一覧</a>
+                <a href="{{ route('company.applications.index') }}" class="nav-link has-badge">応募された案件 <span class="badge">3</span></a>
+                <a href="{{ route('company.scouts.index') }}" class="nav-link has-badge">スカウト <span class="badge">1</span></a>
             </nav>
             <div class="user-menu">
                 <div class="dropdown" id="userDropdown">
                     <button class="user-avatar" id="userDropdownToggle" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="userDropdownMenu">企</button>
                     <div class="dropdown-content" id="userDropdownMenu" role="menu" aria-label="ユーザーメニュー">
-                        <a href="#" class="dropdown-item" role="menuitem">プロフィール設定</a>
+                        <a href="{{ route('company.profile.settings') }}" class="dropdown-item" role="menuitem">プロフィール設定</a>
                         <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item" role="menuitem">ログアウト</a>
+                        <form method="POST" action="{{ route('auth.logout') }}" style="display: inline;">
+                            @csrf
+                            <button type="submit" class="dropdown-item" role="menuitem" style="width: 100%; text-align: left; background: none; border: none; padding: 0.875rem 1.25rem; color: #586069; cursor: pointer; font-size: inherit; font-family: inherit;">ログアウト</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -164,63 +169,114 @@
 
     <main class="main-content">
         <h1 class="page-title">案件 編集</h1>
+        
+        @if ($errors->any())
+            <div class="panel" style="margin-bottom: 1.5rem; background-color: #fff3cd; border-color: #ffc107;">
+                <div style="color: #856404; font-weight: 700;">
+                    <ul style="margin: 0; padding-left: 1.5rem;">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        @endif
+
+        @if (session('success'))
+            <div class="panel" style="margin-bottom: 1.5rem; background-color: #d4edda; border-color: #28a745;">
+                <div style="color: #155724; font-weight: 700;">{{ session('success') }}</div>
+            </div>
+        @endif
+
         <div class="panel">
-            <form action="#" method="post">
+            <form action="{{ route('company.jobs.update', $job) }}" method="post">
+                @csrf
+                @method('PUT')
                 <div class="grid">
                     <div class="field">
                         <label for="title">タイトル（必須）</label>
-                        <input id="title" class="input" type="text" value="ECサイト機能拡張プロジェクト" required>
+                        <input id="title" name="title" class="input" type="text" placeholder="例: ECサイト機能拡張プロジェクト" value="{{ old('title', $job->title) }}" required>
+                        @error('title')
+                            <div class="help" style="color: #d73a49;">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="field">
                         <label for="companyName">会社名</label>
-                        <input id="companyName" class="input" type="text" value="株式会社AITECH">
+                        <input id="companyName" class="input" type="text" value="{{ $job->company->name ?? '未登録' }}" disabled>
+                        <div class="help">企業プロフィールから自動取得されます</div>
                     </div>
                 </div>
 
                 <div class="field">
-                    <label for="overview">案件概要（必須）</label>
-                    <textarea id="overview" class="textarea" required>既存ECの管理画面と商品登録フローを改善。速度改善とUX向上が目的。</textarea>
+                    <label for="description">案件概要（必須）</label>
+                    <textarea id="description" name="description" class="textarea" placeholder="案件の概要を入力してください" required>{{ old('description', $job->description) }}</textarea>
+                    @error('description')
+                        <div class="help" style="color: #d73a49;">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <div class="field">
-                    <label for="work">想定業務</label>
-                    <textarea id="work" class="textarea">管理画面改善 / 商品登録フロー改善 / パフォーマンス改善</textarea>
+                    <label for="required_skills_text">必要スキル（自由入力）</label>
+                    <input id="required_skills_text" name="required_skills_text" class="input" type="text" placeholder="例: PHP, Laravel, Vue.js, MySQL" value="{{ old('required_skills_text', $job->required_skills_text) }}">
+                    <div class="help">カンマ区切りで入力してください</div>
+                    @error('required_skills_text')
+                        <div class="help" style="color: #d73a49;">{{ $message }}</div>
+                    @enderror
                 </div>
 
-                <div class="grid">
+                <div class="grid-3">
                     <div class="field">
-                        <label for="skills">必要スキル（自由入力）</label>
-                        <input id="skills" class="input" type="text" value="PHP, Laravel, Vue.js, MySQL">
-                        <div class="help">カンマ区切り想定（ダミー）</div>
+                        <label for="reward_type">報酬タイプ（必須）</label>
+                        <select id="reward_type" name="reward_type" class="select" required>
+                            <option value="monthly" {{ old('reward_type', $job->reward_type) === 'monthly' ? 'selected' : '' }}>月額/案件単価</option>
+                            <option value="hourly" {{ old('reward_type', $job->reward_type) === 'hourly' ? 'selected' : '' }}>時給</option>
+                        </select>
+                        @error('reward_type')
+                            <div class="help" style="color: #d73a49;">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="field">
-                        <label for="reward">報酬目安</label>
-                        <input id="reward" class="input" type="text" value="50万円〜70万円">
-                    </div>
-                </div>
-
-                <div class="grid">
-                    <div class="field">
-                        <label for="period">期間</label>
-                        <input id="period" class="input" type="text" value="3ヶ月">
+                        <label for="min_rate">最低単価（必須）</label>
+                        <input id="min_rate" name="min_rate" class="input" type="number" placeholder="例: 300000" value="{{ old('min_rate', $job->min_rate) }}" min="0" required>
+                        <div class="help">円単位で入力してください</div>
+                        @error('min_rate')
+                            <div class="help" style="color: #d73a49;">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="field">
-                        <label for="hours">稼働時間</label>
-                        <input id="hours" class="input" type="text" value="週20〜30時間">
+                        <label for="max_rate">最高単価（必須）</label>
+                        <input id="max_rate" name="max_rate" class="input" type="number" placeholder="例: 500000" value="{{ old('max_rate', $job->max_rate) }}" min="0" required>
+                        <div class="help">円単位で入力してください</div>
+                        @error('max_rate')
+                            <div class="help" style="color: #d73a49;">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
 
                 <div class="field">
-                    <label for="status">ステータス</label>
-                    <select id="status" class="select">
-                        <option selected>公開</option>
-                        <option>下書き</option>
-                        <option>停止</option>
+                    <label for="work_time_text">稼働条件（必須）</label>
+                    <input id="work_time_text" name="work_time_text" class="input" type="text" placeholder="例: 週10〜20時間、2〜3ヶ月" value="{{ old('work_time_text', $job->work_time_text) }}" required>
+                    <div class="help">稼働時間や期間などを自由に入力してください</div>
+                    @error('work_time_text')
+                        <div class="help" style="color: #d73a49;">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="field">
+                    <label for="status">ステータス（必須）</label>
+                    <select id="status" name="status" class="select" required>
+                        <option value="{{ App\Models\Job::STATUS_PUBLISHED }}" {{ old('status', $job->status) == App\Models\Job::STATUS_PUBLISHED ? 'selected' : '' }}>公開</option>
+                        <option value="{{ App\Models\Job::STATUS_DRAFT }}" {{ old('status', $job->status) == App\Models\Job::STATUS_DRAFT ? 'selected' : '' }}>下書き</option>
+                        <option value="{{ App\Models\Job::STATUS_STOPPED }}" {{ old('status', $job->status) == App\Models\Job::STATUS_STOPPED ? 'selected' : '' }}>停止</option>
                     </select>
+                    <div class="help">公開のみフリーランス側の案件一覧に表示される想定</div>
+                    @error('status')
+                        <div class="help" style="color: #d73a49;">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <div class="btn-row">
-                    <a class="btn btn-secondary" href="#">キャンセル</a>
+                    <a class="btn btn-secondary" href="{{ route('company.jobs.index') }}">キャンセル</a>
                     <button class="btn btn-primary" type="submit">更新</button>
                 </div>
             </form>

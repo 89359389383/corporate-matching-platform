@@ -80,6 +80,8 @@ class CompanyJobController extends Controller
             'status' => $status,
             // フィルタ保持用
             'keyword' => $keyword,
+            // 企業情報
+            'company' => $company,
         ]);
     }
 
@@ -182,6 +184,44 @@ class CompanyJobController extends Controller
 
         // 一覧へ戻して完了メッセージを表示する
         return redirect('/company/jobs')->with('success', '案件を更新しました');
+    }
+
+    /**
+     * 案件のステータスを更新する
+     */
+    public function updateStatus(Request $request, Job $job)
+    {
+        // 認証ユーザーを取得する
+        $user = Auth::user();
+
+        // 企業以外は拒否する
+        if ($user->role !== 'company') {
+            abort(403);
+        }
+
+        // 自社案件かどうかをチェックする
+        if ($user->company === null || $job->company_id !== $user->company->id) {
+            abort(403);
+        }
+
+        // ステータスをバリデーションする
+        $request->validate([
+            'status' => 'required|in:draft,publish,stopped',
+        ]);
+
+        // ステータスマップ
+        $statusMap = [
+            'draft' => Job::STATUS_DRAFT,
+            'publish' => Job::STATUS_PUBLISHED,
+            'stopped' => Job::STATUS_STOPPED,
+        ];
+
+        // ステータスを更新する
+        $job->status = $statusMap[$request->status];
+        $job->save();
+
+        // 一覧へ戻して完了メッセージを表示する
+        return redirect('/company/jobs')->with('success', 'ステータスを更新しました');
     }
 
     /**

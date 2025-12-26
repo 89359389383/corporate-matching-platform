@@ -245,6 +245,141 @@
         .actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid #e1e4e8; flex-wrap: wrap; }
         .inline { display: inline-flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
 
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+        .pagination-list {
+            display: flex;
+            gap: 0.5rem;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .pagination-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #586069;
+            font-weight: 600;
+            font-size: 0.875rem;
+            border: 1px solid #e1e4e8;
+            background-color: white;
+            transition: all 0.15s ease;
+            min-width: 36px;
+        }
+        .pagination-link:hover {
+            background-color: #f6f8fa;
+            border-color: #d1d5da;
+            color: #24292e;
+        }
+        .pagination-link.is-active {
+            background-color: #0366d6;
+            color: white;
+            border-color: #0366d6;
+        }
+        .pagination-link.is-disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .pagination-ellipsis {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem;
+            color: #586069;
+        }
+
+        /* Delete Confirmation Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .modal-overlay.is-open {
+            display: flex;
+            opacity: 1;
+        }
+        .modal-dialog {
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.2);
+            max-width: 480px;
+            width: 90%;
+            max-height: 90vh;
+            overflow: auto;
+            transform: scale(0.95) translateY(20px);
+            transition: transform 0.2s ease;
+            border: 1px solid #e1e4e8;
+        }
+        .modal-overlay.is-open .modal-dialog {
+            transform: scale(1) translateY(0);
+        }
+        .modal-header {
+            padding: 2rem 2rem 1rem;
+            border-bottom: 1px solid #e1e4e8;
+        }
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #24292e;
+            margin: 0;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .modal-title-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        .modal-body {
+            padding: 1.5rem 2rem;
+        }
+        .modal-message {
+            color: #586069;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+        .modal-footer {
+            padding: 1rem 2rem 2rem;
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+        }
+        .modal-footer .btn {
+            min-width: 100px;
+        }
+
         @media (max-width: 920px) {
             .header-content { height: var(--header-height-mobile); }
             .nav-links { position: static; left: auto; transform: none; justify-content: flex-start; }
@@ -265,18 +400,21 @@
     <header class="header">
         <div class="header-content">
             <nav class="nav-links">
-                <a href="#" class="nav-link">フリーランス一覧</a>
-                <a href="#" class="nav-link active">案件一覧</a>
-                <a href="#" class="nav-link has-badge">応募された案件 <span class="badge">3</span></a>
-                <a href="#" class="nav-link has-badge">スカウト <span class="badge">1</span></a>
+                <a href="{{ route('company.freelancers.index') }}" class="nav-link">フリーランス一覧</a>
+                <a href="{{ route('company.jobs.index') }}" class="nav-link active">案件一覧</a>
+                <a href="{{ route('company.applications.index') }}" class="nav-link has-badge">応募された案件 <span class="badge">3</span></a>
+                <a href="{{ route('company.scouts.index') }}" class="nav-link has-badge">スカウト <span class="badge">1</span></a>
             </nav>
             <div class="user-menu">
                 <div class="dropdown" id="userDropdown">
                     <button class="user-avatar" id="userDropdownToggle" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="userDropdownMenu">企</button>
                     <div class="dropdown-content" id="userDropdownMenu" role="menu" aria-label="ユーザーメニュー">
-                        <a href="#" class="dropdown-item" role="menuitem">プロフィール設定</a>
+                        <a href="{{ route('company.profile.settings') }}" class="dropdown-item" role="menuitem">プロフィール設定</a>
                         <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item" role="menuitem">ログアウト</a>
+                        <form method="POST" action="{{ route('auth.logout') }}" style="display: inline;">
+                            @csrf
+                            <button type="submit" class="dropdown-item" role="menuitem" style="width: 100%; text-align: left; background: none; border: none; padding: 0.875rem 1.25rem; color: #586069; cursor: pointer; font-size: inherit; font-family: inherit;">ログアウト</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -287,104 +425,138 @@
         <aside class="sidebar">
             <div class="panel">
                 <h3>検索</h3>
-                <div class="field">
-                    <label for="keyword">キーワード</label>
-                    <input id="keyword" class="input" type="text" placeholder="タイトル / 概要 / スキル など">
-                </div>
-                <button class="btn btn-primary" type="button">検索</button>
+                <form method="GET" action="{{ route('company.jobs.index') }}">
+                    <div class="field">
+                        <label for="keyword">キーワード</label>
+                        <input id="keyword" name="keyword" class="input" type="text" placeholder="タイトル / 概要 / スキル など" value="{{ old('keyword', $keyword ?? '') }}">
+                    </div>
+                    <button class="btn btn-primary" type="submit">検索</button>
+                    @if(isset($keyword) && $keyword !== '')
+                        <a href="{{ route('company.jobs.index') }}" class="btn btn-secondary" style="margin-top: 0.5rem; display: block; text-align: center;">リセット</a>
+                    @endif
+                </form>
             </div>
         </aside>
 
         <section class="content-area">
             <div class="topbar">
                 <h1 class="page-title">自社案件一覧</h1>
-                <a class="btn btn-primary" href="#">新規登録</a>
+                <a class="btn btn-primary" href="{{ route('company.jobs.create') }}">新規登録</a>
             </div>
+
+            @if(session('success'))
+                <div style="background-color: #e6ffed; border: 1px solid #b7f5c3; color: #1a7f37; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div style="background-color: #fff5f5; border: 1px solid #ffccd2; color: #b31d28; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                    {{ session('error') }}
+                </div>
+            @endif
 
             <div class="list">
-                <article class="card">
-                    <div class="inline">
-                        <span class="pill public">公開</span>
-                        <div class="title">ECサイト機能拡張プロジェクト</div>
+                @forelse($jobs as $job)
+                    @php
+                        $statusClass = '';
+                        $statusText = '';
+                        $statusValue = '';
+                        switch($job->status) {
+                            case \App\Models\Job::STATUS_PUBLISHED:
+                                $statusClass = 'public';
+                                $statusText = '公開';
+                                $statusValue = 'publish';
+                                break;
+                            case \App\Models\Job::STATUS_DRAFT:
+                                $statusClass = 'draft';
+                                $statusText = '下書き';
+                                $statusValue = 'draft';
+                                break;
+                            case \App\Models\Job::STATUS_STOPPED:
+                                $statusClass = 'stopped';
+                                $statusText = '停止';
+                                $statusValue = 'stopped';
+                                break;
+                        }
+                        
+                        // 報酬の表示フォーマット
+                        $rewardDisplay = '';
+                        if ($job->reward_type === 'monthly') {
+                            $rewardDisplay = ($job->min_rate / 10000) . '〜' . ($job->max_rate / 10000) . '万';
+                        } else {
+                            $rewardDisplay = number_format($job->min_rate) . '〜' . number_format($job->max_rate) . '円';
+                        }
+                    @endphp
+                    <article class="card">
+                        <div class="inline">
+                            <span class="pill {{ $statusClass }}">{{ $statusText }}</span>
+                            <div class="title">{{ $job->title }}</div>
+                        </div>
+                        <div class="sub">{{ $company->name }}</div>
+                        <div class="desc">{{ $job->description }}</div>
+                        <div class="meta">
+                            <div class="meta-item"><div class="meta-label">報酬</div><div class="meta-value">{{ $rewardDisplay }}</div></div>
+                            <div class="meta-item"><div class="meta-label">稼働</div><div class="meta-value">{{ $job->work_time_text }}</div></div>
+                            @if($job->required_skills_text)
+                                <div class="meta-item"><div class="meta-label">スキル</div><div class="meta-value">{{ $job->required_skills_text }}</div></div>
+                            @endif
+                        </div>
+                        <div class="actions">
+                            <form method="POST" action="{{ route('company.jobs.status.update', $job) }}" style="margin-right:auto;">
+                                @csrf
+                                @method('PATCH')
+                                <label class="inline" style="font-weight:900; color:#586069;">
+                                    ステータス
+                                    <select name="status" class="select" aria-label="ステータス" onchange="this.form.submit()">
+                                        <option value="publish" {{ $job->status === \App\Models\Job::STATUS_PUBLISHED ? 'selected' : '' }}>公開</option>
+                                        <option value="draft" {{ $job->status === \App\Models\Job::STATUS_DRAFT ? 'selected' : '' }}>下書き</option>
+                                        <option value="stopped" {{ $job->status === \App\Models\Job::STATUS_STOPPED ? 'selected' : '' }}>停止</option>
+                                    </select>
+                                </label>
+                            </form>
+                            <a class="btn btn-secondary" href="{{ route('company.jobs.edit', $job) }}">編集</a>
+                            <form method="POST" action="{{ route('company.jobs.destroy', $job) }}" style="display: inline;" id="delete-form-{{ $job->id }}">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-danger delete-btn" type="button" data-job-id="{{ $job->id }}" data-job-title="{{ $job->title }}">削除</button>
+                            </form>
+                        </div>
+                    </article>
+                @empty
+                    <div style="text-align: center; padding: 3rem; color: #586069;">
+                        <p style="font-size: 1.1rem; margin-bottom: 1rem;">案件がありません</p>
+                        <a href="{{ route('company.jobs.create') }}" class="btn btn-primary">新規案件を登録</a>
                     </div>
-                    <div class="sub">株式会社AITECH</div>
-                    <div class="desc">既存ECの管理画面と商品登録フローを改善。速度改善とUX向上が目的。</div>
-                    <div class="meta">
-                        <div class="meta-item"><div class="meta-label">報酬</div><div class="meta-value">50〜70万</div></div>
-                        <div class="meta-item"><div class="meta-label">期間</div><div class="meta-value">3ヶ月</div></div>
-                        <div class="meta-item"><div class="meta-label">稼働</div><div class="meta-value">週20〜30h</div></div>
-                        <div class="meta-item"><div class="meta-label">スキル</div><div class="meta-value">Laravel</div></div>
-                    </div>
-                    <div class="actions">
-                        <label class="inline" style="margin-right:auto; font-weight:900; color:#586069;">
-                            ステータス
-                            <select class="select" aria-label="ステータス">
-                                <option selected>公開</option>
-                                <option>下書き</option>
-                                <option>停止</option>
-                            </select>
-                        </label>
-                        <a class="btn btn-secondary" href="#">編集</a>
-                        <button class="btn btn-danger" type="button">削除</button>
-                    </div>
-                </article>
-
-                <article class="card">
-                    <div class="inline">
-                        <span class="pill draft">下書き</span>
-                        <div class="title">モバイルアプリ開発（新規）</div>
-                    </div>
-                    <div class="sub">株式会社AITECH</div>
-                    <div class="desc">React Native での新規アプリ立ち上げ。画面設計〜実装まで。</div>
-                    <div class="meta">
-                        <div class="meta-item"><div class="meta-label">報酬</div><div class="meta-value">60〜80万</div></div>
-                        <div class="meta-item"><div class="meta-label">期間</div><div class="meta-value">4ヶ月</div></div>
-                        <div class="meta-item"><div class="meta-label">稼働</div><div class="meta-value">週25〜35h</div></div>
-                        <div class="meta-item"><div class="meta-label">スキル</div><div class="meta-value">RN</div></div>
-                    </div>
-                    <div class="actions">
-                        <label class="inline" style="margin-right:auto; font-weight:900; color:#586069;">
-                            ステータス
-                            <select class="select" aria-label="ステータス">
-                                <option>公開</option>
-                                <option selected>下書き</option>
-                                <option>停止</option>
-                            </select>
-                        </label>
-                        <a class="btn btn-secondary" href="#">編集</a>
-                        <button class="btn btn-danger" type="button">削除</button>
-                    </div>
-                </article>
-
-                <article class="card">
-                    <div class="inline">
-                        <span class="pill stopped">停止</span>
-                        <div class="title">API開発プロジェクト（運用停止）</div>
-                    </div>
-                    <div class="sub">株式会社AITECH</div>
-                    <div class="desc">API設計・実装。停止中のため、新規応募は不可（応募履歴側で閲覧のみ想定）。</div>
-                    <div class="meta">
-                        <div class="meta-item"><div class="meta-label">報酬</div><div class="meta-value">40〜60万</div></div>
-                        <div class="meta-item"><div class="meta-label">期間</div><div class="meta-value">2ヶ月</div></div>
-                        <div class="meta-item"><div class="meta-label">稼働</div><div class="meta-value">週15〜25h</div></div>
-                        <div class="meta-item"><div class="meta-label">スキル</div><div class="meta-value">Node.js</div></div>
-                    </div>
-                    <div class="actions">
-                        <label class="inline" style="margin-right:auto; font-weight:900; color:#586069;">
-                            ステータス
-                            <select class="select" aria-label="ステータス">
-                                <option>公開</option>
-                                <option>下書き</option>
-                                <option selected>停止</option>
-                            </select>
-                        </label>
-                        <a class="btn btn-secondary" href="#">編集</a>
-                        <button class="btn btn-danger" type="button">削除</button>
-                    </div>
-                </article>
+                @endforelse
             </div>
+
+            @if($jobs->hasPages())
+                <div style="margin-top: 2rem; display: flex; justify-content: center;">
+                    {{ $jobs->links() }}
+                </div>
+            @endif
         </section>
     </main>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <span class="modal-title-icon">⚠</span>
+                    削除の確認
+                </h2>
+            </div>
+            <div class="modal-body">
+                <p class="modal-message" id="deleteModalMessage">本当にこの案件を削除しますか？</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">キャンセル</button>
+                <button type="button" class="btn btn-danger" id="deleteConfirmBtn">削除する</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         (function () {
@@ -399,6 +571,75 @@
             document.addEventListener('click', (e) => { if (!dropdown.contains(e.target)) close(); });
             document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
         })();
+
+        // Delete Modal Functions
+        let currentDeleteFormId = null;
+
+        function openDeleteModal(jobId, jobTitle) {
+            const modal = document.getElementById('deleteModal');
+            const message = document.getElementById('deleteModalMessage');
+            const confirmBtn = document.getElementById('deleteConfirmBtn');
+            
+            currentDeleteFormId = jobId;
+            message.textContent = '「' + jobTitle + '」を本当に削除しますか？この操作は取り消せません。';
+            
+            modal.classList.add('is-open');
+            document.body.style.overflow = 'hidden';
+            
+            // Focus on cancel button for accessibility
+            setTimeout(function() {
+                confirmBtn.focus();
+            }, 100);
+        }
+
+        function closeDeleteModal() {
+            const modal = document.getElementById('deleteModal');
+            modal.classList.remove('is-open');
+            document.body.style.overflow = '';
+            currentDeleteFormId = null;
+        }
+
+        function confirmDelete() {
+            if (currentDeleteFormId) {
+                const form = document.getElementById('delete-form-' + currentDeleteFormId);
+                if (form) {
+                    form.submit();
+                }
+            }
+        }
+
+        // Modal event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('deleteModal');
+            const confirmBtn = document.getElementById('deleteConfirmBtn');
+            const deleteButtons = document.querySelectorAll('.delete-btn');
+            
+            // Attach click handlers to all delete buttons
+            deleteButtons.forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const jobId = this.getAttribute('data-job-id');
+                    const jobTitle = this.getAttribute('data-job-title');
+                    openDeleteModal(jobId, jobTitle);
+                });
+            });
+            
+            // Close modal when clicking overlay
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeDeleteModal();
+                }
+            });
+            
+            // Confirm button
+            confirmBtn.addEventListener('click', confirmDelete);
+            
+            // Close on Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && modal.classList.contains('is-open')) {
+                    closeDeleteModal();
+                }
+            });
+        });
     </script>
 </body>
 </html>

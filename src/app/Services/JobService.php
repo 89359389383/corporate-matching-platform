@@ -19,9 +19,13 @@ class JobService
     {
         // 今はjobsだけだが、将来の拡張に備えてトランザクションでまとめる
         return DB::transaction(function () use ($companyId, $validated): Job {
-            // company_id は認証企業からのみ設定する（改ざん防止）
+            // セキュリティ対策：company_idは認証済みの企業IDから設定する
+            // 理由：リクエストに含まれるcompany_idは改ざんされる可能性があるため
             $payload = $validated;
-            // リクエストからcompany_idが来ても上書きして安全側に倒す
+            // リクエストにcompany_idが含まれていても、認証済みのcompanyIdで上書きする
+            // これにより、他の企業のIDを指定して案件を作成する攻撃を防ぐ
+            // 例：悪意のあるユーザーがリクエストボディに{"company_id": 999, "title": "..."}を送信した場合
+            // この対策がないと、企業ID 999の名義で勝手に案件を作成できてしまう危険性がある
             $payload['company_id'] = $companyId;
 
             // jobs にINSERTして案件を作成する
