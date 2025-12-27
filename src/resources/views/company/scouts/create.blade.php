@@ -166,21 +166,56 @@
     <main class="main-content">
         <h1 class="page-title">スカウト送信</h1>
         <div class="panel">
-            <form action="#" method="post">
+            @if ($errors->any())
+                <div style="background-color: #ffeef0; border: 1px solid #d73a49; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+                    <div style="color: #d73a49; font-weight: 700; margin-bottom: 0.5rem;">入力エラーがあります</div>
+                    <ul style="margin-left: 1.5rem; color: #d73a49;">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            @php
+                $freelancerName = $freelancer->display_name ?? '（未設定）';
+                $freelancerJobTitle = $freelancer->job_title ?? '';
+                $freelancerDisplayText = $freelancerName;
+                if ($freelancerJobTitle) {
+                    $freelancerDisplayText .= '（' . $freelancerJobTitle . '）';
+                }
+            @endphp
+
+            <form action="{{ route('company.scouts.store') }}" method="post">
+                @csrf
+                <input type="hidden" name="freelancer_id" value="{{ $freelancer->id }}">
+                @if($job)
+                    <input type="hidden" name="job_id" value="{{ $job->id }}">
+                @endif
+
                 <div class="field">
                     <label>宛先フリーランス</label>
-                    <input class="input" type="text" value="山田 太郎（フルスタックエンジニア）" readonly>
+                    <input class="input" type="text" value="{{ $freelancerDisplayText }}" readonly>
                 </div>
+                @if($job)
+                <div class="field">
+                    <label>関連案件</label>
+                    <input class="input" type="text" value="{{ $job->title }}" readonly>
+                </div>
+                @endif
                 <div class="field">
                     <label for="message">スカウトメッセージ</label>
-                    <textarea id="message" class="textarea" placeholder="例: ぜひ案件のご相談をさせてください。まずは要件を共有します。" required></textarea>
+                    <textarea id="message" name="message" class="textarea @error('message') is-invalid @enderror" placeholder="例: ぜひ案件のご相談をさせてください。まずは要件を共有します。" required>{{ old('message') }}</textarea>
+                    @error('message')
+                        <div style="color: #d73a49; font-size: 0.85rem; margin-top: 0.5rem;">{{ $message }}</div>
+                    @enderror
                     <div class="help">
                         送信時の裏側（想定）：スカウトレコード作成 → <strong>企業 × フリーランス</strong> のチャットスレッド自動生成 → 最初のメッセージとして保存。
-                        送信完了後はフリーランス一覧へ戻す運用（MVP）。
+                        送信完了後はチャット画面へ遷移します。
                     </div>
                 </div>
                 <div class="btn-row">
-                    <a class="btn btn-secondary" href="#">キャンセル</a>
+                    <a class="btn btn-secondary" href="{{ route('company.freelancers.show', $freelancer) }}">キャンセル</a>
                     <button class="btn btn-primary" type="submit">送信</button>
                 </div>
             </form>

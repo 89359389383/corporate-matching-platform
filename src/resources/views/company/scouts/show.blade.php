@@ -223,43 +223,52 @@
             <div class="chat-head">
                 <div style="min-width:0;">
                     <div class="chat-title">スカウトチャット</div>
-                    <div class="chat-sub">宛先：山田 太郎（案件紐付けなし）</div>
+                    <div class="chat-sub">宛先：{{ $thread->freelancer->display_name }}（{{ $thread->job ? $thread->job->title : '案件紐付けなし' }}）</div>
                 </div>
-                <a class="btn btn-secondary" href="#">一覧へ</a>
+                <a class="btn btn-secondary" href="{{ route('company.scouts.index') }}">一覧へ</a>
             </div>
 
             <div class="chat-body">
-                <div class="system">スカウト送信時の最初のメッセージ</div>
+                @if($scout && $scout->message)
+                    <div class="system">スカウト送信時の最初のメッセージ</div>
+                @endif
 
-                <div class="msg-row me">
-                    <div class="bubble">
-                        はじめまして。EC改善の案件でご相談したいです。<br>
-                        週20〜30hで参画可能でしょうか？まずは要件を共有させてください。
-                        <div class="meta">あなた（企業）・ 2025/12/21 14:10 <a class="del" href="#" onclick="return false;">削除</a></div>
-                    </div>
-                </div>
+                @php
+                    $latestMessage = $messages->whereNull('deleted_at')->sortByDesc('sent_at')->first();
+                @endphp
 
-                <div class="msg-row">
-                    <div class="bubble">
-                        ご連絡ありがとうございます。週20〜30hで対応可能です。<br>
-                        まずは現状の課題感とスコープを伺えますと助かります。
-                        <div class="meta">山田 太郎 ・ 2025/12/21 14:25</div>
+                @forelse($messages->whereNull('deleted_at') as $message)
+                    @php
+                        $isMe = $message->sender_type === 'company';
+                        $senderName = $isMe ? 'あなた（企業）' : $thread->freelancer->display_name;
+                        $sentAt = $message->sent_at->format('Y/m/d H:i');
+                        $canDelete = $isMe && $latestMessage && $latestMessage->id === $message->id;
+                    @endphp
+                    <div class="msg-row {{ $isMe ? 'me' : '' }}">
+                        <div class="bubble">
+                            {!! nl2br(e($message->body)) !!}
+                            <div class="meta">
+                                {{ $senderName }} ・ {{ $sentAt }}
+                                @if($canDelete)
+                                    <form action="{{ route('company.messages.destroy', ['message' => $message->id]) }}" method="POST" style="display:inline;" onsubmit="return confirm('このメッセージを削除しますか？');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <a class="del" href="#" onclick="event.preventDefault(); this.closest('form').submit();">削除</a>
+                                    </form>
+                                @endif
+                            </div>
+                        </div>
                     </div>
-                </div>
-
-                <div class="msg-row me">
-                    <div class="bubble">
-                        ありがとうございます。管理画面の速度改善と商品登録フローの短縮が中心です。<br>
-                        今週どこかで30分ほどお時間いただけますか？
-                        <div class="meta">あなた（企業）・ 2025/12/21 14:32 <a class="del" href="#" onclick="return false;">削除</a></div>
-                    </div>
-                </div>
+                @empty
+                    <div class="system">メッセージがありません。</div>
+                @endforelse
             </div>
 
-            <div class="chat-foot">
-                <input class="input" type="text" placeholder="メッセージを入力" aria-label="メッセージ入力">
-                <button class="btn btn-primary" type="button">送信</button>
-            </div>
+            <form class="chat-foot" action="{{ route('company.threads.messages.store', ['thread' => $thread->id]) }}" method="POST">
+                @csrf
+                <input class="input" type="text" name="content" placeholder="メッセージを入力" aria-label="メッセージ入力" required>
+                <button class="btn btn-primary" type="submit">送信</button>
+            </form>
         </div>
     </main>
 

@@ -346,110 +346,98 @@
         <aside class="sidebar">
             <div class="panel">
                 <h3>検索条件</h3>
-                <div class="field">
-                    <label for="keyword">フリーワード</label>
-                    <input id="keyword" class="input" type="text" placeholder="職種 / スキル / 自己紹介 / 希望単価 など">
-                </div>
-                <div class="field">
-                    <label for="salaryText">希望単価（文字列検索）</label>
-                    <input id="salaryText" class="input" type="text" placeholder="例: 60 〜 80万">
-                </div>
-                <button class="btn btn-primary" type="button">検索</button>
+                <form method="GET" action="{{ route('company.freelancers.index') }}">
+                    <div class="field">
+                        <label for="keyword">フリーワード</label>
+                        <input id="keyword" name="keyword" class="input" type="text" placeholder="職種 / スキル / 自己紹介 / 希望単価 など" value="{{ old('keyword', $keyword ?? '') }}">
+                    </div>
+                    <button class="btn btn-primary" type="submit">検索</button>
+                </form>
             </div>
         </aside>
 
         <section class="content-area">
             <h1 class="page-title">フリーランス一覧</h1>
             <div class="list" id="freelancerList" aria-label="フリーランス一覧">
-                <article class="card is-selected" tabindex="0" role="button" data-id="f1" aria-pressed="true">
-                    <div class="row">
-                        <div class="avatar" aria-hidden="true">山</div>
-                        <div style="min-width:0; flex: 1; overflow: hidden;">
-                            <div class="name">山田 太郎</div>
-                            <div class="sub">フルスタックエンジニア（Laravel / Vue）</div>
-                            <div class="tags" aria-label="スキル">
-                                <span class="tag">PHP</span><span class="tag">Laravel</span><span class="tag">Vue.js</span><span class="tag">MySQL</span>
+                @forelse($freelancers as $index => $freelancer)
+                    @php
+                        $avatarText = mb_substr($freelancer->display_name, 0, 1);
+                        $allSkills = $freelancer->skills->pluck('name')->merge($freelancer->customSkills->pluck('name'));
+                        $workHours = $freelancer->min_hours_per_week . '〜' . $freelancer->max_hours_per_week . 'h';
+                        $rateText = ($freelancer->min_rate / 10000) . '〜' . ($freelancer->max_rate / 10000) . '万';
+                    @endphp
+                    <article class="card {{ $index === 0 ? 'is-selected' : '' }}" tabindex="0" role="button" data-id="{{ $freelancer->id }}" aria-pressed="{{ $index === 0 ? 'true' : 'false' }}">
+                        <div class="row">
+                            <div class="avatar" aria-hidden="true">{{ $avatarText }}</div>
+                            <div style="min-width:0; flex: 1; overflow: hidden;">
+                                <div class="name">{{ $freelancer->display_name }}</div>
+                                <div class="sub">{{ $freelancer->job_title ?? '' }}</div>
+                                @if($allSkills->isNotEmpty())
+                                    <div class="tags" aria-label="スキル">
+                                        @foreach($allSkills as $skill)
+                                            <span class="tag">{{ $skill }}</span>
+                                        @endforeach
+                                    </div>
+                                @endif
+                                @if($freelancer->bio)
+                                    <div class="desc">{{ $freelancer->bio }}</div>
+                                @endif
                             </div>
-                            <div class="desc">EC・業務系の開発経験が豊富。要件整理〜実装、運用改善まで一気通貫で対応します。</div>
                         </div>
-                    </div>
-                    <div class="meta" aria-label="ワークスタイル">
-                        <div class="meta-item"><div class="meta-label">稼働</div><div class="meta-value">週20〜30h</div></div>
-                        <div class="meta-item"><div class="meta-label">希望単価</div><div class="meta-value">60〜80万</div></div>
-                    </div>
-                </article>
-
-                <article class="card" tabindex="0" role="button" data-id="f2" aria-pressed="false">
-                    <div class="row">
-                        <div class="avatar" aria-hidden="true">佐</div>
-                        <div style="min-width:0;">
-                            <div class="name">佐藤 花子</div>
-                            <div class="sub">モバイルエンジニア（React Native）</div>
-                            <div class="tags">
-                                <span class="tag">React Native</span><span class="tag">TypeScript</span><span class="tag">Firebase</span>
+                        <div class="meta" aria-label="ワークスタイル">
+                            <div class="meta-item">
+                                <div class="meta-label">稼働</div>
+                                <div class="meta-value">週{{ $workHours }}</div>
                             </div>
-                            <div class="desc">新規アプリ立ち上げ・改善の両方に対応。UI品質と保守性を重視します。</div>
-                        </div>
-                    </div>
-                    <div class="meta">
-                        <div class="meta-item"><div class="meta-label">稼働</div><div class="meta-value">週25〜35h</div></div>
-                        <div class="meta-item"><div class="meta-label">希望単価</div><div class="meta-value">70〜90万</div></div>
-                    </div>
-                </article>
-
-                <article class="card" tabindex="0" role="button" data-id="f3" aria-pressed="false">
-                    <div class="row">
-                        <div class="avatar" aria-hidden="true">鈴</div>
-                        <div style="min-width:0;">
-                            <div class="name">鈴木 健</div>
-                            <div class="sub">データエンジニア（Python）</div>
-                            <div class="tags">
-                                <span class="tag">Python</span><span class="tag">Pandas</span><span class="tag">BigQuery</span><span class="tag">GCP</span>
+                            <div class="meta-item">
+                                <div class="meta-label">希望単価</div>
+                                <div class="meta-value">{{ $rateText }}</div>
                             </div>
-                            <div class="desc">ETL構築・可視化・分析基盤整備に強み。データ活用の運用設計まで支援します。</div>
                         </div>
+                    </article>
+                @empty
+                    <div style="text-align: center; padding: 3rem; color: #586069;">
+                        <p>フリーランスが見つかりませんでした。</p>
                     </div>
-                    <div class="meta">
-                        <div class="meta-item"><div class="meta-label">稼働</div><div class="meta-value">週30〜40h</div></div>
-                        <div class="meta-item"><div class="meta-label">希望単価</div><div class="meta-value">80〜110万</div></div>
-                    </div>
-                </article>
+                @endforelse
             </div>
+            @if($freelancers->hasPages())
+                <div style="margin-top: 2rem; display: flex; justify-content: center;">
+                    {{ $freelancers->links() }}
+                </div>
+            @endif
         </section>
 
         <aside class="sidebar right">
             <div class="panel" id="detailPanel" aria-live="polite">
                 <h3>選択中のフリーランス</h3>
-                <div class="row">
-                    <div class="avatar" id="dAvatar" aria-hidden="true">山</div>
-                    <div style="min-width:0; flex: 1; overflow: hidden;">
-                        <div class="name" id="dName">山田 太郎</div>
-                        <div class="sub" id="dRole">フルスタックエンジニア（Laravel / Vue）</div>
+                <div id="detailContent" style="display: none;">
+                    <div class="row">
+                        <div class="avatar" id="dAvatar" aria-hidden="true"></div>
+                        <div style="min-width:0; flex: 1; overflow: hidden;">
+                            <div class="name" id="dName"></div>
+                            <div class="sub" id="dRole"></div>
+                        </div>
+                    </div>
+
+                    <div class="detail-title">自己紹介</div>
+                    <div class="desc" id="dBio"></div>
+
+                    <div class="detail-title">スキル</div>
+                    <div class="tags" id="dSkills"></div>
+
+                    <div class="detail-title">ワークスタイル</div>
+                    <div class="meta" id="dMeta"></div>
+
+                    <div class="detail-title">ポートフォリオ</div>
+                    <div class="desc" id="dPortfolio" style="word-break: break-all; overflow-wrap: break-word;"></div>
+
+                    <div class="detail-actions">
+                        <a class="btn btn-primary" id="dScoutLink" href="{{ $freelancers->isNotEmpty() ? route('company.scouts.create', ['freelancer_id' => $freelancers->first()->id]) : '#' }}">スカウト</a>
                     </div>
                 </div>
-
-                <div class="detail-title">自己紹介</div>
-                <div class="desc" id="dBio">EC・業務系の開発経験が豊富。要件整理〜実装、運用改善まで一気通貫で対応します。</div>
-
-                <div class="detail-title">スキル</div>
-                <div class="tags" id="dSkills">
-                    <span class="tag">PHP</span><span class="tag">Laravel</span><span class="tag">Vue.js</span><span class="tag">MySQL</span>
-                </div>
-
-                <div class="detail-title">ワークスタイル</div>
-                <div class="meta" id="dMeta">
-                    <div class="meta-item"><div class="meta-label">稼働</div><div class="meta-value">週20〜30h</div></div>
-                    <div class="meta-item"><div class="meta-label">希望単価</div><div class="meta-value">60〜80万</div></div>
-                </div>
-
-                <div class="detail-title">ポートフォリオ</div>
-                <div class="desc" id="dPortfolio" style="word-break: break-all; overflow-wrap: break-word;">
-                    <a class="link" href="#" onclick="return false;">https://portfolio.example.com/yamada</a>
-                </div>
-
-                <div class="detail-actions">
-                    <a class="btn btn-primary" href="#">スカウト</a>
-                    <a class="btn btn-secondary" href="#">詳細ページへ</a>
+                <div id="detailEmpty" style="text-align: center; padding: 2rem; color: #586069;">
+                    <p>フリーランスを選択してください</p>
                 </div>
             </div>
         </aside>
@@ -473,37 +461,31 @@
     </script>
     <script>
         (function () {
-            const data = {
-                f1: {
-                    avatar: '山',
-                    name: '山田 太郎',
-                    role: 'フルスタックエンジニア（Laravel / Vue）',
-                    bio: 'EC・業務系の開発経験が豊富。要件整理〜実装、運用改善まで一気通貫で対応します。',
-                    skills: ['PHP', 'Laravel', 'Vue.js', 'MySQL'],
-                    meta: [['稼働', '週20〜30h'], ['希望単価', '60〜80万']],
-                    portfolio: 'https://portfolio.example.com/yamada'
-                },
-                f2: {
-                    avatar: '佐',
-                    name: '佐藤 花子',
-                    role: 'モバイルエンジニア（React Native）',
-                    bio: '新規アプリ立ち上げ・改善の両方に対応。UI品質と保守性を重視します。',
-                    skills: ['React Native', 'TypeScript', 'Firebase'],
-                    meta: [['稼働', '週25〜35h'], ['希望単価', '70〜90万']],
-                    portfolio: 'https://portfolio.example.com/sato'
-                },
-                f3: {
-                    avatar: '鈴',
-                    name: '鈴木 健',
-                    role: 'データエンジニア（Python）',
-                    bio: 'ETL構築・可視化・分析基盤整備に強み。データ活用の運用設計まで支援します。',
-                    skills: ['Python', 'Pandas', 'BigQuery', 'GCP'],
-                    meta: [['稼働', '週30〜40h'], ['希望単価', '80〜110万']],
-                    portfolio: 'https://portfolio.example.com/suzuki'
-                }
-            };
+            // フリーランスデータをJSON形式で埋め込む
+            @php
+                $freelancerDataArray = $freelancers->map(function($freelancer) {
+                    $allSkills = $freelancer->skills->pluck('name')->merge($freelancer->customSkills->pluck('name'));
+                    $workHours = $freelancer->min_hours_per_week . '〜' . $freelancer->max_hours_per_week . 'h';
+                    $rateText = ($freelancer->min_rate / 10000) . '〜' . ($freelancer->max_rate / 10000) . '万';
+                    
+                    return [
+                        'id' => $freelancer->id,
+                        'avatar' => mb_substr($freelancer->display_name, 0, 1),
+                        'name' => $freelancer->display_name,
+                        'role' => $freelancer->job_title ?? '',
+                        'bio' => $freelancer->bio ?? '',
+                        'skills' => $allSkills->toArray(),
+                        'workHours' => $workHours,
+                        'rateText' => $rateText,
+                        'portfolios' => $freelancer->portfolios->pluck('url')->toArray(),
+                    ];
+                })->values()->toArray();
+            @endphp
+            const freelancerData = @json($freelancerDataArray);
 
             const list = document.getElementById('freelancerList');
+            const detailContent = document.getElementById('detailContent');
+            const detailEmpty = document.getElementById('detailEmpty');
             const dAvatar = document.getElementById('dAvatar');
             const dName = document.getElementById('dName');
             const dRole = document.getElementById('dRole');
@@ -511,23 +493,54 @@
             const dSkills = document.getElementById('dSkills');
             const dMeta = document.getElementById('dMeta');
             const dPortfolio = document.getElementById('dPortfolio');
-            if (!list || !dAvatar || !dName || !dRole || !dBio || !dSkills || !dMeta || !dPortfolio) return;
+            const dScoutLink = document.getElementById('dScoutLink');
+            
+            if (!list || !detailContent || !detailEmpty || !dAvatar || !dName || !dRole || !dBio || !dSkills || !dMeta || !dPortfolio || !dScoutLink) return;
+
+            // データをIDでマッピング
+            const dataMap = {};
+            freelancerData.forEach(item => {
+                dataMap[item.id] = item;
+            });
 
             const render = (id) => {
-                const x = data[id];
-                if (!x) return;
+                const x = dataMap[id];
+                if (!x) {
+                    detailContent.style.display = 'none';
+                    detailEmpty.style.display = 'block';
+                    return;
+                }
+                
+                detailContent.style.display = 'block';
+                detailEmpty.style.display = 'none';
+                
                 dAvatar.textContent = x.avatar;
                 dName.textContent = x.name;
                 dRole.textContent = x.role;
-                dBio.textContent = x.bio;
-                dSkills.innerHTML = x.skills.map(s => `<span class="tag">${s}</span>`).join('');
-                dMeta.innerHTML = x.meta.map(([k, v]) => `
+                dBio.textContent = x.bio || '（未設定）';
+                dSkills.innerHTML = x.skills.length > 0 
+                    ? x.skills.map(s => `<span class="tag">${s}</span>`).join('')
+                    : '<span style="color: #586069;">（未設定）</span>';
+                dMeta.innerHTML = `
                     <div class="meta-item">
-                        <div class="meta-label">${k}</div>
-                        <div class="meta-value">${v}</div>
+                        <div class="meta-label">稼働</div>
+                        <div class="meta-value">週${x.workHours}</div>
                     </div>
-                `).join('');
-                dPortfolio.innerHTML = `<a class="link" href="${x.portfolio}" target="_blank" rel="noopener noreferrer">${x.portfolio}</a>`;
+                    <div class="meta-item">
+                        <div class="meta-label">希望単価</div>
+                        <div class="meta-value">${x.rateText}</div>
+                    </div>
+                `;
+                
+                if (x.portfolios && x.portfolios.length > 0) {
+                    dPortfolio.innerHTML = x.portfolios.map(url => 
+                        `<a class="link" href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
+                    ).join('<br>');
+                } else {
+                    dPortfolio.innerHTML = '<span style="color: #586069;">（未設定）</span>';
+                }
+                
+                dScoutLink.href = '{{ route("company.scouts.create") }}?freelancer_id=' + id;
             };
 
             const selectCard = (card) => {
@@ -537,8 +550,14 @@
                 });
                 card.classList.add('is-selected');
                 card.setAttribute('aria-pressed', 'true');
-                render(card.getAttribute('data-id'));
+                render(parseInt(card.getAttribute('data-id')));
             };
+
+            // 初期表示：最初のカードを選択
+            const firstCard = list.querySelector('.card');
+            if (firstCard) {
+                selectCard(firstCard);
+            }
 
             list.addEventListener('click', (e) => {
                 const card = e.target.closest('.card');
