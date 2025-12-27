@@ -24,7 +24,9 @@ class FreelancerProfileController extends Controller
             return redirect('/freelancer/jobs');
         }
 
-        return view('freelancer.profile.create');
+        return view('freelancer.profile.create', [
+            'user' => $user,
+        ]);
     }
 
     /**
@@ -67,6 +69,7 @@ class FreelancerProfileController extends Controller
         }
 
         return view('freelancer.profile.settings', [
+            'user' => $user,
             'freelancer' => $freelancer,
         ]);
     }

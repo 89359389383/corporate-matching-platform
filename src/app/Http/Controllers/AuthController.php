@@ -23,16 +23,15 @@ class AuthController extends Controller
     }
 
     /**
-     * ログイン処理を行い、role に応じて遷移先を分岐する
+     * フリーランスとしてログインする（freelancer guard）
      */
-    public function login(LoginRequest $request)
+    public function loginFreelancer(LoginRequest $request)
     {
         // 入力を最低限チェックする（FormRequest に委譲）
         $credentials = $request->validated();
 
-        // メール/パスワードで認証を試みる（Auth::attempt）
-        if (!Auth::attempt($credentials)) {
-            // 失敗時はエラーを返してログイン画面へ戻す（email欄にまとめて表示）
+        // freelancer guard で認証を試みる
+        if (!Auth::guard('freelancer')->attempt($credentials)) {
             throw ValidationException::withMessages(['email' => 'メールアドレスまたはパスワードが正しくありません']);
         }
 
@@ -43,40 +42,52 @@ class AuthController extends Controller
         // これにより、ログイン前のセッションIDではアクセスできなくなり、セキュリティが向上します。
         $request->session()->regenerate();
 
-        // ログインしたユーザーを取得する（role分岐に使用）
+        // ログインしたユーザーを取得する
         /** @var User $user */
-        $user = Auth::user();
-
-        // role によってトップページへリダイレクトする
-        if ($user->role === 'freelancer') {
-            // フリーランスは案件一覧へ
-            return redirect('/freelancer/jobs');
-        }
-
-        if ($user->role === 'company') {
-            // 企業はフリーランス一覧へ
-            return redirect('/company/freelancers');
-        }
+        $user = Auth::guard('freelancer')->user();
 
         // 想定外のroleなら安全側に倒してログアウトし、ログインへ戻す
-        Auth::logout();
+        if (!$user || $user->role !== 'freelancer') {
+            Auth::guard('freelancer')->logout();
 
-        // 現在のセッションを完全に無効化して破棄します。
-        // invalidate()を呼ぶことで、セッションに保存されている全てのデータが削除され、
-        // セッションIDも無効になります。これにより、ログアウト処理の後に
-        // セッションに残っている認証情報やその他のデータが誤って再利用されることを防ぎます。
-        // 中途半端なログイン状態を残さないことで、セキュリティを確保します。
-        $request->session()->invalidate();
+            // セッションを無効化して安全にする
+            $request->session()->invalidate();
 
-        // CSRF（Cross-Site Request Forgery）トークンを再生成します。
-        // CSRF攻撃とは、ユーザーが意図しないリクエストを外部サイトから送信させる攻撃です。
-        // セッションを無効化した後は、古いCSRFトークンも無効になっているため、
-        // 新しいセッション用に新しいCSRFトークンを生成する必要があります。
-        // これにより、次のリクエストから正常にCSRF保護が機能するようになります。
-        $request->session()->regenerateToken();
+            // CSRFトークンも再生成する
+            $request->session()->regenerateToken();
 
-        // ログイン画面に戻してエラーを表示する
-        return redirect('/login')->withErrors(['email' => 'アカウント種別が不正です']);
+            return redirect('/login')->withErrors(['email' => 'フリーランスアカウントではありません']);
+        }
+
+        // フリーランスは案件一覧へ
+        return redirect('/freelancer/jobs');
+    }
+
+    /**
+     * 企業としてログインする（company guard）
+     */
+    public function loginCompany(LoginRequest $request)
+    {
+        $credentials = $request->validated();
+
+        if (!Auth::guard('company')->attempt($credentials)) {
+            throw ValidationException::withMessages(['email' => 'メールアドレスまたはパスワードが正しくありません']);
+        }
+
+        $request->session()->regenerate();
+
+        /** @var User $user */
+        $user = Auth::guard('company')->user();
+
+        if (!$user || $user->role !== 'company') {
+            Auth::guard('company')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            return redirect('/login')->withErrors(['email' => '企業アカウントではありません']);
+        }
+
+        // 企業はフリーランス一覧へ
+        return redirect('/company/freelancers');
     }
 
     /**
@@ -107,7 +118,8 @@ class AuthController extends Controller
         ]);
 
         // 作成したユーザーでログインさせる
-        Auth::login($user);
+        Auth::guard('freelancer')->login($user);
+        $request->session()->regenerate();
 
         // プロフィール登録画面へリダイレクトする（/freelancer/profile 相当）
         return redirect('/freelancer/profile');
@@ -205,7 +217,8 @@ class AuthController extends Controller
         ]);
 
         // 作成したユーザーでログインさせる
-        Auth::login($user);
+        Auth::guard('company')->login($user);
+        $request->session()->regenerate();
 
         // 企業プロフィール登録画面へ遷移する（/company/profile 相当）
         return redirect('/company/profile');
@@ -216,7 +229,9 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        // Laravelのログアウト処理を呼ぶ
+        // どちらでログインしていても確実に落とす（同時ログインは要件外だが、安全側）
+        Auth::guard('freelancer')->logout();
+        Auth::guard('company')->logout();
         Auth::logout();
 
         // セッションを無効化して安全にする

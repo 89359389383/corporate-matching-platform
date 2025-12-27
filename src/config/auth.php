@@ -40,6 +40,18 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // フリーランス用ログイン状態（セッション上の“箱”を分ける）
+        'freelancer' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
+
+        // 企業用ログイン状態（セッション上の“箱”を分ける）
+        'company' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
     ],
 
     /*

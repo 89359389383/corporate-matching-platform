@@ -39,11 +39,11 @@ class FreelancerRegisterRequest extends FormRequest
             'skills' => ['sometimes', 'array'],
             'skills.*' => ['integer'],
             'custom_skills' => ['sometimes', 'array'],
-            'custom_skills.*' => ['string', 'max:255'],
+            'custom_skills.*' => ['nullable', 'string', 'max:255'],
 
             // ポートフォリオURL（任意）
             'portfolio_urls' => ['sometimes', 'array'],
-            'portfolio_urls.*' => ['string', 'max:2000'],
+            'portfolio_urls.*' => ['nullable', 'string', 'max:2000'],
         ];
     }
 
@@ -104,11 +104,11 @@ class FreelancerRegisterRequest extends FormRequest
 
             'custom_skills.array' => '自由入力スキルは配列形式で送信してください。',
             'custom_skills.*.string' => '自由入力スキルは文字列で入力してください。',
-            'custom_skills.*.max' => '自由入力スキルは255文字以内で入力してください。',
+            'custom_skills.*.max' => '自由入力スキルは255文字以内で入力してください。（空欄も可）',
 
             'portfolio_urls.array' => 'ポートフォリオURLは配列形式で送信してください。',
             'portfolio_urls.*.string' => 'ポートフォリオURLは文字列で入力してください。',
-            'portfolio_urls.*.max' => 'ポートフォリオURLは2000文字以内で入力してください。',
+            'portfolio_urls.*.max' => 'ポートフォリオURLは2000文字以内で入力してください。（空欄も可）',
         ];
     }
 }

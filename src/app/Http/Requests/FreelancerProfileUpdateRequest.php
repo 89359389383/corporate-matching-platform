@@ -35,15 +35,15 @@ class FreelancerProfileUpdateRequest extends FormRequest
             'experience_companies' => ['nullable', 'string', 'max:5000'],
             'icon' => ['sometimes', 'file', 'image', 'max:5120'],
 
-            // スキル関連（任意）
+             // スキル関連（任意）
             'skills' => ['sometimes', 'array'],
             'skills.*' => ['integer'],
             'custom_skills' => ['sometimes', 'array'],
-            'custom_skills.*' => ['string', 'max:255'],
+            'custom_skills.*' => ['nullable', 'string', 'max:255'],
 
             // ポートフォリオURL（任意）
             'portfolio_urls' => ['sometimes', 'array'],
-            'portfolio_urls.*' => ['string', 'max:2000'],
+            'portfolio_urls.*' => ['nullable', 'string', 'max:2000'],
         ];
     }
 

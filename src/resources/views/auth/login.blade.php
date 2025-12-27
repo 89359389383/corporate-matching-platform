@@ -370,7 +370,7 @@
             </div>
             @endif
 
-            <form class="login-form" method="POST" action="{{ route('auth.login') }}">
+            <form class="login-form" method="POST">
                 @csrf
 
                 <div class="form-group">
@@ -415,7 +415,19 @@
                     @enderror
                 </div>
 
-                <button type="submit" class="login-button">ログイン</button>
+                <button
+                    type="submit"
+                    class="login-button"
+                    formaction="{{ route('auth.login.freelancer') }}">
+                    フリーランスでログイン
+                </button>
+
+                <button
+                    type="submit"
+                    class="login-button"
+                    formaction="{{ route('auth.login.company') }}">
+                    企業でログイン
+                </button>
 
                 <div class="register-links">
                     <a href="{{ route('auth.register.freelancer.form') }}">フリーランスとして新規登録</a>

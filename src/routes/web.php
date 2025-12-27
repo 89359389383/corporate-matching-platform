@@ -38,8 +38,9 @@ Route::get('/', function () {
 // ログイン画面表示
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('auth.login.form');
 
-// ログイン処理
-Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
+// ログイン処理（guard別）
+Route::post('/login/freelancer', [AuthController::class, 'loginFreelancer'])->name('auth.login.freelancer');
+Route::post('/login/company', [AuthController::class, 'loginCompany'])->name('auth.login.company');
 
 // ログアウト（クリック導線用：POST）
 Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
@@ -56,7 +57,7 @@ Route::get('/register/company', [AuthController::class, 'showCompanyRegister'])-
 // 企業 新規登録 保存（ログイン情報登録）
 Route::post('/register/company', [AuthController::class, 'storeCompany'])->name('auth.register.company.store');
 
-Route::middleware(['auth', 'freelancer'])->group(function () {
+Route::middleware(['auth:freelancer', 'freelancer'])->group(function () {
     // フリーランス プロフィール 表示
     Route::get('/freelancer/profile', [FreelancerProfileController::class, 'create'])->name('freelancer.profile.create');
 
@@ -97,7 +98,7 @@ Route::middleware(['auth', 'freelancer'])->group(function () {
     Route::get('/freelancer/scouts', [FreelancerScoutController::class, 'index'])->name('freelancer.scouts.index');
 });
 
-Route::middleware(['auth', 'company'])->group(function () {
+Route::middleware(['auth:company', 'company'])->group(function () {
     // 企業 プロフィール 表示
     Route::get('/company/profile', [CompanyProfileController::class, 'create'])->name('company.profile.create');
 
