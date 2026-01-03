@@ -29,7 +29,7 @@ class FreelancerProfileUpdateRequest extends FormRequest
             // 働き方・単価（任意）
             'work_style_text' => ['nullable', 'string', 'max:5000'],
             'min_rate' => ['nullable', 'integer', 'min:0'],
-            'max_rate' => ['nullable', 'integer', 'min:0'],
+            'max_rate' => ['nullable', 'integer', 'min:0', 'gte:min_rate'],
 
             // その他（任意）
             'experience_companies' => ['nullable', 'string', 'max:5000'],
@@ -45,6 +45,34 @@ class FreelancerProfileUpdateRequest extends FormRequest
             'portfolio_urls' => ['sometimes', 'array'],
             'portfolio_urls.*' => ['nullable', 'string', 'max:2000'],
         ];
+    }
+
+    /**
+     * DB側（freelancers.min_rate/max_rate）がNOT NULLのため、
+     * 未入力でも保存できるように値を補完する。
+     *
+     * - 両方未入力: 0/0（=未設定扱い）
+     * - 片方のみ入力: もう片方に同値を補完
+     */
+    protected function prepareForValidation(): void
+    {
+        $min = $this->input('min_rate');
+        $max = $this->input('max_rate');
+
+        if ($min === null && $max === null) {
+            $this->merge(['min_rate' => 0, 'max_rate' => 0]);
+            return;
+        }
+
+        if ($min === null && $max !== null) {
+            $this->merge(['min_rate' => $max]);
+            return;
+        }
+
+        if ($max === null && $min !== null) {
+            $this->merge(['max_rate' => $min]);
+            return;
+        }
     }
 
     public function messages(): array
@@ -90,6 +118,7 @@ class FreelancerProfileUpdateRequest extends FormRequest
 
             'max_rate.integer' => '希望単価（上限）は整数で入力してください。',
             'max_rate.min' => '希望単価（上限）は0以上で入力してください。',
+            'max_rate.gte' => '希望単価（上限）は希望単価（下限）以上で入力してください。',
 
             'experience_companies.string' => '経験企業は文字列で入力してください。',
             'experience_companies.max' => '経験企業は5000文字以内で入力してください。',

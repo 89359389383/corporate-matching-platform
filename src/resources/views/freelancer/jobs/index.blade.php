@@ -444,13 +444,14 @@
 
         .job-details {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1.5rem;
+            max-width: 600px;
+            grid-template-columns: repeat(auto-fit, minmax(90px, calc(50% - 25px)));
             margin-bottom: 2rem;
         }
 
         .detail-item {
             display: flex;
+            max-width: 250px;
             flex-direction: row;
             align-items: center;
             justify-content: space-between;
@@ -461,7 +462,7 @@
         }
 
         .detail-label {
-            font-size: 0.75rem;
+            font-size: 1rem;
             color: #6a737d;
             font-weight: 600;
             text-transform: uppercase;
@@ -773,7 +774,7 @@
                         $isApplied = in_array($job->id, $appliedJobIds ?? []);
                         $rewardText = '';
                         if ($job->reward_type === 'monthly') {
-                            $rewardText = $job->min_rate . '〜' . $job->max_rate . '万円';
+                            $rewardText = ($job->min_rate / 10000) . '〜' . ($job->max_rate / 10000) . '万円';
                         } else {
                             $rewardText = number_format($job->min_rate) . '〜' . number_format($job->max_rate) . '円/時';
                         }

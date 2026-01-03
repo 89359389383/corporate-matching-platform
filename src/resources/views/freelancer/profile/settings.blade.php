@@ -434,12 +434,12 @@
         }
         .kv {
             display: grid;
-            grid-template-columns: 120px 1fr;
+            grid-template-columns: 100px 1fr;
             gap: 0.75rem 1rem;
             margin-top: 1rem;
         }
         .k { color: #6a737d; font-weight: 900; font-size: 0.85rem; }
-        .v { color: #24292e; font-weight: 900; font-size: 0.9rem; }
+        .v { color: #24292e; font-weight: 900; font-size: 0.9rem; white-space: nowrap; }
 
         /* Responsive */
         @media (max-width: 1200px) {
@@ -528,9 +528,9 @@
                     <div class="v" id="preview-rate">
                         @if($freelancer && ($freelancer->min_rate || $freelancer->max_rate))
                             @if($freelancer->min_rate && $freelancer->max_rate)
-                                {{ $freelancer->min_rate }}〜{{ $freelancer->max_rate }}
+                                {{ $freelancer->min_rate }}〜{{ $freelancer->max_rate }}万円
                             @else
-                                {{ $freelancer->min_rate ?? $freelancer->max_rate }}
+                                {{ $freelancer->min_rate ?? $freelancer->max_rate }}万円
                             @endif
                         @else
                             未設定
@@ -683,7 +683,7 @@
                         </div>
                     </div>
 
-                    <div class="grid-2" style="margin-top:1.25rem;">
+                    <div class="grid-2" style="margin-top:1.25rem; align-items: start;">
                         <div class="row">
                             <div class="label">働き方（自由入力）</div>
                             <textarea class="textarea @error('work_style_text') is-invalid @enderror" name="work_style_text">{{ old('work_style_text', $freelancer->work_style_text ?? '') }}</textarea>
@@ -691,11 +691,11 @@
                             <span class="error-message">{{ $message }}</span>
                             @enderror
                         </div>
-                        <div class="row">
+                        <div class="row" style="align-items: start;">
                             <div class="label">希望単価（下限〜上限）</div>
-                            <div class="grid-2">
-                                <input class="input @error('min_rate') is-invalid @enderror" id="min_rate" name="min_rate" type="number" value="{{ old('min_rate', $freelancer->min_rate ?? '') }}" placeholder="下限">
-                                <input class="input @error('max_rate') is-invalid @enderror" id="max_rate" name="max_rate" type="number" value="{{ old('max_rate', $freelancer->max_rate ?? '') }}" placeholder="上限">
+                            <div class="grid-2" style="align-items: start;">
+                                <input class="input @error('min_rate') is-invalid @enderror" id="min_rate" name="min_rate" type="number" value="{{ old('min_rate', $freelancer->min_rate ?? '') }}" placeholder="下限" min="0" step="1">
+                                <input class="input @error('max_rate') is-invalid @enderror" id="max_rate" name="max_rate" type="number" value="{{ old('max_rate', $freelancer->max_rate ?? '') }}" placeholder="上限" min="0" step="1">
                             </div>
                             @error('min_rate')
                             <span class="error-message">{{ $message }}</span>
@@ -1084,7 +1084,7 @@
             const previewRate = document.getElementById('preview-rate');
             if (previewRate) {
                 if (minRate || maxRate) {
-                    const rateText = minRate && maxRate ? `${minRate}〜${maxRate}` : (minRate || maxRate || '未設定');
+                    const rateText = minRate && maxRate ? `${minRate}〜${maxRate}万円` : (minRate || maxRate ? `${minRate || maxRate}万円` : '未設定');
                     previewRate.textContent = rateText;
                 } else {
                     previewRate.textContent = '未設定';

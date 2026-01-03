@@ -7,7 +7,7 @@
     <style>
         :root { --header-height: 104px; --header-height-mobile: 91px; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { font-size: 130%; }
+        html { font-size: 97.5%; }
         body {
             font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background-color: #fafbfc;
@@ -35,7 +35,7 @@
         }
         .nav-links {
             display: flex;
-            gap: 2rem;
+            gap: 3rem;
             align-items: center;
             position: absolute;
             left: 50%;
@@ -47,7 +47,7 @@
             text-decoration: none;
             color: #586069;
             font-weight: 500;
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             padding: 0.75rem 1.25rem;
             border-radius: 8px;
             transition: all 0.15s ease;
@@ -61,8 +61,8 @@
         .nav-link:hover { background-color: #f6f8fa; color: #24292e; }
         .nav-link.active { background-color: #0366d6; color: white; box-shadow: 0 2px 8px rgba(3, 102, 214, 0.3); }
         .badge {
-            background-color: #d73a49; color: white; border-radius: 999px;
-            padding: 0.15rem 0.5rem; font-size: 0.7rem; font-weight: 700;
+            background-color: #d73a49; color: white; border-radius: 50%;
+            padding: 0.15rem 0.45rem; font-size: 0.7rem; font-weight: 600;
             min-width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center;
             box-shadow: 0 1px 3px rgba(209, 58, 73, 0.3);
             position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
@@ -72,7 +72,7 @@
             width: 36px; height: 36px; border-radius: 50%;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex; align-items: center; justify-content: center;
-            color: white; font-weight: 700; cursor: pointer; transition: all 0.15s ease;
+            color: white; font-weight: 600; cursor: pointer; transition: all 0.15s ease;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             border: none; padding: 0; appearance: none;
         }

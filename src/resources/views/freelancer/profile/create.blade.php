@@ -5,10 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>プロフィール作成 - AITECH</title>
     <style>
-        :root {
-            --header-height: 104px;       /* 80px * 1.3 */
-            --header-height-mobile: 91px; /* 70px * 1.3 */
-        }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { font-size: 97.5%; }
@@ -19,130 +15,6 @@
             line-height: 1.5;
         }
 
-        /* Header Styles - Minimalist */
-        .header {
-            background-color: #ffffff;
-            border-bottom: 1px solid #e1e4e8;
-            padding: 0 3rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-        .header-content {
-            max-width: 1600px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: var(--header-height);
-            position: relative;
-        }
-        .nav-links {
-            display: flex;
-            flex-direction: row;
-            gap: 3rem;
-            align-items: center;
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            justify-content: center;
-        }
-        .nav-link {
-            text-decoration: none;
-            color: #586069;
-            font-weight: 500;
-            font-size: 1.1rem;
-            padding: 0.75rem 1.25rem;
-            border-radius: 8px;
-            transition: all 0.15s ease;
-            position: relative;
-            letter-spacing: -0.01em;
-            display: inline-flex;
-            align-items: center;
-        }
-        .nav-link.has-badge { padding-right: 3rem; }
-        .nav-link:hover { background-color: #f6f8fa; color: #24292e; }
-        .nav-link.active {
-            background-color: #0366d6;
-            color: white;
-            box-shadow: 0 2px 8px rgba(3, 102, 214, 0.3);
-        }
-        .badge {
-            background-color: #d73a49;
-            color: white;
-            border-radius: 50%;
-            padding: 0.15rem 0.45rem;
-            font-size: 0.7rem;
-            font-weight: 600;
-            min-width: 18px;
-            height: 18px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 1px 3px rgba(209, 58, 73, 0.3);
-            position: absolute;
-            right: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-        .user-menu {
-            display: flex;
-            align-items: center;
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-        .user-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border: none;
-            padding: 0;
-            appearance: none;
-        }
-        .user-avatar:hover { transform: scale(1.08); box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
-        .user-avatar:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.25), 0 2px 8px rgba(0,0,0,0.1); }
-
-        /* Dropdown Menu */
-        .dropdown { position: relative; }
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 100%;
-            background-color: white;
-            min-width: 240px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08);
-            border-radius: 12px;
-            z-index: 1000;
-            border: 1px solid #e1e4e8;
-            margin-top: 0.5rem;
-        }
-        .dropdown.is-open .dropdown-content { display: block; }
-        .dropdown-item {
-            display: block;
-            padding: 0.875rem 1.25rem;
-            text-decoration: none;
-            color: #586069;
-            transition: all 0.15s ease;
-            border-radius: 6px;
-            margin: 0 0.25rem;
-            white-space: nowrap;
-        }
-        .dropdown-item:hover { background-color: #f6f8fa; color: #24292e; }
-        .dropdown-divider { height: 1px; background-color: #e1e4e8; margin: 0.5rem 0; }
 
         /* Layout */
         .main-content {
@@ -157,7 +29,7 @@
             width: 360px;
             flex-shrink: 0;
             position: sticky;
-            top: calc(var(--header-height) + 1.5rem);
+            top: 1.5rem;
             align-self: flex-start;
         }
 
@@ -191,7 +63,7 @@
         }
 
         .form { display: grid; gap: 1.25rem; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; align-items: start; }
         .row { display: grid; gap: 0.6rem; }
         .label {
             font-weight: 900;
@@ -370,10 +242,6 @@
             .sidebar { width: 320px; }
         }
         @media (max-width: 768px) {
-            .header-content { padding: 0 1.5rem; height: var(--header-height-mobile); }
-            .nav-links { gap: 1.5rem; position: static; left: auto; transform: none; justify-content: flex-start; flex-direction: row; flex-wrap: wrap; }
-            .user-menu { position: static; right: auto; top: auto; transform: none; margin-left: auto; }
-            .nav-link { padding: 0.5rem 1rem; font-size: 1rem; }
             .main-content { flex-direction: column; padding: 1.5rem; }
             .sidebar { width: 100%; order: -1; position: static; top: auto; }
             .grid-2 { grid-template-columns: 1fr; }
@@ -384,36 +252,6 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-content">
-            <nav class="nav-links">
-                <a href="{{ route('freelancer.jobs.index') }}" class="nav-link">案件一覧</a>
-                <a href="{{ route('freelancer.applications.index') }}" class="nav-link has-badge">
-                    応募した案件
-                    <span class="badge">3</span>
-                </a>
-                <a href="{{ route('freelancer.scouts.index') }}" class="nav-link has-badge">
-                    スカウト
-                    <span class="badge">1</span>
-                </a>
-            </nav>
-            <div class="user-menu">
-                <div class="dropdown" id="userDropdown">
-                    <button class="user-avatar" id="userDropdownToggle" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="userDropdownMenu">{{ mb_substr($user->email ?? 'U', 0, 1) }}</button>
-                    <div class="dropdown-content" id="userDropdownMenu" role="menu" aria-label="ユーザーメニュー">
-                        <a href="{{ route('freelancer.profile.settings') }}" class="dropdown-item" role="menuitem">プロフィール設定</a>
-                        <div class="dropdown-divider"></div>
-                        <a href="{{ route('auth.logout') }}" class="dropdown-item" role="menuitem" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">ログアウト</a>
-                        <form id="logout-form" action="{{ route('auth.logout') }}" method="POST" style="display: none;">
-                            @csrf
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
-
     <main class="main-content">
         <!-- Sidebar preview -->
         <aside class="sidebar">
@@ -524,42 +362,64 @@
                     <div class="divider"></div>
 
                     <div class="panel-title" style="margin-bottom:1rem;">稼働条件</div>
-                    <div class="grid-2">
-                        <div class="row">
-                            <label class="label" for="min_rate">希望単価（下限〜上限）</label>
-                            <div class="grid-2">
-                                <input class="input @error('min_rate') is-invalid @enderror" id="min_rate" name="min_rate" type="number" value="{{ old('min_rate') }}" placeholder="下限">
-                                <input class="input @error('max_rate') is-invalid @enderror" name="max_rate" type="number" value="{{ old('max_rate') }}" placeholder="上限">
+                    <div class="row">
+                        <div class="grid-2">
+                            <div class="row" style="align-self: start;">
+                                <label class="label" for="min_rate">希望単価（下限〜上限）</label>
+                                <div class="help">未入力の場合は「未設定」として登録されます（あとから変更できます）。</div>
+                                <div class="grid-2" style="align-items: stretch;">
+                                    <input class="input @error('min_rate') is-invalid @enderror" id="min_rate" name="min_rate" type="number" value="{{ old('min_rate') }}" placeholder="下限（万円）" min="0" step="1">
+                                    <input class="input @error('max_rate') is-invalid @enderror" name="max_rate" type="number" value="{{ old('max_rate') }}" placeholder="上限（万円）" min="0" step="1">
+                                </div>
+                                @error('min_rate')
+                                <span class="error-message">{{ $message }}</span>
+                                @enderror
+                                @error('max_rate')
+                                <span class="error-message">{{ $message }}</span>
+                                @enderror
                             </div>
-                            @error('min_rate')
-                            <span class="error-message">{{ $message }}</span>
-                            @enderror
-                            @error('max_rate')
-                            <span class="error-message">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        <div class="row">
-                            <label class="label">稼働可能時間 <span class="required">必須</span></label>
-                            <div class="grid-2">
-                                <input class="input @error('min_hours_per_week') is-invalid @enderror" name="min_hours_per_week" type="number" value="{{ old('min_hours_per_week') }}" placeholder="週 下限(h)" required>
-                                <input class="input @error('max_hours_per_week') is-invalid @enderror" name="max_hours_per_week" type="number" value="{{ old('max_hours_per_week') }}" placeholder="週 上限(h)" required>
+                            <div class="row" style="align-self: start;">
+                                <label class="label">稼働可能時間 <span class="required">必須</span></label>
+                                <div class="help" style="margin-bottom:0.75rem;">1週間あたりの稼働可能時間の範囲と、1日あたりの稼働時間・稼働日数を入力してください。</div>
+                                <div style="margin-bottom:0.75rem;">
+                                    <div style="font-weight: 700; color: #586069; font-size: 0.85rem; margin-bottom:0.5rem;">週間稼働時間</div>
+                                    <div class="grid-2" style="align-items: stretch;">
+                                        <div class="row" style="gap:0.4rem;">
+                                            <input class="input @error('min_hours_per_week') is-invalid @enderror" name="min_hours_per_week" type="number" value="{{ old('min_hours_per_week') }}" placeholder="例: 20" required>
+                                            <div class="help" style="margin:0; font-size:0.8rem;">週間の最小稼働時間（時間）</div>
+                                        </div>
+                                        <div class="row" style="gap:0.4rem;">
+                                            <input class="input @error('max_hours_per_week') is-invalid @enderror" name="max_hours_per_week" type="number" value="{{ old('max_hours_per_week') }}" placeholder="例: 40" required>
+                                            <div class="help" style="margin:0; font-size:0.8rem;">週間の最大稼働時間（時間）</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 700; color: #586069; font-size: 0.85rem; margin-bottom:0.5rem;">1日あたりの稼働時間・稼働日数</div>
+                                    <div class="grid-2" style="align-items: stretch;">
+                                        <div class="row" style="gap:0.4rem;">
+                                            <input class="input @error('hours_per_day') is-invalid @enderror" name="hours_per_day" type="number" value="{{ old('hours_per_day') }}" placeholder="例: 8" required>
+                                            <div class="help" style="margin:0; font-size:0.8rem;">1日あたりの稼働時間（時間）</div>
+                                        </div>
+                                        <div class="row" style="gap:0.4rem;">
+                                            <input class="input @error('days_per_week') is-invalid @enderror" name="days_per_week" type="number" value="{{ old('days_per_week') }}" placeholder="例: 5" required>
+                                            <div class="help" style="margin:0; font-size:0.8rem;">1週間あたりの稼働日数（日）</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                @error('min_hours_per_week')
+                                <span class="error-message">{{ $message }}</span>
+                                @enderror
+                                @error('max_hours_per_week')
+                                <span class="error-message">{{ $message }}</span>
+                                @enderror
+                                @error('hours_per_day')
+                                <span class="error-message">{{ $message }}</span>
+                                @enderror
+                                @error('days_per_week')
+                                <span class="error-message">{{ $message }}</span>
+                                @enderror
                             </div>
-                            <div class="grid-2" style="margin-top:0.75rem;">
-                                <input class="input @error('hours_per_day') is-invalid @enderror" name="hours_per_day" type="number" value="{{ old('hours_per_day') }}" placeholder="h/day" required>
-                                <input class="input @error('days_per_week') is-invalid @enderror" name="days_per_week" type="number" value="{{ old('days_per_week') }}" placeholder="日/week" required>
-                            </div>
-                            @error('min_hours_per_week')
-                            <span class="error-message">{{ $message }}</span>
-                            @enderror
-                            @error('max_hours_per_week')
-                            <span class="error-message">{{ $message }}</span>
-                            @enderror
-                            @error('hours_per_day')
-                            <span class="error-message">{{ $message }}</span>
-                            @enderror
-                            @error('days_per_week')
-                            <span class="error-message">{{ $message }}</span>
-                            @enderror
                         </div>
                     </div>
 
@@ -590,38 +450,6 @@
     </main>
 
     <script>
-        (function () {
-            const dropdown = document.getElementById('userDropdown');
-            const toggle = document.getElementById('userDropdownToggle');
-            const menu = document.getElementById('userDropdownMenu');
-            if (!dropdown || !toggle || !menu) return;
-
-            const open = () => {
-                dropdown.classList.add('is-open');
-                toggle.setAttribute('aria-expanded', 'true');
-            };
-
-            const close = () => {
-                dropdown.classList.remove('is-open');
-                toggle.setAttribute('aria-expanded', 'false');
-            };
-
-            const isOpen = () => dropdown.classList.contains('is-open');
-
-            toggle.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (isOpen()) close();
-                else open();
-            });
-
-            document.addEventListener('click', (e) => {
-                if (!dropdown.contains(e.target)) close();
-            });
-
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') close();
-            });
-        })();
 
         // アイコンファイルプレビュー機能
         (function () {
@@ -753,7 +581,7 @@
             const minRate = document.getElementById('min_rate').value;
             const maxRate = document.querySelector('input[name="max_rate"]').value;
             if (minRate || maxRate) {
-                const rateText = minRate && maxRate ? `${minRate}〜${maxRate}` : (minRate || maxRate || '未設定');
+                const rateText = minRate && maxRate ? `${minRate}〜${maxRate}万円` : (minRate || maxRate ? `${minRate || maxRate}万円` : '未設定');
                 document.getElementById('preview-rate').textContent = rateText;
             } else {
                 document.getElementById('preview-rate').textContent = '未設定';

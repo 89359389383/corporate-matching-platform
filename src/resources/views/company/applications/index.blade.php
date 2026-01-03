@@ -7,7 +7,7 @@
     <style>
         :root { --header-height: 104px; --header-height-mobile: 91px; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { font-size: 130%; }
+        html { font-size: 97.5%; }
         body {
             font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background-color: #fafbfc;
@@ -37,7 +37,7 @@
         }
         .nav-links {
             display: flex;
-            gap: 2rem;
+            gap: 3rem;
             align-items: center;
             position: absolute;
             left: 50%;
@@ -49,7 +49,7 @@
             text-decoration: none;
             color: #586069;
             font-weight: 500;
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             padding: 0.75rem 1.25rem;
             border-radius: 8px;
             transition: all 0.15s ease;
@@ -69,10 +69,10 @@
         .badge {
             background-color: #d73a49;
             color: white;
-            border-radius: 999px;
-            padding: 0.15rem 0.5rem;
+            border-radius: 50%;
+            padding: 0.15rem 0.45rem;
             font-size: 0.7rem;
-            font-weight: 700;
+            font-weight: 600;
             min-width: 18px;
             height: 18px;
             display: inline-flex;
@@ -89,7 +89,7 @@
             width: 36px; height: 36px; border-radius: 50%;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex; align-items: center; justify-content: center;
-            color: white; font-weight: 700; cursor: pointer; transition: all 0.15s ease;
+            color: white; font-weight: 600; cursor: pointer; transition: all 0.15s ease;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             border: none; padding: 0; appearance: none;
         }
@@ -187,8 +187,8 @@
             align-items: flex-start;
             margin-bottom: 1rem;
         }
-        .title { font-size: 1.35rem; font-weight: 900; line-height: 1.2; margin-bottom: 0.25rem; }
-        .sub { color: #586069; font-weight: 700; }
+        .title { font-size: 1.4rem; font-weight: 900; line-height: 1.2; margin-bottom: 0.25rem; }
+        .sub { color: #586069; font-weight: 700; font-size: 1rem; }
         .row { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
         .avatar {
             width: 36px; height: 36px; border-radius: 50%;
@@ -228,8 +228,9 @@
             align-items: center;
         }
         .meta-label { font-size: 0.75rem; color: #6a737d; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
-        .meta-value { font-weight: 900; color: #24292e; white-space: nowrap; }
-        .desc { color: #586069; margin-top: 0.75rem; line-height: 1.65; }
+        .meta-value { font-weight: 900; color: #24292e; white-space: nowrap; font-size: 1.05rem; }
+        .meta-value.skills { white-space: normal; word-break: break-word; line-height: 1.6; }
+        .desc { color: #586069; margin-top: 0.75rem; line-height: 1.65; font-size: 1rem; }
         .actions {
             display: flex;
             justify-content: flex-end;
@@ -341,7 +342,7 @@
                         // 報酬表示用
                         $rewardText = '';
                         if ($job->reward_type === 'monthly') {
-                            $rewardText = number_format($job->min_rate) . '〜' . number_format($job->max_rate) . '万';
+                            $rewardText = number_format($job->min_rate / 10000, 0) . '〜' . number_format($job->max_rate / 10000, 0) . '万';
                         } else {
                             $rewardText = number_format($job->min_rate) . '〜' . number_format($job->max_rate) . '円/時';
                         }
@@ -378,7 +379,7 @@
                             <div class="meta-item"><div class="meta-label">報酬</div><div class="meta-value">{{ $rewardText }}</div></div>
                             <div class="meta-item"><div class="meta-label">稼働</div><div class="meta-value">{{ $job->work_time_text }}</div></div>
                             @if($job->required_skills_text)
-                                <div class="meta-item"><div class="meta-label">スキル</div><div class="meta-value">{{ Str::limit($job->required_skills_text, 30) }}</div></div>
+                                <div class="meta-item"><div class="meta-label">スキル</div><div class="meta-value skills">{{ $job->required_skills_text }}</div></div>
                             @endif
                         </div>
                         <div class="actions">
@@ -417,7 +418,7 @@
                         // 報酬表示用
                         $rewardText = '';
                         if ($job->reward_type === 'monthly') {
-                            $rewardText = number_format($job->min_rate) . '〜' . number_format($job->max_rate) . '万';
+                            $rewardText = number_format($job->min_rate / 10000, 0) . '〜' . number_format($job->max_rate / 10000, 0) . '万';
                         } else {
                             $rewardText = number_format($job->min_rate) . '〜' . number_format($job->max_rate) . '円/時';
                         }
@@ -454,7 +455,7 @@
                             <div class="meta-item"><div class="meta-label">報酬</div><div class="meta-value">{{ $rewardText }}</div></div>
                             <div class="meta-item"><div class="meta-label">稼働</div><div class="meta-value">{{ $job->work_time_text }}</div></div>
                             @if($job->required_skills_text)
-                                <div class="meta-item"><div class="meta-label">スキル</div><div class="meta-value">{{ Str::limit($job->required_skills_text, 30) }}</div></div>
+                                <div class="meta-item"><div class="meta-label">スキル</div><div class="meta-value skills">{{ $job->required_skills_text }}</div></div>
                             @endif
                         </div>
                         <div class="actions">

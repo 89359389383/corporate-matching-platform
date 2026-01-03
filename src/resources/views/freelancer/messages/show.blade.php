@@ -323,16 +323,21 @@
         .btn:hover { background: #f6f8fa; transform: translateY(-1px); }
 
         .messages {
-            padding: 1.5rem;
-            height: 520px;
-            overflow: auto;
+            padding: 70px;
+            overflow-y: auto;
             display: grid;
             gap: 0.85rem;
             background: linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
+            position: relative;
         }
 
         .bubble-row { display: flex; align-items: flex-end; gap: 0.75rem; }
         .bubble-row.me { justify-content: flex-end; }
+        .bubble-row.first-message {
+            justify-content: flex-end;
+            max-width: 320px;
+            margin-left: auto;
+        }
         .bubble {
             max-width: 74%;
             padding: 0.9rem 1rem;
@@ -345,6 +350,24 @@
             background: #f1f8ff;
             border-color: #c8e1ff;
         }
+        .bubble.first-message {
+            max-width: 100%;
+            background: #f6f8fa;
+            border: 1px solid #e1e4e8;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 1rem 1.25rem;
+            position: relative;
+        }
+        .bubble.first-message p {
+            color: #24292e;
+            font-weight: 600;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        .bubble.first-message small {
+            color: #6a737d;
+            font-weight: 800;
+        }
         .bubble p { color: #24292e; font-size: 0.95rem; line-height: 1.6; }
         .bubble small { display: block; margin-top: 0.4rem; color: #6a737d; font-weight: 800; font-size: 0.8rem; }
 
@@ -352,9 +375,8 @@
             padding: 1.25rem 1.5rem;
             border-top: 1px solid #e1e4e8;
             display: grid;
-            grid-template-columns: 1fr auto;
+            grid-template-columns: 1fr;
             gap: 0.75rem;
-            align-items: center;
             background: #ffffff;
         }
         .input {
@@ -365,6 +387,8 @@
             font-size: 0.95rem;
             transition: all 0.15s ease;
             background-color: #fafbfc;
+            min-height: 14rem;
+            resize: vertical;
         }
         .input:focus {
             outline: none;
@@ -382,6 +406,9 @@
             cursor: pointer;
             transition: all 0.15s ease;
             font-size: 0.95rem;
+            width: 500px;
+            max-width: 100%;
+            margin: 0 auto;
         }
         .send:hover { background: #0256cc; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(3, 102, 214, 0.3); }
 
@@ -393,7 +420,7 @@
         @media (max-width: 900px) {
             .chat-shell { grid-template-columns: 1fr; }
             .thread-list { max-height: 360px; }
-            .messages { height: 420px; }
+            .messages { max-height: 500px; }
         }
         @media (max-width: 768px) {
             .header-content { padding: 0 1.5rem; height: var(--header-height-mobile); }
@@ -402,6 +429,13 @@
             .nav-link { padding: 0.5rem 1rem; font-size: 1rem; }
             .main-content { padding: 1.5rem; }
             .bubble { max-width: 90%; }
+            .bubble-row.first-message {
+                max-width: calc(100% - 3rem);
+                margin-left: auto;
+            }
+            .bubble.first-message {
+                max-width: 100%;
+            }
             .composer { grid-template-columns: 1fr; }
         }
     </style>
@@ -463,6 +497,7 @@
                 @forelse($messages as $message)
                     @php
                         $isMe = $message->sender_type === 'freelancer';
+                        $isFirst = $loop->first;
                         $senderName = '';
                         if ($message->sender_type === 'company') {
                             $senderName = mb_substr($thread->company->name ?? '企業', 0, 1);
@@ -471,28 +506,49 @@
                         }
                         $sentAt = $message->sent_at ? $message->sent_at->format('m/d H:i') : '';
                         $isLatest = $loop->last;
-                        $canDelete = $isMe && $isLatest && $message->sender_type === 'freelancer';
+                        $canDelete = $isMe && $message->sender_type === 'freelancer';
                     @endphp
-                    <div class="bubble-row {{ $isMe ? 'me' : '' }}">
-                        @if(!$isMe)
-                            <div class="avatar" style="width:36px;height:36px;">{{ $senderName }}</div>
-                        @endif
-                        <div class="bubble {{ $isMe ? 'me' : '' }}">
-                            <p>{{ $message->body }}</p>
-                            <small>
-                                {{ $sentAt }}
-                                @if($canDelete)
-                                    <span style="margin-left:0.75rem;">
-                                        <form action="{{ route('freelancer.messages.destroy', ['message' => $message->id]) }}" method="POST" style="display:inline;" onsubmit="return confirm('このメッセージを削除しますか？');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" style="background:none;border:none;color:#d73a49;font-weight:900;cursor:pointer;">削除</button>
-                                        </form>
-                                    </span>
-                                @endif
-                            </small>
+                    @if($isFirst)
+                        <div class="bubble-row first-message">
+                            <div class="bubble first-message">
+                                <p>{{ $message->body }}</p>
+                                <small>
+                                    {{ $sentAt }}
+                                    @if($canDelete)
+                                        <span style="margin-left:0.75rem;">
+                                            <form action="{{ route('freelancer.messages.destroy', ['message' => $message->id]) }}" method="POST" style="display:inline;" onsubmit="return confirm('このメッセージを削除しますか？');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" style="background:none;border:none;color:#d73a49;font-weight:900;cursor:pointer;">削除</button>
+                                            </form>
+                                        </span>
+                                    @endif
+                                </small>
+                            </div>
                         </div>
-                    </div>
+                    @endif
+                    @if(!$isFirst)
+                        <div class="bubble-row {{ $isMe ? 'me' : '' }}">
+                            @if(!$isMe)
+                                <div class="avatar" style="width:36px;height:36px;">{{ $senderName }}</div>
+                            @endif
+                            <div class="bubble {{ $isMe ? 'me' : '' }}">
+                                <p>{{ $message->body }}</p>
+                                <small>
+                                    {{ $sentAt }}
+                                    @if($canDelete && $isLatest)
+                                        <span style="margin-left:0.75rem;">
+                                            <form action="{{ route('freelancer.messages.destroy', ['message' => $message->id]) }}" method="POST" style="display:inline;" onsubmit="return confirm('このメッセージを削除しますか？');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" style="background:none;border:none;color:#d73a49;font-weight:900;cursor:pointer;">削除</button>
+                                            </form>
+                                        </span>
+                                    @endif
+                                </small>
+                            </div>
+                        </div>
+                    @endif
                 @empty
                     <div style="text-align: center; padding: 2rem; color: #6a737d;">
                         <p>メッセージがありません。</p>
@@ -502,7 +558,7 @@
 
             <form class="composer" action="{{ route('freelancer.threads.messages.store', ['thread' => $thread->id]) }}" method="post">
                 @csrf
-                <input class="input" type="text" name="content" value="" placeholder="メッセージを入力…" aria-label="メッセージを入力" required>
+                <textarea class="input" name="content" placeholder="メッセージを入力…" aria-label="メッセージを入力" required></textarea>
                 <button class="send" type="submit">送信</button>
             </form>
         </section>

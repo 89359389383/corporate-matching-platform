@@ -226,6 +226,7 @@
         }
         .detail-item {
             display: flex;
+            max-width: 280px;
             align-items: center;
             justify-content: space-between;
             gap: 1rem;
@@ -246,6 +247,10 @@
             color: #24292e;
             font-size: 1.05rem;
             white-space: nowrap;
+        }
+
+        .job-details {
+            max-width: 600px;
         }
 
         .skills {
@@ -422,17 +427,16 @@
                 </div>
                 <div class="hero-meta" aria-label="タグ">
                     <span class="chip primary">公開中</span>
-                    <span class="chip">{{ $job->work_time_text }}</span>
-                    @php
-                        $rewardText = '';
-                        if ($job->reward_type === 'monthly') {
-                            $rewardText = $job->min_rate . '〜' . $job->max_rate . '万円';
-                        } else {
-                            $rewardText = number_format($job->min_rate) . '〜' . number_format($job->max_rate) . '円/時';
-                        }
-                    @endphp
-                    <span class="chip">{{ $rewardText }}</span>
                 </div>
+
+                @php
+                    $rewardText = '';
+                    if ($job->reward_type === 'monthly') {
+                        $rewardText = ($job->min_rate / 10000) . '〜' . ($job->max_rate / 10000) . '万円';
+                    } elseif ($job->reward_type === 'hourly') {
+                        $rewardText = number_format($job->min_rate) . '〜' . number_format($job->max_rate) . '円/時';
+                    }
+                @endphp
 
                 <div class="job-details" aria-label="主要条件">
                     <div class="detail-item">

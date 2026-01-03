@@ -7,7 +7,7 @@
     <style>
         :root { --header-height: 104px; --header-height-mobile: 91px; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { font-size: 100%; }
+        html { font-size: 97.5%; }
         body {
             font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background-color: #fafbfc;
@@ -37,7 +37,7 @@
         }
         .nav-links {
             display: flex;
-            gap: 2rem;
+            gap: 3rem;
             align-items: center;
             position: absolute;
             left: 50%;
@@ -49,7 +49,7 @@
             text-decoration: none;
             color: #586069;
             font-weight: 500;
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             padding: 0.75rem 1.25rem;
             border-radius: 8px;
             transition: all 0.15s ease;
@@ -69,10 +69,10 @@
         .badge {
             background-color: #d73a49;
             color: white;
-            border-radius: 999px;
-            padding: 0.15rem 0.5rem;
+            border-radius: 50%;
+            padding: 0.15rem 0.45rem;
             font-size: 0.7rem;
-            font-weight: 700;
+            font-weight: 600;
             min-width: 18px;
             height: 18px;
             display: inline-flex;
@@ -89,7 +89,7 @@
             width: 36px; height: 36px; border-radius: 50%;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex; align-items: center; justify-content: center;
-            color: white; font-weight: 700; cursor: pointer; transition: all 0.15s ease;
+            color: white; font-weight: 600; cursor: pointer; transition: all 0.15s ease;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             border: none; padding: 0; appearance: none;
         }
@@ -173,6 +173,8 @@
             font-size: 0.875rem;
             letter-spacing: -0.01em;
             white-space: nowrap;
+            height: 38px;
+            box-sizing: border-box;
         }
         .btn-primary { background-color: #0366d6; color: #fff; }
         .btn-primary:hover { background-color: #0256cc; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(3,102,214,0.3); }
@@ -211,23 +213,47 @@
         .title { font-size: 1.35rem; font-weight: 900; margin-bottom: 0.25rem; }
         .sub { color: #586069; font-weight: 700; }
         .desc { color: #586069; margin-top: 0.75rem; line-height: 1.65; }
-        .meta {
+        .job-details {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1rem;
+            max-width: 600px;
+            grid-template-columns: repeat(auto-fit, minmax(90px, calc(50% - 25px)));
+            margin-bottom: 2rem;
             margin-top: 1rem;
         }
-        .meta-item {
+        .detail-item {
+            display: flex;
+            max-width: 250px;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 1rem;
+            background-color: #f6f8fa;
+            border-radius: 8px;
+        }
+        .detail-label {
+            font-size: 1rem;
+            color: #6a737d;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0;
+            white-space: nowrap;
+        }
+        .detail-value {
+            font-weight: 700;
+            color: #24292e;
+            font-size: 1.1rem;
+            white-space: nowrap;
+        }
+        .skills-section {
+            margin-top: 1rem;
             padding: 0.85rem;
             background-color: #f6f8fa;
             border-radius: 10px;
-            display: flex;
-            justify-content: space-between;
-            gap: 0.75rem;
-            align-items: center;
         }
-        .meta-label { font-size: 0.75rem; color: #6a737d; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
-        .meta-value { font-weight: 900; color: #24292e; white-space: nowrap; }
+        .skills-label { font-size: 0.75rem; color: #6a737d; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; }
+        .skills-value { font-weight: 900; color: #24292e; }
         .pill {
             display: inline-flex;
             align-items: center;
@@ -386,13 +412,13 @@
             .user-menu { position: static; transform: none; margin-left: auto; }
             .main-content { flex-direction: column; padding: 1.5rem; }
             .sidebar { width: 100%; position: static; top: auto; order: -1; }
-            .meta { grid-template-columns: 1fr; }
+            .job-details { grid-template-columns: 1fr; }
             .actions .btn { width: 100%; }
         }
         @media (max-width: 1200px) {
-            .nav-links { gap: 1rem; }
-            .nav-link { font-size: 0.95rem; padding: 0.6rem 0.9rem; }
-            .nav-link.has-badge { padding-right: 2.6rem; }
+            .nav-links { gap: 1.5rem; }
+            .nav-link { font-size: 1rem; padding: 0.5rem 1rem; }
+            .nav-link.has-badge { padding-right: 3rem; }
         }
     </style>
 </head>
@@ -496,9 +522,9 @@
                         // 報酬の表示フォーマット
                         $rewardDisplay = '';
                         if ($job->reward_type === 'monthly') {
-                            $rewardDisplay = ($job->min_rate / 10000) . '〜' . ($job->max_rate / 10000) . '万';
+                            $rewardDisplay = ($job->min_rate / 10000) . '〜' . ($job->max_rate / 10000) . '万円';
                         } else {
-                            $rewardDisplay = number_format($job->min_rate) . '〜' . number_format($job->max_rate) . '円';
+                            $rewardDisplay = number_format($job->min_rate) . '〜' . number_format($job->max_rate) . '円/時';
                         }
                     @endphp
                     <article class="card">
@@ -508,13 +534,22 @@
                         </div>
                         <div class="sub">{{ $company->name }}</div>
                         <div class="desc">{{ $job->description }}</div>
-                        <div class="meta">
-                            <div class="meta-item"><div class="meta-label">報酬</div><div class="meta-value">{{ $rewardDisplay }}</div></div>
-                            <div class="meta-item"><div class="meta-label">稼働</div><div class="meta-value">{{ $job->work_time_text }}</div></div>
-                            @if($job->required_skills_text)
-                                <div class="meta-item"><div class="meta-label">スキル</div><div class="meta-value">{{ $job->required_skills_text }}</div></div>
-                            @endif
+                        <div class="job-details">
+                            <div class="detail-item">
+                                <div class="detail-label">稼働時間</div>
+                                <div class="detail-value">{{ $job->work_time_text }}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">報酬</div>
+                                <div class="detail-value">{{ $rewardDisplay }}</div>
+                            </div>
                         </div>
+                        @if($job->required_skills_text)
+                            <div class="skills-section">
+                                <div class="skills-label">スキル</div>
+                                <div class="skills-value">{{ $job->required_skills_text }}</div>
+                            </div>
+                        @endif
                         <div class="actions">
                             <form method="POST" action="{{ route('company.jobs.status.update', $job) }}" style="margin-right:auto;">
                                 @csrf

@@ -308,26 +308,27 @@
 
         .job-details {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
             margin-bottom: 1.75rem;
+            max-width: 600px;
         }
 
         .detail-item {
             display: flex;
-            flex-direction: row;
+            max-width: 280px;
             align-items: center;
             justify-content: space-between;
             gap: 1rem;
             padding: 1rem;
             background-color: #f6f8fa;
-            border-radius: 8px;
+            border-radius: 10px;
         }
 
         .detail-label {
             font-size: 0.75rem;
             color: #6a737d;
-            font-weight: 600;
+            font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 0;
@@ -335,9 +336,9 @@
         }
 
         .detail-value {
-            font-weight: 700;
+            font-weight: 900;
             color: #24292e;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             white-space: nowrap;
         }
 
@@ -431,6 +432,10 @@
 
             .tabs-bar {
                 padding: 0 2rem;
+            }
+
+            .job-details {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -615,7 +620,7 @@
                         // 報酬表示用
                         $rewardText = '';
                         if ($job->reward_type === 'monthly') {
-                            $rewardText = number_format($job->min_rate) . '〜' . number_format($job->max_rate) . '万円';
+                            $rewardText = ($job->min_rate / 10000) . '〜' . ($job->max_rate / 10000) . '万円';
                         } elseif ($job->reward_type === 'hourly') {
                             $rewardText = number_format($job->min_rate) . '〜' . number_format($job->max_rate) . '円/時';
                         }

@@ -7,7 +7,7 @@
     <style>
         :root { --header-height: 104px; --header-height-mobile: 91px; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { font-size: 100%; }
+        html { font-size: 97.5%; }
         body {
             font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background-color: #fafbfc;
@@ -37,7 +37,7 @@
         }
         .nav-links {
             display: flex;
-            gap: 2rem;
+            gap: 3rem;
             align-items: center;
             position: absolute;
             left: 50%;
@@ -49,8 +49,8 @@
             text-decoration: none;
             color: #586069;
             font-weight: 500;
-            font-size: 0.9rem;
-            padding: 0.65rem 1.1rem;
+            font-size: 1.1rem;
+            padding: 0.75rem 1.25rem;
             border-radius: 8px;
             transition: all 0.15s ease;
             position: relative;
@@ -69,10 +69,10 @@
         .badge {
             background-color: #d73a49;
             color: white;
-            border-radius: 999px;
-            padding: 0.15rem 0.5rem;
+            border-radius: 50%;
+            padding: 0.15rem 0.45rem;
             font-size: 0.7rem;
-            font-weight: 700;
+            font-weight: 600;
             min-width: 18px;
             height: 18px;
             display: inline-flex;
@@ -101,7 +101,7 @@
             align-items: center;
             justify-content: center;
             color: white;
-            font-weight: 700;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.15s ease;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -377,7 +377,15 @@
                         $avatarText = mb_substr($freelancer->display_name, 0, 1);
                         $allSkills = $freelancer->skills->pluck('name')->merge($freelancer->customSkills->pluck('name'));
                         $workHours = $freelancer->min_hours_per_week . '〜' . $freelancer->max_hours_per_week . 'h';
-                        $rateText = ($freelancer->min_rate / 10000) . '〜' . ($freelancer->max_rate / 10000) . '万';
+                        $minRate = $freelancer->min_rate ?: null; // 0は未設定扱い
+                        $maxRate = $freelancer->max_rate ?: null; // 0は未設定扱い
+                        if ($minRate !== null && $maxRate !== null) {
+                            $rateText = $minRate . '〜' . $maxRate . '万';
+                        } elseif ($minRate !== null || $maxRate !== null) {
+                            $rateText = ($minRate ?? $maxRate) . '万';
+                        } else {
+                            $rateText = '未設定';
+                        }
                     @endphp
                     <article class="card {{ $index === 0 ? 'is-selected' : '' }}" tabindex="0" role="button" data-id="{{ $freelancer->id }}" aria-pressed="{{ $index === 0 ? 'true' : 'false' }}">
                         <div class="row">
@@ -480,30 +488,41 @@
             document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
         })();
     </script>
+
+    @php
+        $freelancerDataArray = $freelancers->map(function($freelancer) use ($scoutThreadMap) {
+            $allSkills = $freelancer->skills->pluck('name')->merge($freelancer->customSkills->pluck('name'));
+            $workHours = $freelancer->min_hours_per_week . '〜' . $freelancer->max_hours_per_week . 'h';
+
+            $minRate = $freelancer->min_rate ?: null; // 0は未設定扱い
+            $maxRate = $freelancer->max_rate ?: null; // 0は未設定扱い
+            if ($minRate !== null && $maxRate !== null) {
+                $rateText = $minRate . '〜' . $maxRate . '万';
+            } elseif ($minRate !== null || $maxRate !== null) {
+                $rateText = ($minRate ?? $maxRate) . '万';
+            } else {
+                $rateText = '未設定';
+            }
+
+            return [
+                'id' => $freelancer->id,
+                'avatar' => mb_substr($freelancer->display_name, 0, 1),
+                'name' => $freelancer->display_name,
+                'role' => $freelancer->job_title ?? '',
+                'bio' => $freelancer->bio ?? '',
+                'skills' => $allSkills->toArray(),
+                'workHours' => $workHours,
+                'rateText' => $rateText,
+                'portfolios' => $freelancer->portfolios->pluck('url')->toArray(),
+                'threadId' => $scoutThreadMap[$freelancer->id] ?? null,
+            ];
+        })->values()->toArray();
+    @endphp
+    <script type="application/json" id="freelancerDataJson">{!! json_encode($freelancerDataArray, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
     <script>
         (function () {
-            // フリーランスデータをJSON形式で埋め込む
-            @php
-                $freelancerDataArray = $freelancers->map(function($freelancer) use ($scoutThreadMap) {
-                    $allSkills = $freelancer->skills->pluck('name')->merge($freelancer->customSkills->pluck('name'));
-                    $workHours = $freelancer->min_hours_per_week . '〜' . $freelancer->max_hours_per_week . 'h';
-                    $rateText = ($freelancer->min_rate / 10000) . '〜' . ($freelancer->max_rate / 10000) . '万';
-                    
-                    return [
-                        'id' => $freelancer->id,
-                        'avatar' => mb_substr($freelancer->display_name, 0, 1),
-                        'name' => $freelancer->display_name,
-                        'role' => $freelancer->job_title ?? '',
-                        'bio' => $freelancer->bio ?? '',
-                        'skills' => $allSkills->toArray(),
-                        'workHours' => $workHours,
-                        'rateText' => $rateText,
-                        'portfolios' => $freelancer->portfolios->pluck('url')->toArray(),
-                        'threadId' => $scoutThreadMap[$freelancer->id] ?? null,
-                    ];
-                })->values()->toArray();
-            @endphp
-            const freelancerData = @json($freelancerDataArray);
+            const dataEl = document.getElementById('freelancerDataJson');
+            const freelancerData = dataEl ? JSON.parse(dataEl.textContent || '[]') : [];
 
             const list = document.getElementById('freelancerList');
             const detailContent = document.getElementById('detailContent');

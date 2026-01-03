@@ -7,7 +7,7 @@
     <style>
         :root { --header-height: 104px; --header-height-mobile: 91px; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { font-size: 130%; }
+        html { font-size: 97.5%; }
         body {
             font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background-color: #fafbfc;
@@ -35,7 +35,7 @@
         }
         .nav-links {
             display: flex;
-            gap: 2rem;
+            gap: 3rem;
             align-items: center;
             position: absolute;
             left: 50%;
@@ -47,7 +47,7 @@
             text-decoration: none;
             color: #586069;
             font-weight: 500;
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             padding: 0.75rem 1.25rem;
             border-radius: 8px;
             transition: all 0.15s ease;
@@ -67,10 +67,10 @@
         .badge {
             background-color: #d73a49;
             color: white;
-            border-radius: 999px;
-            padding: 0.15rem 0.5rem;
+            border-radius: 50%;
+            padding: 0.15rem 0.45rem;
             font-size: 0.7rem;
-            font-weight: 700;
+            font-weight: 600;
             min-width: 18px;
             height: 18px;
             display: inline-flex;
@@ -99,7 +99,7 @@
             align-items: center;
             justify-content: center;
             color: white;
-            font-weight: 700;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.15s ease;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
