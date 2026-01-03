@@ -8,18 +8,41 @@
         :root {
             --header-height: 104px;       /* 80px * 1.3 */
             --header-height-mobile: 91px; /* 70px * 1.3 */
+
+            /* UI tokens (messages/show.blade.php より統一) */
+            --bg: #f6f8fb;
+            --surface: #ffffff;
+            --surface-2: #fbfcfe;
+            --text: #0f172a;
+            --muted: #64748b;
+            --border: #e6eaf2;
+            --border-2: #dbe2ee;
+            --primary: #0366d6;
+            --primary-2: #0256cc;
+            --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+            --shadow-md: 0 10px 30px rgba(15, 23, 42, 0.10);
+            --radius-lg: 18px;
+            --radius-md: 14px;
+            --radius-sm: 12px;
+            --focus: 0 0 0 4px rgba(3, 102, 214, 0.14);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { font-size: 97.5%; }
+        html { font-size: 100%; }
         body {
             font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background-color: #fafbfc;
-            color: #24292e;
-            line-height: 1.5;
+            background:
+                radial-gradient(1200px 600px at 20% 0%, rgba(3, 102, 214, 0.08), transparent 60%),
+                radial-gradient(900px 500px at 90% 10%, rgba(102, 126, 234, 0.10), transparent 55%),
+                var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        /* Header Styles - Minimalist（基準UIと統一） */
+        /* Header Styles - Minimalist（messages/show.blade.php に揃える） */
         .header {
             background-color: #ffffff;
             border-bottom: 1px solid #e1e4e8;
@@ -144,39 +167,41 @@
         .dropdown-item:hover { background-color: #f6f8fa; color: #24292e; }
         .dropdown-divider { height: 1px; background-color: #e1e4e8; margin: 0.5rem 0; }
 
-        /* Page（基準UIと統一） */
+        /* Page（messages/show.blade.php に揃える） */
         .main-content {
-            max-width: 1600px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 3rem;
+            padding: 2.5rem 1.75rem 3rem;
         }
         .page-title {
-            font-size: 2rem;
-            font-weight: 800;
-            margin-bottom: 0.75rem;
-            color: #24292e;
-            letter-spacing: -0.025em;
+            font-size: 1.9rem;
+            font-weight: 900;
+            margin-bottom: 0.6rem;
+            color: var(--text);
+            letter-spacing: -0.03em;
         }
         .page-subtitle {
-            color: #6a737d;
-            font-size: 1rem;
-            margin-bottom: 2.25rem;
+            color: var(--muted);
+            font-size: 1.02rem;
+            margin-bottom: 1.75rem;
+            font-weight: 600;
         }
         .panel {
-            background-color: white;
-            border-radius: 16px;
-            padding: 0;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
-            border: 1px solid #e1e4e8;
+            background-color: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
             overflow: hidden;
         }
         .chat-header {
             padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid #e1e4e8;
+            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 1rem;
+            background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
         }
         .chat-title {
             display: grid;
@@ -186,15 +211,16 @@
         .chat-title strong {
             font-size: 1.05rem;
             font-weight: 900;
-            color: #24292e;
+            color: var(--text);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            letter-spacing: -0.02em;
         }
         .chat-title span {
-            color: #6a737d;
-            font-size: 0.85rem;
-            font-weight: 800;
+            color: var(--muted);
+            font-size: 0.9rem;
+            font-weight: 700;
         }
         .btn {
             padding: 0.7rem 1rem;
@@ -214,19 +240,27 @@
         }
         .btn:hover { background: #f6f8fa; transform: translateY(-1px); }
         .messages {
-            padding: 70px;
+            padding: 1.25rem 1.25rem 1rem;
             overflow-y: auto;
             display: grid;
             gap: 0.85rem;
-            background: linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
+            background:
+                radial-gradient(900px 420px at 10% 0%, rgba(3, 102, 214, 0.06), transparent 60%),
+                linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
             position: relative;
-            max-height: 620px;
+            scrollbar-gutter: stable;
+            flex: 1 1 auto;
         }
         .bubble-row { display: flex; align-items: flex-end; gap: 0.75rem; }
         .bubble-row.me { justify-content: flex-end; }
-        .bubble-row.first-message { max-width: 320px; }
-        .bubble-row.first-message.me { justify-content: flex-end; margin-left: auto; }
-        .bubble-row.first-message:not(.me) { justify-content: flex-start; margin-right: auto; }
+        .bubble-row.first-message {
+            justify-content: flex-end;
+            max-width: 420px;
+            margin-left: auto;
+            position: sticky;
+            top: 1rem;
+            z-index: 3;
+        }
         .avatar {
             width: 44px;
             height: 44px;
@@ -242,75 +276,142 @@
         .bubble {
             max-width: 74%;
             padding: 0.9rem 1rem;
-            border-radius: 14px;
-            border: 1px solid #e1e4e8;
-            background: #ffffff;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.92);
+            box-shadow: var(--shadow-sm);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            overflow-wrap: anywhere;
         }
-        .bubble.me { background: #f1f8ff; border-color: #c8e1ff; }
+        .bubble.me {
+            background: linear-gradient(180deg, rgba(241,248,255,0.98) 0%, rgba(236,246,255,0.98) 100%);
+            border-color: #cfe4ff;
+        }
         .bubble.first-message {
             max-width: 100%;
-            background: #f6f8fa;
-            border: 1px solid #e1e4e8;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            padding: 1rem 1.25rem;
+            background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,250,252,0.98) 100%);
+            border: 1px solid var(--border-2);
+            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.14);
+            padding: 1rem 1.1rem 0.9rem;
+            position: relative;
+            border-radius: 18px;
+        }
+        .bubble.first-message::before {
+            content: "最初のメッセージ";
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 22px;
+            padding: 0 0.55rem;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 900;
+            letter-spacing: 0.02em;
+            color: rgba(2, 86, 204, 0.95);
+            background: rgba(3, 102, 214, 0.10);
+            border: 1px solid rgba(3, 102, 214, 0.18);
+            margin-bottom: 0.5rem;
+        }
+        .bubble.first-message p {
+            color: var(--text);
+            font-weight: 650;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+        .bubble.first-message small {
+            color: var(--muted);
+            font-weight: 800;
+        }
+        .bubble p { color: var(--text); font-size: 0.95rem; line-height: 1.7; white-space: pre-wrap; }
+        .bubble small {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            margin-top: 0.45rem;
+            color: var(--muted);
+            font-weight: 800;
+            font-size: 0.82rem;
         }
         .bubble p { color: #24292e; font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap; }
         .bubble small { display: block; margin-top: 0.4rem; color: #6a737d; font-weight: 800; font-size: 0.8rem; }
         .composer {
-            padding: 1.25rem 1.5rem;
-            border-top: 1px solid #e1e4e8;
+            padding: 1rem 1.25rem 1.25rem;
+            border-top: 1px solid var(--border);
             display: grid;
             grid-template-columns: 1fr;
             gap: 0.75rem;
-            background: #ffffff;
+            background: linear-gradient(180deg, var(--surface-2) 0%, var(--surface) 100%);
         }
         .input {
             width: 100%;
-            padding: 0.875rem 1rem;
-            border: 2px solid #e1e4e8;
-            border-radius: 12px;
-            font-size: 0.95rem;
+            padding: 0.95rem 1rem;
+            border: 1px solid var(--border-2);
+            border-radius: 14px;
+            font-size: 0.98rem;
             transition: all 0.15s ease;
-            background-color: #fafbfc;
-            min-height: 14rem;
+            background-color: #ffffff;
+            min-height: 7.25rem;
+            max-height: 18rem;
             resize: vertical;
+            line-height: 1.7;
+            box-shadow: inset 0 1px 0 rgba(15, 23, 42, 0.03);
         }
         .input:focus {
             outline: none;
-            border-color: #0366d6;
-            box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.1);
-            background-color: white;
+            border-color: rgba(3, 102, 214, 0.55);
+            box-shadow: var(--focus);
         }
         .send {
-            padding: 0.875rem 1.25rem;
-            border-radius: 12px;
+            padding: 0.85rem 1.2rem;
+            border-radius: 14px;
             font-weight: 900;
             border: none;
-            background: #0366d6;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-2) 100%);
             color: white;
             cursor: pointer;
             transition: all 0.15s ease;
-            font-size: 0.95rem;
-            width: 500px;
+            font-size: 0.98rem;
+            width: fit-content;
+            min-width: 160px;
             max-width: 100%;
-            margin: 0 auto;
+            margin-left: auto;
+            box-shadow: 0 10px 20px rgba(3, 102, 214, 0.22);
         }
-        .send:hover { background: #0256cc; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(3, 102, 214, 0.3); }
+        .send:hover { transform: translateY(-1px); box-shadow: 0 14px 26px rgba(3, 102, 214, 0.26); }
+        .send:active { transform: translateY(0px); }
+        .send:focus-visible { outline: none; box-shadow: var(--focus), 0 14px 26px rgba(3, 102, 214, 0.26); }
 
-        /* Responsive */
+        /* Responsive（messages/show.blade.php メディアクエリ準拠） */
         @media (max-width: 1200px) {
-            .main-content { padding: 2rem; }
+            .main-content { padding: 2rem 1.25rem 2.5rem; }
+        }
+        @media (max-width: 900px) {
+            .messages { max-height: 500px; }
         }
         @media (max-width: 768px) {
             .header-content { padding: 0 1.5rem; height: var(--header-height-mobile); }
             .nav-links { gap: 1.5rem; position: static; left: auto; transform: none; justify-content: flex-start; flex-direction: row; flex-wrap: wrap; }
             .user-menu { position: static; right: auto; top: auto; transform: none; margin-left: auto; }
             .nav-link { padding: 0.5rem 1rem; font-size: 1rem; }
-            .main-content { padding: 1.5rem; }
-            .messages { padding: 1.5rem; max-height: 520px; }
-            .bubble { max-width: 90%; }
-            .bubble-row.first-message { max-width: calc(100% - 3rem); }
+            .main-content { padding: 1.5rem 1rem 2rem; }
+            .page-title { font-size: 1.65rem; }
+            .page-subtitle { font-size: 0.98rem; }
+            .messages { padding: 1rem; }
+            .bubble { max-width: 92%; }
+            .bubble-row.first-message {
+                max-width: calc(100% - 1rem);
+                margin-left: auto;
+            }
+            .bubble.first-message {
+                max-width: 100%;
+            }
+            .composer { grid-template-columns: 1fr; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; scroll-behavior: auto !important; }
         }
     </style>
 </head>
@@ -354,7 +455,7 @@
 
     <main class="main-content">
         <h1 class="page-title">スカウトチャット</h1>
-        <p class="page-subtitle">スカウト送信時のメッセージを先頭に表示します。開いた時点で未読が解除されます。</p>
+        <p class="page-subtitle">スカウトに関するやり取りを確認できます。開いた時点で未読が解除されます。</p>
 
         <section class="panel chat-pane" aria-label="チャット">
             <div class="chat-header">
@@ -366,23 +467,22 @@
             </div>
 
             <div class="messages" id="messages" aria-label="メッセージ一覧">
-                @php
-                    $companyInitial = mb_substr($thread->company->name ?? '企', 0, 1);
-                    $activeMessages = $messages->whereNull('deleted_at')->sortBy('sent_at')->values();
-                    $latestMessage = $activeMessages->last();
-                @endphp
-
-                @forelse($activeMessages as $message)
+                @forelse($messages as $message)
                     @php
                         $isMe = $message->sender_type === 'freelancer';
                         $isFirst = $loop->first;
+                        $senderName = '';
+                        if ($message->sender_type === 'company') {
+                            $senderName = mb_substr($thread->company->name ?? '企業', 0, 1);
+                        } elseif ($message->sender_type === 'freelancer') {
+                            $senderName = mb_substr(auth()->user()->freelancer->display_name ?? auth()->user()->email ?? 'U', 0, 1);
+                        }
                         $sentAt = $message->sent_at ? $message->sent_at->format('m/d H:i') : '';
-                        $isLatest = $latestMessage && $latestMessage->id === $message->id;
-                        $canDelete = $isMe && $isLatest;
+                        $isLatest = $loop->last;
+                        $canDelete = $isMe && $message->sender_type === 'freelancer';
                     @endphp
-
                     @if($isFirst)
-                        <div class="bubble-row first-message {{ $isMe ? 'me' : '' }}">
+                        <div class="bubble-row first-message">
                             <div class="bubble first-message">
                                 <p>{{ $message->body }}</p>
                                 <small>
@@ -399,16 +499,17 @@
                                 </small>
                             </div>
                         </div>
-                    @else
+                    @endif
+                    @if(!$isFirst)
                         <div class="bubble-row {{ $isMe ? 'me' : '' }}">
                             @if(!$isMe)
-                                <div class="avatar">{{ $companyInitial }}</div>
+                                <div class="avatar" style="width:36px;height:36px;">{{ $senderName }}</div>
                             @endif
                             <div class="bubble {{ $isMe ? 'me' : '' }}">
                                 <p>{{ $message->body }}</p>
                                 <small>
                                     {{ $sentAt }}
-                                    @if($canDelete)
+                                    @if($canDelete && $isLatest)
                                         <span style="margin-left:0.75rem;">
                                             <form action="{{ route('freelancer.messages.destroy', ['message' => $message->id]) }}" method="POST" style="display:inline;" onsubmit="return confirm('このメッセージを削除しますか？');">
                                                 @csrf

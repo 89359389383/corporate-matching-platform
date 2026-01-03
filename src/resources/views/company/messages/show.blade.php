@@ -5,20 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>応募案件チャット（企業）- AITECH</title>
     <style>
-        :root { --header-height: 104px; --header-height-mobile: 91px; }
+        :root {
+            --header-height: 104px;       /* 80px * 1.3 */
+            --header-height-mobile: 91px; /* 70px * 1.3 */
+
+            /* UI tokens (messages/show.blade.php より統一) */
+            --bg: #f6f8fb;
+            --surface: #ffffff;
+            --surface-2: #fbfcfe;
+            --text: #0f172a;
+            --muted: #64748b;
+            --border: #e6eaf2;
+            --border-2: #dbe2ee;
+            --primary: #0366d6;
+            --primary-2: #0256cc;
+            --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+            --shadow-md: 0 10px 30px rgba(15, 23, 42, 0.10);
+            --radius-lg: 18px;
+            --radius-md: 14px;
+            --radius-sm: 12px;
+            --focus: 0 0 0 4px rgba(3, 102, 214, 0.14);
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { font-size: 97.5%; }
+        html { font-size: 100%; }
         body {
             font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background-color: #fafbfc;
-            color: #24292e;
-            line-height: 1.5;
+            background:
+                radial-gradient(1200px 600px at 20% 0%, rgba(3, 102, 214, 0.08), transparent 60%),
+                radial-gradient(900px 500px at 90% 10%, rgba(102, 126, 234, 0.10), transparent 55%),
+                var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         /* Header（基準UIと統一） */
         .header {
             background-color: #ffffff;
-            border-bottom: 1px solid #e1e4e8;
+            border-bottom: 1px solid var(--border);
             padding: 0 3rem;
             position: sticky;
             top: 0;
@@ -150,11 +176,12 @@
         }
         .chat-header {
             padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid #e1e4e8;
+            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 1rem;
+            background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
         }
         .chat-title {
             display: grid;
@@ -164,15 +191,16 @@
         .chat-title strong {
             font-size: 1.05rem;
             font-weight: 900;
-            color: #24292e;
+            color: var(--text);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            letter-spacing: -0.02em;
         }
         .chat-title span {
-            color: #6a737d;
-            font-size: 0.85rem;
-            font-weight: 800;
+            color: var(--muted);
+            font-size: 0.9rem;
+            font-weight: 700;
         }
         .chat-tools {
             display: inline-flex;
@@ -219,15 +247,23 @@
             overflow-y: auto;
             display: grid;
             gap: 0.85rem;
-            background: linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
+            background: 
+                radial-gradient(900px 420px at 10% 0%, rgba(3, 102, 214, 0.06), transparent 60%),
+                linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
             position: relative;
-            max-height: 620px;
+            scrollbar-gutter: stable;
+            flex: 1 1 auto;
         }
         .bubble-row { display: flex; align-items: flex-end; gap: 0.75rem; }
         .bubble-row.me { justify-content: flex-end; }
-        .bubble-row.first-message { max-width: 320px; }
-        .bubble-row.first-message.me { justify-content: flex-end; margin-left: auto; }
-        .bubble-row.first-message:not(.me) { justify-content: flex-start; margin-right: auto; }
+        .bubble-row.first-message {
+            justify-content: flex-end;
+            max-width: 420px;
+            margin-left: auto;
+            position: sticky;
+            top: 1rem;
+            z-index: 3;
+        }
 
         .avatar {
             width: 44px;
