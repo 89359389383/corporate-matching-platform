@@ -92,7 +92,7 @@
         .dropdown-item:hover { background-color: #f6f8fa; color: #24292e; }
         .dropdown-divider { height: 1px; background-color: #e1e4e8; margin: 0.5rem 0; }
 
-        .main-content { max-width: 1100px; margin: 0 auto; padding: 3rem; }
+        .main-content { max-width: 700px; margin: 0 auto; padding: 3rem; }
         .page-title { font-size: 2rem; font-weight: 900; margin-bottom: 1.5rem; letter-spacing: -0.025em; }
         .panel {
             background-color: white; border-radius: 16px; padding: 2rem;
