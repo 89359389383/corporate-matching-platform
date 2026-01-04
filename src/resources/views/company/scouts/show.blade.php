@@ -5,7 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>スカウトチャット（企業）- AITECH</title>
     <style>
-        :root { --header-height: 104px; --header-height-mobile: 91px; }
+        :root {
+            --header-height: 104px;       /* 80px * 1.3 */
+            --header-height-mobile: 91px; /* 70px * 1.3 */
+
+            /* UI tokens (messages/show.blade.php より統一) */
+            --bg: #f6f8fb;
+            --surface: #ffffff;
+            --surface-2: #fbfcfe;
+            --text: #0f172a;
+            --muted: #64748b;
+            --border: #e6eaf2;
+            --border-2: #dbe2ee;
+            --primary: #0366d6;
+            --primary-2: #0256cc;
+            --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+            --shadow-md: 0 10px 30px rgba(15, 23, 42, 0.10);
+            --radius-lg: 18px;
+            --radius-md: 14px;
+            --radius-sm: 12px;
+            --focus: 0 0 0 4px rgba(3, 102, 214, 0.14);
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { font-size: 97.5%; }
         body {
@@ -99,7 +119,7 @@
         .dropdown-divider { height: 1px; background-color: #e1e4e8; margin: 0.5rem 0; }
 
         /* Page（基準UIと統一） */
-        .main-content { max-width: 1600px; margin: 0 auto; padding: 3rem; }
+        .main-content { max-width: 1200px; margin: 0 auto; padding: 3rem; }
         .page-title {
             font-size: 2rem;
             font-weight: 800;
@@ -175,9 +195,14 @@
         }
         .bubble-row { display: flex; align-items: flex-end; gap: 0.75rem; }
         .bubble-row.me { justify-content: flex-end; }
-        .bubble-row.first-message { max-width: 320px; }
-        .bubble-row.first-message.me { justify-content: flex-end; margin-left: auto; }
-        .bubble-row.first-message:not(.me) { justify-content: flex-start; margin-right: auto; }
+        .bubble-row.first-message {
+            justify-content: flex-end;
+            width: 100%;
+            margin-left: auto;
+            position: sticky; /* メッセージ欄の右上に固定表示（見た目のみ） */
+            top: 1rem;
+            z-index: 3;
+        }
 
         .avatar {
             width: 44px;
@@ -193,19 +218,31 @@
         }
         .bubble {
             max-width: 74%;
+            width: 80%;
             padding: 0.9rem 1rem;
-            border-radius: 14px;
-            border: 1px solid #e1e4e8;
-            background: #fff;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.92);
+            box-shadow: var(--shadow-sm);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            overflow-wrap: anywhere;
         }
-        .bubble.me { background: #f1f8ff; border-color: #c8e1ff; }
+        .bubble.me {
+            background: linear-gradient(180deg, rgba(241,248,255,0.98) 0%, rgba(236,246,255,0.98) 100%);
+            border-color: #cfe4ff;
+            width: 80%;
+            padding: 20px;
+        }
         .bubble.first-message {
-            max-width: 100%;
-            background: #f6f8fa;
-            border: 1px solid #e1e4e8;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            padding: 1rem 1.25rem;
+            width: 80%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,250,252,0.98) 100%);
+            margin-bottom: 50px;
+            border: 1px solid var(--border-2);
+            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.14);
+            padding: 1rem 1.1rem 0.9rem;
+            position: relative;
+            border-radius: 18px;
         }
         .bubble p { color: #24292e; font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap; }
         .bubble small { display: block; margin-top: 0.4rem; color: #6a737d; font-weight: 800; font-size: 0.8rem; }
@@ -265,8 +302,14 @@
             .user-menu { position: static; transform: none; margin-left: auto; }
             .main-content { padding: 1.5rem; }
             .messages { padding: 1.5rem; max-height: 520px; }
-            .bubble { max-width: 90%; }
-            .bubble-row.first-message { max-width: calc(100% - 3rem); }
+            .bubble { max-width: 92%; }
+            .bubble-row.first-message {
+                max-width: calc(100% - 1rem);
+                margin-left: auto;
+            }
+            .bubble.first-message {
+                max-width: 100%;
+            }
         }
         @media (max-width: 1200px) {
             .nav-links { gap: 1.5rem; }

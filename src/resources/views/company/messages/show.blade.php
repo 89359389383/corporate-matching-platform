@@ -150,7 +150,7 @@
 
         /* Page（基準UIと統一） */
         .main-content {
-            max-width: 1600px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 3rem;
         }
@@ -258,9 +258,9 @@
         .bubble-row.me { justify-content: flex-end; }
         .bubble-row.first-message {
             justify-content: flex-end;
-            max-width: 420px;
+            width: 100%;
             margin-left: auto;
-            position: sticky;
+            position: sticky; /* メッセージ欄の右上に固定表示（見た目のみ） */
             top: 1rem;
             z-index: 3;
         }
@@ -280,19 +280,31 @@
 
         .bubble {
             max-width: 74%;
+            width: 80%;
             padding: 0.9rem 1rem;
-            border-radius: 14px;
-            border: 1px solid #e1e4e8;
-            background: #ffffff;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.92);
+            box-shadow: var(--shadow-sm);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            overflow-wrap: anywhere;
         }
-        .bubble.me { background: #f1f8ff; border-color: #c8e1ff; }
+        .bubble.me {
+            background: linear-gradient(180deg, rgba(241,248,255,0.98) 0%, rgba(236,246,255,0.98) 100%);
+            border-color: #cfe4ff;
+            width: 80%;
+            padding: 20px;
+        }
         .bubble.first-message {
-            max-width: 100%;
-            background: #f6f8fa;
-            border: 1px solid #e1e4e8;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            padding: 1rem 1.25rem;
+            width: 80%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,250,252,0.98) 100%);
+            margin-bottom: 50px;
+            border: 1px solid var(--border-2);
+            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.14);
+            padding: 1rem 1.1rem 0.9rem;
+            position: relative;
+            border-radius: 18px;
         }
         .bubble p { color: #24292e; font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap; }
         .bubble small { display: block; margin-top: 0.4rem; color: #6a737d; font-weight: 800; font-size: 0.8rem; }
@@ -352,8 +364,14 @@
             .user-menu { position: static; transform: none; margin-left: auto; }
             .main-content { padding: 1.5rem; }
             .messages { padding: 1.5rem; max-height: 520px; }
-            .bubble { max-width: 90%; }
-            .bubble-row.first-message { max-width: calc(100% - 3rem); }
+            .bubble { max-width: 92%; }
+            .bubble-row.first-message {
+                max-width: calc(100% - 1rem);
+                margin-left: auto;
+            }
+            .bubble.first-message {
+                max-width: 100%;
+            }
         }
         @media (max-width: 1200px) {
             .nav-links { gap: 1.5rem; }

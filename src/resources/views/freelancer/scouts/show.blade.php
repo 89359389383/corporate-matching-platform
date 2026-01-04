@@ -255,9 +255,9 @@
         .bubble-row.me { justify-content: flex-end; }
         .bubble-row.first-message {
             justify-content: flex-end;
-            max-width: 420px;
+            width: 100%;
             margin-left: auto;
-            position: sticky;
+            position: sticky; /* メッセージ欄の右上に固定表示（見た目のみ） */
             top: 1rem;
             z-index: 3;
         }
@@ -275,6 +275,7 @@
         }
         .bubble {
             max-width: 74%;
+            width: 80%;
             padding: 0.9rem 1rem;
             border-radius: 16px;
             border: 1px solid var(--border);
@@ -287,10 +288,13 @@
         .bubble.me {
             background: linear-gradient(180deg, rgba(241,248,255,0.98) 0%, rgba(236,246,255,0.98) 100%);
             border-color: #cfe4ff;
+            width: 80%;
+            padding: 20px;
         }
         .bubble.first-message {
-            max-width: 100%;
+            width: 80%;
             background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,250,252,0.98) 100%);
+            margin-bottom: 50px;
             border: 1px solid var(--border-2);
             box-shadow: 0 10px 22px rgba(15, 23, 42, 0.14);
             padding: 1rem 1.1rem 0.9rem;
