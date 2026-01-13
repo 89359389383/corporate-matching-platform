@@ -21,14 +21,14 @@ class JobRequest extends FormRequest
             // 説明（必須）
             'description' => ['required', 'string', 'max:5000'],
             // 必須スキル（任意）
-            'required_skills_text' => ['nullable', 'string', 'max:2000'],
+            'required_skills_text' => ['nullable', 'string', 'max:500'],
             // 報酬種別（必須）
             'reward_type' => ['required', 'string', 'in:monthly,hourly'],
             // 報酬レンジ（必須）
             'min_rate' => ['required', 'integer', 'min:0'],
             'max_rate' => ['required', 'integer', 'min:0', 'gte:min_rate'],
             // 稼働条件（必須）
-            'work_time_text' => ['required', 'string', 'max:2000'],
+            'work_time_text' => ['required', 'string', 'max:100'],
             // ステータス（必須）
             'status' => ['required', 'integer', 'in:' . Job::STATUS_DRAFT . ',' . Job::STATUS_PUBLISHED . ',' . Job::STATUS_STOPPED],
         ];
@@ -46,7 +46,7 @@ class JobRequest extends FormRequest
             'description.max' => '説明は5000文字以内で入力してください。',
 
             'required_skills_text.string' => '必須スキルは文字列で入力してください。',
-            'required_skills_text.max' => '必須スキルは2000文字以内で入力してください。',
+            'required_skills_text.max' => '必須スキルは500文字以内で入力してください。',
 
             'reward_type.required' => '報酬タイプを選択してください。',
             'reward_type.string' => '報酬タイプは文字列で入力してください。',
@@ -63,7 +63,7 @@ class JobRequest extends FormRequest
 
             'work_time_text.required' => '稼働条件を入力してください。',
             'work_time_text.string' => '稼働条件は文字列で入力してください。',
-            'work_time_text.max' => '稼働条件は2000文字以内で入力してください。',
+            'work_time_text.max' => '稼働条件は100文字以内で入力してください。',
 
             'status.required' => 'ステータスを指定してください。',
             'status.integer' => 'ステータスの指定が不正です。',

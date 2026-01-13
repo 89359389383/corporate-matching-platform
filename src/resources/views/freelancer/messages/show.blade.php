@@ -375,9 +375,6 @@
             justify-content: flex-end;
             width: 100%;
             margin-left: auto;
-            position: sticky; /* メッセージ欄の右上に固定表示（見た目のみ） */
-            top: 1rem;
-            z-index: 3;
         }
         .bubble {
             max-width: 74%;
@@ -398,30 +395,19 @@
             padding: 20px;
         }
         .bubble.first-message {
+            max-width: 74%;
             width: 80%;
-            background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,250,252,0.98) 100%);
-            margin-bottom: 50px;
-            border: 1px solid var(--border-2);
-            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.14);
-            padding: 1rem 1.1rem 0.9rem;
+            padding: 20px;
+            border-radius: 16px;
+            border-color: #cfe4ff;
+            background: linear-gradient(180deg, rgba(241,248,255,0.98) 0%, rgba(236,246,255,0.98) 100%);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 0.85rem;
             position: relative;
-            border-radius: 18px;
         }
         .bubble.first-message::before {
-            content: "最初のメッセージ";
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            height: 22px;
-            padding: 0 0.55rem;
-            border-radius: 999px;
-            font-size: 0.72rem;
-            font-weight: 900;
-            letter-spacing: 0.02em;
-            color: rgba(2, 86, 204, 0.95);
-            background: rgba(3, 102, 214, 0.10);
-            border: 1px solid rgba(3, 102, 214, 0.18);
-            margin-bottom: 0.5rem;
+            display: none;
+            content: "";
         }
         .bubble.first-message p {
             color: var(--text);
@@ -474,7 +460,7 @@
             box-shadow: var(--focus);
         }
         .send {
-            padding: 0.85rem 1.2rem;
+            padding: 14px 40px;
             border-radius: 14px;
             font-weight: 900;
             border: none;
@@ -482,9 +468,8 @@
             color: white;
             cursor: pointer;
             transition: all 0.15s ease;
-            font-size: 0.98rem;
-            width: fit-content;
-            min-width: 160px;
+            font-size: 20px;
+            min-width: 260px;
             max-width: 100%;
             margin-left: auto;
             box-shadow: 0 10px 20px rgba(3, 102, 214, 0.22);
@@ -526,6 +511,58 @@
 
         @media (prefers-reduced-motion: reduce) {
             * { transition: none !important; scroll-behavior: auto !important; }
+        }
+        /* Delete confirmation modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(2,6,23,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .modal-overlay.is-open { display: flex; }
+        .modal-dialog {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1.5rem;
+            max-width: 420px;
+            width: calc(100% - 2rem);
+            box-shadow: 0 14px 40px rgba(2,6,23,0.18);
+            border: 1px solid var(--border-2);
+            text-align: left;
+        }
+        .modal-dialog h2 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: var(--text);
+        }
+        .modal-dialog p { color: var(--muted); margin: 0 0 1rem 0; }
+        .modal-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        .modal-actions > button {
+            flex: 1;
+            min-width: 0; /* allow shrinking in flex */
+            font-size: 0.92rem; /* match .btn */
+            padding: 0.72rem 1rem;
+            font-weight: 800;
+            border-radius: 10px;
+        }
+        .btn-danger {
+            background: linear-gradient(180deg, #d73a49 0%, #c5303f 100%);
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+        .modal-actions .btn {
+            background: linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%);
+            color: var(--text);
+            border: 1px solid var(--border-2);
         }
     </style>
     @include('partials.aitech-responsive')
@@ -576,7 +613,6 @@
             <div class="chat-header">
                 <div class="chat-title">
                     <strong>{{ $thread->company->name ?? '企業名不明' }}@if($thread->job) / {{ $thread->job->title }}@endif</strong>
-                    <span>案件に関するやり取り</span>
                 </div>
                 @if($thread->job)
                     <a class="btn" href="{{ route('freelancer.jobs.show', ['job' => $thread->job->id]) }}">案件詳細</a>
@@ -604,15 +640,7 @@
                                 <p>{{ $message->body }}</p>
                                 <small>
                                     {{ $sentAt }}
-                                    @if($canDelete)
-                                        <span style="margin-left:0.75rem;">
-                                            <form action="{{ route('freelancer.messages.destroy', ['message' => $message->id]) }}" method="POST" style="display:inline;" onsubmit="return confirm('このメッセージを削除しますか？');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" style="background:none;border:none;color:#d73a49;font-weight:900;cursor:pointer;">削除</button>
-                                            </form>
-                                        </span>
-                                    @endif
+                                    {{-- 最初のメッセージの削除ボタンは表示しない --}}
                                 </small>
                             </div>
                         </div>
@@ -625,10 +653,10 @@
                                     {{ $sentAt }}
                                     @if($canDelete && $isLatest)
                                         <span style="margin-left:0.75rem;">
-                                            <form action="{{ route('freelancer.messages.destroy', ['message' => $message->id]) }}" method="POST" style="display:inline;" onsubmit="return confirm('このメッセージを削除しますか？');">
+                                            <form action="{{ route('freelancer.messages.destroy', ['message' => $message->id]) }}" method="POST" style="display:inline;" class="delete-form" data-message-id="{{ $message->id }}">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" style="background:none;border:none;color:#d73a49;font-weight:900;cursor:pointer;">削除</button>
+                                                <button type="button" class="delete-trigger" style="background:none;border:none;color:#d73a49;font-weight:900;cursor:pointer;">削除</button>
                                             </form>
                                         </span>
                                     @endif
@@ -691,12 +719,77 @@
         })();
     </script>
 
+    <!-- Delete confirmation modal -->
+    <div id="confirmDeleteModal" class="modal-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="confirmDeleteTitle">
+        <div class="modal-dialog" role="document">
+            <h2 id="confirmDeleteTitle">このメッセージを削除しますか？</h2>
+            <p>削除すると元に戻せません。よろしいですか？</p>
+            <div class="modal-actions">
+                <button id="confirmDeleteBtn" class="btn-danger">削除する</button>
+                <button id="cancelDeleteBtn" class="btn">キャンセル</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         (function () {
             const el = document.getElementById('messages');
             if (!el) return;
             // 初期表示で最下部へ
             el.scrollTop = el.scrollHeight;
+        })();
+    </script>
+
+    <script>
+        (function () {
+            let pendingForm = null;
+            const modal = document.getElementById('confirmDeleteModal');
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+            const cancelBtn = document.getElementById('cancelDeleteBtn');
+
+            function openModal(form) {
+                pendingForm = form;
+                modal.classList.add('is-open');
+                modal.setAttribute('aria-hidden', 'false');
+                confirmBtn.focus();
+            }
+            function closeModal() {
+                pendingForm = null;
+                modal.classList.remove('is-open');
+                modal.setAttribute('aria-hidden', 'true');
+            }
+
+            document.addEventListener('click', (e) => {
+                const trigger = e.target.closest && e.target.closest('.delete-trigger');
+                if (trigger) {
+                    e.preventDefault();
+                    const form = trigger.closest('form');
+                    if (form) openModal(form);
+                }
+            });
+
+            // Overlay click closes modal
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+
+            cancelBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                closeModal();
+            });
+
+            confirmBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (!pendingForm) return closeModal();
+                // submit the form
+                pendingForm.submit();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.classList.contains('is-open')) {
+                    closeModal();
+                }
+            });
         })();
     </script>
 </body>

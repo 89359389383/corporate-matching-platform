@@ -117,7 +117,7 @@
 
         /* Main Layout */
         .main-content {
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
             padding: 3rem;
         }
@@ -145,13 +145,41 @@
         }
 
         .panel-title {
-            font-size: 1.1rem;
+            font-size: 20px;
             font-weight: 800;
             margin-bottom: 1.25rem;
             color: #24292e;
             letter-spacing: -0.01em;
         }
 
+        .job-summary {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .summary-line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 0.25rem;
+        }
+        .summary-label {
+            color: #6a737d;
+            font-weight: 700;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .summary-value {
+            color: #24292e;
+            font-weight: 700;
+            font-size: 20px;
+        }
+        .summary-separator {
+            color: #6a737d;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin: 0 0.25rem;
+        }
         .kv {
             display: grid;
             grid-template-columns: 140px 1fr;
@@ -185,7 +213,7 @@
         .label {
             font-weight: 800;
             color: #586069;
-            font-size: 0.9rem;
+            font-size: 18px;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
@@ -224,10 +252,14 @@
         .actions {
             display: flex;
             gap: 1rem;
-            justify-content: flex-end;
+            justify-content: flex-start;
             padding-top: 1rem;
             border-top: 1px solid #e1e4e8;
             flex-wrap: wrap;
+        }
+        .actions .btn {
+            flex: 1;
+            min-width: 0;
         }
         .btn {
             padding: 0.875rem 1.75rem;
@@ -244,9 +276,19 @@
             letter-spacing: -0.01em;
             white-space: nowrap;
         }
-        .btn-secondary { background-color: #586069; color: white; }
+        .btn-secondary {
+            background-color: #586069;
+            color: white;
+            font-size: 20px;
+            padding: 15px 60px;
+        }
         .btn-secondary:hover { background-color: #4c5561; transform: translateY(-1px); }
-        .btn-primary { background-color: #0366d6; color: white; }
+        .btn-primary {
+            background-color: #0366d6;
+            color: white;
+            font-size: 20px;
+            padding: 15px 60px;
+        }
         .btn-primary:hover { background-color: #0256cc; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(3, 102, 214, 0.3); }
 
         /* Dropdown Menu */
@@ -341,29 +383,36 @@
             <!-- 応募先案件 -->
             <div class="panel">
                 <div class="panel-title">応募先案件</div>
-                <div class="kv">
-                    <div class="k">案件名</div>
-                    <div class="v">{{ $job->title }}</div>
-                    <div class="k">会社名</div>
-                    <div class="v">{{ $job->company->name }}</div>
-                    <div class="k">報酬</div>
-                    <div class="v">
-                        @php
-                            $rewardText = '';
-                            if ($job->reward_type === 'monthly') {
-                                $rewardText = $job->min_rate . '〜' . $job->max_rate . '万円';
-                            } else {
-                                $rewardText = number_format($job->min_rate) . '〜' . number_format($job->max_rate) . '円/時';
-                            }
-                        @endphp
-                        {{ $rewardText }}
+                <div class="job-summary">
+                    <div class="summary-line">
+                        <span class="summary-label">会社名：</span>
+                        <span class="summary-value">{{ $job->company->name }}</span>
                     </div>
-                    <div class="k">想定稼働時間／期間</div>
-                    <div class="v">{{ $job->work_time_text }}</div>
+                    <div class="summary-line">
+                        <span class="summary-label">求人名：</span>
+                        <span class="summary-value">{{ $job->title }}</span>
+                        <span class="summary-separator"> / </span>
+                        <span class="summary-label">報酬：</span>
+                        <span class="summary-value">
+                            @php
+                                $rewardText = '';
+                                if ($job->reward_type === 'monthly') {
+                                    $rewardText = ($job->min_rate / 10000) . '〜' . ($job->max_rate / 10000) . '万円';
+                                } else {
+                                    $rewardText = number_format($job->min_rate) . '〜' . number_format($job->max_rate) . '円/時';
+                                }
+                            @endphp
+                            {{ $rewardText }}
+                        </span>
+                    </div>
+                    <div class="summary-line">
+                        <span class="summary-label">想定稼働時間／期間：</span>
+                        <span class="summary-value">{{ $job->work_time_text }}</span>
+                    </div>
                     @if($job->required_skills_text)
-                    <div class="k">必要スキル</div>
-                    <div class="v">
-                        <div class="skills" aria-label="必要スキル">
+                    <div class="summary-line">
+                        <span class="summary-label">必要スキル：</span>
+                        <div class="summary-value skills" aria-label="必要スキル">
                             @php
                                 $skills = explode(',', $job->required_skills_text);
                             @endphp
@@ -384,7 +433,6 @@
                     <div class="form-row">
                         <label class="label" for="message">応募メッセージ <span class="required">必須</span></label>
                         <textarea id="message" class="textarea" name="message" placeholder="例) 要件の◯◯に対して、Laravel + Vueでの実装経験があります。稼働は週25h、開始は1月上旬から可能です。実績: https://...">{{ old('message') }}</textarea>
-                        <div class="help">200〜600文字程度が目安です。具体的な成果（数値/期間/担当範囲）を入れると強いです。</div>
                         @error('message')
                             <div class="help" style="color: #d73a49;">{{ $message }}</div>
                         @enderror
@@ -397,11 +445,6 @@
                 </form>
             </div>
 
-            <!-- 応募前のチェック -->
-            <div class="panel">
-                <div class="panel-title">応募前のチェック</div>
-                <p class="help">応募メッセージは、要件への適合・稼働可能時間・実績URL（GitHub/ポートフォリオ）を簡潔にまとめると通過率が上がります。</p>
-            </div>
         </div>
     </main>
 

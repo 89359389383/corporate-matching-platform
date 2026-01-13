@@ -23,13 +23,15 @@
             margin: 0 auto;
             padding: 3rem;
             gap: 3rem;
+            position: relative;
         }
         .content-area { flex: 1; min-width: 0; }
         .sidebar {
             width: 360px;
             flex-shrink: 0;
             position: sticky;
-            top: 1.5rem;
+            top: 3rem;
+            height: fit-content;
             align-self: flex-start;
         }
 
@@ -149,9 +151,9 @@
             flex-wrap: wrap;
         }
         .btn {
-            padding: 0.875rem 1.75rem;
-            border-radius: 10px;
-            font-weight: 800;
+            padding: 15px 60px;
+            border-radius: 8px;
+            font-weight: 600;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -159,7 +161,7 @@
             transition: all 0.15s ease;
             cursor: pointer;
             border: none;
-            font-size: 0.95rem;
+            font-size: 20px;
             letter-spacing: -0.01em;
             white-space: nowrap;
         }
@@ -171,6 +173,7 @@
             background-color: transparent;
             color: #0366d6;
             border: 2px solid #0366d6;
+            padding: 8px;
         }
         .btn-outline:hover {
             background-color: #f1f8ff;
@@ -182,6 +185,15 @@
             gap: 0.75rem;
         }
         .skill-input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+        }
+        .portfolio-container {
+            display: grid;
+            gap: 0.75rem;
+        }
+        .portfolio-input-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1.25rem;
@@ -283,7 +295,6 @@
         <!-- Form -->
         <div class="content-area">
             <h1 class="page-title">プロフィール作成</h1>
-            <p class="page-subtitle">機能要件のプロフィール項目を登録します。</p>
 
             <div class="panel">
                 <div class="panel-title">基本情報</div>
@@ -347,14 +358,18 @@
 
                     <div class="row">
                         <label class="label">ポートフォリオURL（任意・複数）</label>
-                        <div class="grid-2">
-                            <input class="input" name="portfolio_urls[]" type="url" value="{{ old('portfolio_urls.0') }}" placeholder="例: https://example.com/portfolio">
-                            <input class="input" name="portfolio_urls[]" type="url" value="{{ old('portfolio_urls.1') }}" placeholder="例: https://github.com/yourname">
+                        <div class="help">複数入力できます。</div>
+                        <div class="portfolio-container" id="portfolio-container">
+                            <div class="portfolio-input-row">
+                                <input class="input portfolio-input" name="portfolio_urls[]" type="url" value="{{ old('portfolio_urls.0') }}" placeholder="例: https://example.com/portfolio">
+                                <input class="input portfolio-input" name="portfolio_urls[]" type="url" value="{{ old('portfolio_urls.1') }}" placeholder="例: https://github.com/yourname">
+                            </div>
+                            <div class="portfolio-input-row">
+                                <input class="input portfolio-input" name="portfolio_urls[]" type="url" value="{{ old('portfolio_urls.2') }}" placeholder="例: https://...">
+                                <input class="input portfolio-input" name="portfolio_urls[]" type="url" value="{{ old('portfolio_urls.3') }}" placeholder="例: https://...">
+                            </div>
                         </div>
-                        <div class="grid-2" style="margin-top:0.75rem;">
-                            <input class="input" name="portfolio_urls[]" type="url" value="{{ old('portfolio_urls.2') }}" placeholder="例: https://...">
-                            <input class="input" name="portfolio_urls[]" type="url" value="{{ old('portfolio_urls.3') }}" placeholder="例: https://...">
-                        </div>
+                        <button type="button" class="btn btn-outline" id="add-portfolio-btn" style="margin-top:0.75rem;">追加する</button>
                         @error('portfolio_urls.*')
                         <span class="error-message">{{ $message }}</span>
                         @enderror
@@ -536,6 +551,45 @@
                             input.setAttribute('data-listener-added', 'true');
                         }
                     });
+                });
+            }
+        })();
+
+        // ポートフォリオURL入力欄追加機能
+        (function () {
+            const addPortfolioBtn = document.getElementById('add-portfolio-btn');
+            const portfolioContainer = document.getElementById('portfolio-container');
+            let portfolioCount = 4; // 初期の4つの入力欄
+
+            if (addPortfolioBtn && portfolioContainer) {
+                addPortfolioBtn.addEventListener('click', function() {
+                    // 最後の行を取得
+                    const lastRow = portfolioContainer.lastElementChild;
+                    const inputsInLastRow = lastRow.querySelectorAll('.portfolio-input');
+
+                    // 最後の行に空きがある場合はそこに追加、なければ新しい行を作成
+                    if (inputsInLastRow.length < 2) {
+                        // 最後の行に追加
+                        const newInput = document.createElement('input');
+                        newInput.className = 'input portfolio-input';
+                        newInput.name = 'portfolio_urls[]';
+                        newInput.type = 'url';
+                        newInput.placeholder = '例: https://...';
+                        lastRow.appendChild(newInput);
+                    } else {
+                        // 新しい行を作成
+                        const newRow = document.createElement('div');
+                        newRow.className = 'portfolio-input-row';
+                        const newInput = document.createElement('input');
+                        newInput.className = 'input portfolio-input';
+                        newInput.name = 'portfolio_urls[]';
+                        newInput.type = 'url';
+                        newInput.placeholder = '例: https://...';
+                        newRow.appendChild(newInput);
+                        portfolioContainer.appendChild(newRow);
+                    }
+
+                    portfolioCount++;
                 });
             }
         })();

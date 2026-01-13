@@ -8,6 +8,10 @@
         :root {
             --header-height: 104px;       /* 80px * 1.3 */
             --header-height-mobile: 91px; /* 70px * 1.3 */
+            --container-max-width: 1600px;
+            --main-padding: 3rem;
+            --sidebar-width: 320px;
+            --sidebar-gap: 3rem;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -147,19 +151,26 @@
         /* Layout */
         .main-content {
             display: flex;
-            max-width: 1600px;
+            max-width: var(--container-max-width);
             margin: 0 auto;
-            padding: 3rem;
-            gap: 3rem;
+            padding: var(--main-padding);
+            gap: var(--sidebar-gap);
         }
         .sidebar {
-            width: 320px;
+            width: var(--sidebar-width);
             flex-shrink: 0;
-            position: sticky;
-            top: calc(var(--header-height) + 1.5rem);
+            /* スクロールしても同じ位置に固定（デスクトップ） */
+            position: fixed;
+            left: calc((100vw - min(var(--container-max-width), 100vw)) / 2 + var(--main-padding));
             align-self: flex-start;
+            z-index: 50;
         }
-        .content-area { flex: 1; min-width: 0; }
+        /* fixed sidebar による被りを避ける */
+        .content-area {
+            flex: 1;
+            min-width: 0;
+            margin-left: calc(var(--sidebar-width) + var(--sidebar-gap));
+        }
         .page-title {
             font-size: 2rem;
             font-weight: 800;
@@ -305,9 +316,9 @@
             flex-wrap: wrap;
         }
         .btn {
-            padding: 0.875rem 1.75rem;
-            border-radius: 10px;
-            font-weight: 800;
+            padding: 15px 60px;
+            border-radius: 8px;
+            font-weight: 600;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -315,7 +326,7 @@
             transition: all 0.15s ease;
             cursor: pointer;
             border: none;
-            font-size: 0.95rem;
+            font-size: 20px;
             letter-spacing: -0.01em;
             white-space: nowrap;
         }
@@ -329,6 +340,7 @@
             background-color: transparent;
             color: #0366d6;
             border: 2px solid #0366d6;
+            padding: 6px;
         }
         .btn-outline:hover {
             background-color: #f1f8ff;
@@ -354,7 +366,7 @@
         .skill-input-row, .portfolio-input-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 1.25rem;
+            gap: 42px;
             align-items: start;
         }
         .skill-input-row > div, .portfolio-input-row > div {
@@ -443,16 +455,32 @@
 
         /* Responsive */
         @media (max-width: 1200px) {
-            .main-content { padding: 2rem; gap: 2rem; }
-            .sidebar { width: 280px; }
+            :root {
+                --main-padding: 2rem;
+                --sidebar-width: 280px;
+                --sidebar-gap: 2rem;
+            }
         }
         @media (max-width: 768px) {
+            :root {
+                --main-padding: 1.5rem;
+            }
             .header-content { padding: 0 1.5rem; height: var(--header-height-mobile); }
             .nav-links { gap: 1.5rem; position: static; left: auto; transform: none; justify-content: flex-start; flex-direction: row; flex-wrap: wrap; }
             .user-menu { position: static; right: auto; top: auto; transform: none; margin-left: auto; }
             .nav-link { padding: 0.5rem 1rem; font-size: 1rem; }
             .main-content { flex-direction: column; padding: 1.5rem; }
-            .sidebar { width: 100%; order: -1; position: static; top: auto; }
+            .sidebar {
+                width: 100%;
+                order: -1;
+                position: static;
+                top: auto;
+                left: auto;
+                z-index: auto;
+            }
+            .content-area {
+                margin-left: 0;
+            }
             .grid-2 { grid-template-columns: 1fr; }
             .kv { grid-template-columns: 1fr; }
             .actions { flex-direction: column; }
@@ -501,7 +529,7 @@
 
     <main class="main-content">
         <aside class="sidebar" aria-label="設定メニュー">
-            <div class="panel profile-card" style="margin-top: 2rem;">
+            <div class="panel profile-card" >
                 <div class="panel-title">プレビュー</div>
                 <div class="profile-head">
                     <div class="big-avatar" id="preview-avatar">
@@ -735,7 +763,7 @@
                             </div>
                         @endforeach
                     </div>
-                    <button type="button" class="btn btn-outline" id="add-portfolio-btn" style="margin-top:0.75rem;">ポートフォリオURLを追加</button>
+                    <button type="button" class="btn btn-outline" id="add-portfolio-btn" style="margin-top:0.75rem; width: 100%;">ポートフォリオURLを追加</button>
                     @error('portfolio_urls.*')
                     <span class="error-message">{{ $message }}</span>
                     @enderror

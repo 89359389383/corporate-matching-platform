@@ -8,6 +8,10 @@
         :root {
             --header-height: 104px;       /* 80px * 1.3 */
             --header-height-mobile: 91px; /* 70px * 1.3 */
+            --container-max-width: 1600px;
+            --main-padding: 0.5rem;
+            --sidebar-width: 320px;
+            --sidebar-gap: 3rem;
         }
 
         * {
@@ -149,19 +153,27 @@
         /* Main Layout - Clean and Spacious */
         .main-content {
             display: flex;
-            max-width: 1600px;
+            max-width: var(--container-max-width);
             margin: 0 auto;
-            padding: 3rem;
-            gap: 3rem;
+            padding: var(--main-padding);
+            gap: var(--sidebar-gap);
         }
 
         /* Sidebar - Minimal */
         .sidebar {
-            width: 320px;
+            width: var(--sidebar-width);
             flex-shrink: 0;
-            position: sticky;
-            top: calc(var(--header-height) + 1.5rem);
+            /* スクロールしても同じ位置に固定（デスクトップ） */
+            position: fixed;
+            left: calc((100vw - min(var(--container-max-width), 100vw)) / 2 + var(--main-padding));
             align-self: flex-start;
+            z-index: 50;
+        }
+
+        /* fixed sidebar による被りを避ける */
+        .content-area {
+            flex: 1;
+            margin-left: calc(var(--sidebar-width) + var(--sidebar-gap));
         }
 
         .search-section {
@@ -266,8 +278,8 @@
 
         .price-input {
             flex: 1 1 0;
-            width: 0;
             min-width: 0;
+            max-width: 300px;
             padding: 0.5rem 0.625rem;
             border: 2px solid #e1e4e8;
             border-radius: 6px;
@@ -302,7 +314,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.15s ease;
-            font-size: 0.95rem;
+            font-size: 16px;
         }
 
         .search-btn:hover {
@@ -422,16 +434,16 @@
         }
 
         .job-title {
-            font-size: 1.4rem;
+            font-size: 24px;
             font-weight: 700;
-            color: #24292e;
+            color: #0060ff;
             margin-bottom: 0.5rem;
             line-height: 1.3;
         }
 
         .company-name {
             color: #586069;
-            font-size: 1rem;
+            font-size: 18px;
             font-weight: 500;
         }
 
@@ -500,7 +512,7 @@
             color: #0366d6;
             padding: 0.375rem 0.875rem;
             border-radius: 20px;
-            font-size: 0.85rem;
+            font-size: 16px;
             font-weight: 600;
             border: 1px solid #c8e1ff;
         }
@@ -531,6 +543,8 @@
         .btn-secondary {
             background-color: #586069;
             color: white;
+            font-size: 20px;
+            padding: 15px 60px;
         }
 
         .btn-secondary:hover {
@@ -541,6 +555,8 @@
         .btn-primary {
             background-color: #0366d6;
             color: white;
+            font-size: 20px;
+            padding: 15px 60px;
         }
 
         .btn-primary:hover {
@@ -552,6 +568,7 @@
         .btn-success {
             background-color: #28a745;
             color: white;
+            font-size: 20px;
         }
 
         .btn-success:hover {
@@ -561,6 +578,12 @@
 
         /* Responsive Design */
         @media (max-width: 1200px) {
+            :root {
+                --main-padding: 2rem;
+                --sidebar-width: 280px;
+                --sidebar-gap: 2rem;
+            }
+
             .main-content {
                 padding: 2rem;
                 gap: 2rem;
@@ -572,6 +595,10 @@
         }
 
         @media (max-width: 768px) {
+            :root {
+                --main-padding: 1.5rem;
+            }
+
             .header-content {
                 padding: 0 1.5rem;
                 height: var(--header-height-mobile);
@@ -610,6 +637,12 @@
                 order: -1;
                 position: static;
                 top: auto;
+                left: auto;
+                z-index: auto;
+            }
+
+            .content-area {
+                margin-left: 0;
             }
 
             .search-section {
@@ -767,8 +800,6 @@
 
         <!-- Content Area -->
         <div class="content-area">
-            <h1 class="page-title">公開中の案件</h1>
-
             <div class="jobs-grid">
                 @forelse($jobs as $job)
                     @php
@@ -804,7 +835,6 @@
 
                         @if(count($skills) > 0)
                         <div class="skills-section">
-                            <div class="skills-title">必要スキル</div>
                             <div class="skills">
                                 @foreach($skills as $skill)
                                     <span class="skill-tag">{{ trim($skill) }}</span>

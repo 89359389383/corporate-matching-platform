@@ -167,14 +167,17 @@
             background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
         }
         .hero-title {
-            font-size: 2rem;
-            font-weight: 800;
-            letter-spacing: -0.025em;
+            font-size: 20px;
+            font-weight: 700;
             margin-bottom: 0.5rem;
-            color: #24292e;
-            line-height: 1.2;
+            color: #0060ff;
+            line-height: 1.3;
         }
-        .hero-company { color: #586069; font-size: 1.05rem; font-weight: 600; }
+        .hero-company {
+            color: #586069;
+            font-size: 20px;
+            font-weight: 500;
+        }
         .hero-meta {
             display: flex;
             gap: 0.75rem;
@@ -315,10 +318,27 @@
             font-size: 0.95rem;
             letter-spacing: -0.01em;
         }
-        .btn-primary { background-color: #0366d6; color: white; }
-        .btn-primary:hover { background-color: #0256cc; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(3, 102, 214, 0.3); }
-        .btn-secondary { background-color: #586069; color: white; }
-        .btn-secondary:hover { background-color: #4c5561; transform: translateY(-1px); }
+        .btn-primary {
+            background-color: #0366d6;
+            color: white;
+            font-size: 20px;
+            padding: 15px 60px;
+        }
+        .btn-primary:hover {
+            background-color: #0256cc;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(3, 102, 214, 0.3);
+        }
+        .btn-secondary {
+            background-color: #586069;
+            color: white;
+            font-size: 20px;
+            padding: 15px 60px;
+        }
+        .btn-secondary:hover {
+            background-color: #4c5561;
+            transform: translateY(-1px);
+        }
         .btn-ghost {
             background: #fafbfc;
             color: #24292e;

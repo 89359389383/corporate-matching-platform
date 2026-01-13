@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>応募管理</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #fafbfc;
+            color: #24292e;
+        }
+
+        /* ===== 全体幅 ===== */
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* ===== ヘッダー ===== */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+        }
+
+        .total-unread {
+            background: #d73a49;
+            color: #fff;
+            border-radius: 999px;
+            padding: 0.3rem 0.7rem;
+            font-size: 0.8rem;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            line-height: 1;
+        }
+
+        /* ===== タブ ===== */
+        .tabs {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .tab-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .tab {
+            padding: 0.6rem 1.2rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            background: #e1e4e8;
+        }
+
+        .tab.active {
+            background: #0366d6;
+            color: #fff;
+        }
+
+        .filter-btn {
+            font-size: 0.8rem;
+            font-weight: 800;
+            padding: 0.45rem 0.9rem;
+            border-radius: 999px;
+            border: 1px solid #d1d5da;
+            background: #fff;
+            cursor: pointer;
+        }
+
+        .filter-btn.active {
+            background: #24292e;
+            color: #fff;
+            border-color: #24292e;
+        }
+
+        /* ===== レイアウト ===== */
+        .layout {
+            display: none;
+            gap: 1.5rem;
+        }
+
+        .layout.active {
+            display: flex;
+        }
+
+        .jobs {
+            width: 70%;
+        }
+
+        .applicants {
+            width: 30%;
+            background: #fff;
+            border: 1px solid #e1e4e8;
+            border-radius: 14px;
+            padding: 1.25rem;
+            min-height: 420px;
+        }
+
+        /* ===== カード ===== */
+        .card {
+            background: #fff;
+            border: 1px solid #e1e4e8;
+            border-radius: 14px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+        }
+
+        .card.active {
+            border-color: #0366d6;
+            box-shadow: 0 0 0 2px rgba(3, 102, 214, 0.15);
+        }
+
+        .job-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+
+        .job-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.75rem;
+        }
+
+        /* ===== バッジ ===== */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            background: #d73a49;
+            color: #fff;
+            border-radius: 999px;
+            padding: 0.28rem 0.65rem;
+            font-size: 0.75rem;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .badge.gray {
+            background: #6a737d;
+        }
+
+        /* ===== フリーランス ===== */
+        .freelancer {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .freelancer:last-child {
+            border-bottom: none;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .freelancer-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .name {
+            font-weight: 800;
+            font-size: 0.9rem;
+        }
+
+        .message {
+            font-size: 0.85rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .time {
+            font-size: 0.75rem;
+            color: #6a737d;
+        }
+
+        /* ★ チャット1行固定 */
+        .btn {
+            background: #0366d6;
+            color: #fff;
+            padding: 0.45rem 0.9rem;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            min-width: 60px;
+            text-decoration: none;
+        }
+
+        #freelancerView {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- ヘッダー -->
+        <div class="header">
+            <h1>応募管理</h1>
+            <span class="total-unread" id="totalUnread">未読 0</span>
+        </div>
+
+        <!-- タブ -->
+        <div class="tabs">
+            <div class="tab-group">
+                <div class="tab active" id="tabJobs" onclick="showJobs()">案件一覧</div>
+                <div class="tab" id="tabFreelancers" onclick="showFreelancers()">フリーランス一覧</div>
+            </div>
+            <button class="filter-btn" id="filterBtn" onclick="toggleUnread()">未読のみ</button>
+        </div>
+
+        <!-- 案件一覧 -->
+        <div class="layout active" id="jobView">
+            <section class="jobs" id="jobs"></section>
+            <aside class="applicants" id="applicants"></aside>
+        </div>
+
+        <!-- フリーランス一覧 -->
+        <div id="freelancerView"></div>
+
+    </div>
+
+    <script>
+        let unreadOnly = false;
+        let currentJobKey = 'jobA';
+
+        const data = {
+            jobA: {
+                title: 'Laravel 新規開発案件',
+                freelancers: [
+                    { name: 'A', msg: 'Laravel経験5年', time: '2026/01/10 19:30', unread: true },
+                    { name: 'B', msg: 'ぜひお話したい', time: '2026/01/09 14:05', unread: true },
+                    { name: 'C', msg: 'フルリモート希望', time: '2026/01/08 09:12', unread: false },
+                ]
+            },
+            jobB: {
+                title: 'React 改修',
+                freelancers: [
+                    { name: 'D', msg: 'React経験あり', time: '2026/01/11 10:22', unread: false }
+                ]
+            }
+        };
+
+        function updateTotalUnread() {
+            const total = Object.values(data).flatMap(j => j.freelancers).filter(f => f.unread).length;
+            document.getElementById('totalUnread').textContent = `未読 ${total}`;
+        }
+
+        function renderJobs() {
+            const jobs = document.getElementById('jobs');
+            jobs.innerHTML = '';
+
+            Object.entries(data).forEach(([key, job]) => {
+                const unreadCount = job.freelancers.filter(f => f.unread).length;
+                if (unreadOnly && unreadCount === 0) return;
+
+                const card = document.createElement('div');
+                card.className = 'card' + (key === currentJobKey ? ' active' : '');
+                card.onclick = () => selectJob(key);
+
+                card.innerHTML = `
+        <div class="job-title">${job.title}</div>
+        <div class="job-footer">
+          <span>応募者 ${job.freelancers.length}名</span>
+          <span class="badge ${unreadCount === 0 ? 'gray' : ''}">未読 ${unreadCount}</span>
+        </div>
+      `;
+                jobs.appendChild(card);
+            });
+        }
+
+        function renderApplicants() {
+            const box = document.getElementById('applicants');
+            const job = data[currentJobKey];
+            let list = unreadOnly ? job.freelancers.filter(f => f.unread) : job.freelancers;
+
+            box.innerHTML = `<h3>${job.title}</h3>` + list.map(f => `
+      <div class="freelancer">
+        <div class="avatar">${f.name}</div>
+        <div class="freelancer-body">
+          <div class="name">フリーランス${f.name}</div>
+          <div class="message">${f.msg}</div>
+          <div class="time">${f.time}</div>
+        </div>
+        ${f.unread ? '<span class="badge">未読</span>' : '<a class="btn">チャット</a>'}
+      </div>
+    `).join('');
+        }
+
+        function renderFreelancers() {
+            const view = document.getElementById('freelancerView');
+            const all = Object.values(data)
+                .flatMap(j => j.freelancers)
+                .filter(f => !unreadOnly || f.unread)
+                .sort((a, b) => new Date(b.time) - new Date(a.time));
+
+            view.innerHTML = all.map(f => `
+      <div class="freelancer">
+        <div class="avatar">${f.name}</div>
+        <div class="freelancer-body">
+          <div class="name">フリーランス${f.name}</div>
+          <div class="message">${f.msg}</div>
+          <div class="time">${f.time}</div>
+        </div>
+        ${f.unread ? '<span class="badge">未読</span>' : '<a class="btn">チャット</a>'}
+      </div>
+    `).join('');
+        }
+
+        function selectJob(key) {
+            currentJobKey = key;
+            renderJobs();
+            renderApplicants();
+        }
+
+        function toggleUnread() {
+            unreadOnly = !unreadOnly;
+            document.getElementById('filterBtn').classList.toggle('active', unreadOnly);
+            refresh();
+        }
+
+        function refresh() {
+            updateTotalUnread();
+            renderJobs();
+            renderApplicants();
+            if (document.getElementById('tabFreelancers').classList.contains('active')) {
+                renderFreelancers();
+            }
+        }
+
+        function showJobs() {
+            document.getElementById('tabJobs').classList.add('active');
+            document.getElementById('tabFreelancers').classList.remove('active');
+            document.getElementById('jobView').classList.add('active');
+            document.getElementById('freelancerView').style.display = 'none';
+            refresh();
+        }
+
+        function showFreelancers() {
+            document.getElementById('tabFreelancers').classList.add('active');
+            document.getElementById('tabJobs').classList.remove('active');
+            document.getElementById('jobView').classList.remove('active');
+            document.getElementById('freelancerView').style.display = 'block';
+            renderFreelancers();
+        }
+
+        /* 初期描画 */
+        refresh();
+    </script>
+
+</body>
+
+</html>
