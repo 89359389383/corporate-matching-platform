@@ -130,4 +130,47 @@ class CompanyApplicationController extends Controller
             'userInitial' => $userInitial,
         ]);
     }
+
+    /**
+     * 応募ステータスを更新する
+     *
+     * 入口:
+     * - PATCH /company/applications/{application}
+     */
+    public function update(Request $request, Application $application)
+    {
+        // 認証ユーザーを取得する（企業想定）
+        $user = Auth::user();
+
+        // 企業以外は拒否する
+        if ($user->role !== 'company') {
+            abort(403);
+        }
+
+        // company を取得する
+        $company = $user->company;
+
+        // company が無い場合は先に登録へ誘導する
+        if ($company === null) {
+            return redirect('/company/profile')->with('error', '先に企業プロフィールを登録してください');
+        }
+
+        // 応募が自社案件へのものかどうか確認する
+        if ($application->job->company_id !== $company->id) {
+            abort(403, 'アクセス権限がありません');
+        }
+
+        // バリデーション
+        $request->validate([
+            'status' => 'required|integer|in:0,1,2', // 0:未対応, 1:対応中, 2:クローズ
+        ]);
+
+        // ステータスを更新する
+        $application->update([
+            'status' => $request->status,
+        ]);
+
+        // 成功メッセージを付けて一覧へリダイレクト
+        return redirect()->back()->with('success', '応募ステータスを更新しました');
+    }
 }

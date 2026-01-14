@@ -9,7 +9,7 @@
             --header-height: 104px;       /* 80px * 1.3 */
             --header-height-mobile: 91px; /* 70px * 1.3 */
 
-            /* UI tokens (messages/show.blade.php より統一) */
+            /* UI tokens (high readability / production-grade) */
             --bg: #f6f8fb;
             --surface: #ffffff;
             --surface-2: #fbfcfe;
@@ -35,7 +35,7 @@
             line-height: 1.5;
         }
 
-        /* Header（基準UIと統一） */
+        /* Header */
         .header {
             background-color: #ffffff;
             border-bottom: 1px solid #e1e4e8;
@@ -49,6 +49,7 @@
         .header-content {
             max-width: 1600px;
             margin: 0 auto;
+            border-bottom: 1px solid #e1e4e8;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -57,13 +58,13 @@
         }
         .nav-links {
             display: flex;
-            flex-direction: row;
             gap: 3rem;
             align-items: center;
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
             justify-content: center;
+            flex-wrap: nowrap;
         }
         .nav-link {
             text-decoration: none;
@@ -118,7 +119,7 @@
         .dropdown-item:hover { background-color: #f6f8fa; color: #24292e; }
         .dropdown-divider { height: 1px; background-color: #e1e4e8; margin: 0.5rem 0; }
 
-        /* Page（基準UIと統一） */
+        /* Page */
         .main-content { max-width: 1200px; margin: 0 auto; padding: 3rem; }
         .page-title {
             font-size: 2rem;
@@ -142,11 +143,12 @@
         }
         .chat-header {
             padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid #e1e4e8;
+            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 1rem;
+            background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
         }
         .chat-title {
             display: grid;
@@ -156,19 +158,19 @@
         .chat-title strong {
             font-size: 1.05rem;
             font-weight: 900;
-            color: #24292e;
+            color: var(--text);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
         .chat-title span {
-            color: #6a737d;
-            font-size: 0.85rem;
-            font-weight: 800;
+            color: var(--muted);
+            font-size: 0.9rem;
+            font-weight: 700;
         }
         .btn {
-            padding: 0.7rem 1rem;
-            border-radius: 10px;
+            padding: 0.72rem 1rem;
+            border-radius: 12px;
             font-weight: 800;
             text-decoration: none;
             display: inline-flex;
@@ -176,21 +178,26 @@
             justify-content: center;
             transition: all 0.15s ease;
             cursor: pointer;
-            border: 1px solid #e1e4e8;
-            background: #fafbfc;
-            color: #24292e;
-            font-size: 0.9rem;
+            border: 1px solid var(--border-2);
+            background: linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%);
+            color: var(--text);
+            font-size: 0.92rem;
             white-space: nowrap;
         }
-        .btn:hover { background: #f6f8fa; transform: translateY(-1px); }
+        .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+        .btn:focus-visible { outline: none; box-shadow: var(--focus), var(--shadow-sm); }
 
         .messages {
-            padding: 70px;
+            padding: 1.25rem 1.25rem 1rem;
             overflow-y: auto;
             display: grid;
             gap: 0.85rem;
-            background: linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
+            background:
+                radial-gradient(900px 420px at 10% 0%, rgba(3, 102, 214, 0.06), transparent 60%),
+                linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
             position: relative;
+            scrollbar-gutter: stable;
+            flex: 1 1 auto;
             max-height: 620px;
         }
         .bubble-row { display: flex; align-items: flex-end; gap: 0.75rem; }
@@ -203,7 +210,6 @@
             top: 1rem;
             z-index: 3;
         }
-
         .avatar {
             width: 44px;
             height: 44px;
@@ -281,27 +287,43 @@
             background-color: white;
         }
         .send {
-            padding: 0.875rem 1.25rem;
-            border-radius: 12px;
+            padding: 14px 40px;
+            border-radius: 14px;
             font-weight: 900;
             border: none;
-            background: #0366d6;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-2) 100%);
             color: white;
             cursor: pointer;
             transition: all 0.15s ease;
-            font-size: 0.95rem;
-            width: 500px;
+            font-size: 20px;
+            min-width: 260px;
             max-width: 100%;
-            margin: 0 auto;
+            margin-left: auto;
+            box-shadow: 0 10px 20px rgba(3, 102, 214, 0.22);
         }
-        .send:hover { background: #0256cc; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(3, 102, 214, 0.3); }
+        .send:hover { transform: translateY(-1px); box-shadow: 0 14px 26px rgba(3, 102, 214, 0.26); }
+        .send:active { transform: translateY(0px); }
+        .send:focus-visible { outline: none; box-shadow: var(--focus), 0 14px 26px rgba(3, 102, 214, 0.26); }
 
-        @media (max-width: 920px) {
-            .header-content { height: var(--header-height-mobile); }
-            .nav-links { position: static; left: auto; transform: none; justify-content: flex-start; }
-            .user-menu { position: static; transform: none; margin-left: auto; }
-            .main-content { padding: 1.5rem; }
-            .messages { padding: 1.5rem; max-height: 520px; }
+        @media (max-width: 1200px) {
+            .main-content { padding: 2rem 1.25rem 2.5rem; }
+            .chat-shell { grid-template-columns: 340px 1fr; }
+        }
+        @media (max-width: 900px) {
+            .chat-shell { grid-template-columns: 1fr; }
+            .thread-list { max-height: 360px; }
+            .messages { max-height: 500px; }
+        }
+        @media (max-width: 768px) {
+            .header-content { padding: 0 1.5rem; height: var(--header-height-mobile); }
+            .nav-links { gap: 1.5rem; position: static; left: auto; transform: none; justify-content: flex-start; flex-direction: row; flex-wrap: wrap; }
+            .user-menu { position: static; right: auto; top: auto; transform: none; margin-left: auto; }
+            .nav-link { padding: 0.5rem 1rem; font-size: 1rem; }
+            .main-content { padding: 1.5rem 1rem 2rem; }
+            .page-title { font-size: 1.65rem; }
+            .page-subtitle { font-size: 0.98rem; }
+            .chat-pane { min-height: min(860px, calc(100vh - var(--header-height-mobile) - 6.25rem)); }
+            .messages { padding: 1rem; }
             .bubble { max-width: 92%; }
             .bubble-row.first-message {
                 max-width: calc(100% - 1rem);
@@ -310,11 +332,62 @@
             .bubble.first-message {
                 max-width: 100%;
             }
+            .composer { grid-template-columns: 1fr; }
         }
-        @media (max-width: 1200px) {
-            .nav-links { gap: 1.5rem; }
-            .nav-link { font-size: 1rem; padding: 0.6rem 0.9rem; }
-            .nav-link.has-badge { padding-right: 2.6rem; }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; scroll-behavior: auto !important; }
+        }
+        /* Delete confirmation modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(2,6,23,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .modal-overlay.is-open { display: flex; }
+        .modal-dialog {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1.5rem;
+            max-width: 420px;
+            width: calc(100% - 2rem);
+            box-shadow: 0 14px 40px rgba(2,6,23,0.18);
+            border: 1px solid var(--border-2);
+            text-align: left;
+        }
+        .modal-dialog h2 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: var(--text);
+        }
+        .modal-dialog p { color: var(--muted); margin: 0 0 1rem 0; }
+        .modal-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        .modal-actions > button {
+            flex: 1;
+            min-width: 0; /* allow shrinking in flex */
+            font-size: 0.92rem; /* match .btn */
+            padding: 0.72rem 1rem;
+            font-weight: 800;
+            border-radius: 10px;
+        }
+        .btn-danger {
+            background: linear-gradient(180deg, #d73a49 0%, #c5303f 100%);
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+        .modal-actions .btn {
+            background: linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%);
+            color: var(--text);
+            border: 1px solid var(--border-2);
         }
     </style>
     @include('partials.aitech-responsive')
@@ -406,9 +479,6 @@
                         </div>
                     @else
                         <div class="bubble-row {{ $isMe ? 'me' : '' }}">
-                            @if(!$isMe)
-                                <div class="avatar">{{ $freelancerInitial }}</div>
-                            @endif
                             <div class="bubble {{ $isMe ? 'me' : '' }}">
                                 <p>{{ $message->body }}</p>
                                 <small>

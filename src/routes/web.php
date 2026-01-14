@@ -150,6 +150,9 @@ Route::middleware(['auth:company', 'company'])->group(function () {
     // 応募一覧
     Route::get('/company/applications', [CompanyApplicationController::class, 'index'])->name('company.applications.index');
 
+    // 応募ステータス更新
+    Route::patch('/company/applications/{application}', [CompanyApplicationController::class, 'update'])->name('company.applications.update');
+
     // チャット画面(応募・スカウト)
     Route::get('/company/threads/{thread}', [CompanyMessageController::class, 'show'])->name('company.threads.show');
 

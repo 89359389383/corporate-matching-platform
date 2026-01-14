@@ -146,7 +146,7 @@
             text-decoration: none; display: inline-flex; align-items: center; justify-content: center;
             transition: all 0.15s ease; cursor: pointer; border: none; font-size: 0.95rem; white-space: nowrap;
         }
-        .btn-primary { background-color: #0366d6; color: #fff; }
+        .btn-primary { background-color: #0366d6; color: #fff; font-size: 20px; padding: 15px 60px; }
         .btn-primary:hover { background-color: #0256cc; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(3,102,214,0.3); }
         .btn-secondary { background-color: #586069; color: #fff; }
         .btn-secondary:hover { background-color: #4c5561; transform: translateY(-1px); }

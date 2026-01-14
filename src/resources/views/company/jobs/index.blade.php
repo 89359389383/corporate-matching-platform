@@ -160,9 +160,9 @@
         }
         .input:focus, .select:focus { outline: none; border-color: #0366d6; box-shadow: 0 0 0 3px rgba(3,102,214,0.1); background-color: #fff; }
         .btn {
-            padding: 0.6rem 1.5rem;
+            padding: 0.875rem 1.75rem;
             border-radius: 8px;
-            font-weight: 800;
+            font-weight: 600;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -170,17 +170,18 @@
             transition: all 0.15s ease;
             cursor: pointer;
             border: none;
-            font-size: 0.875rem;
+            font-size: 0.95rem;
             letter-spacing: -0.01em;
-            white-space: nowrap;
-            height: 38px;
+            line-height: 1;               /* 明示的に行間を統一 */
+            vertical-align: middle;       /* inline 要素の揃えを統一 */
+            min-height: 48px;             /* ボタンの最小縦サイズを揃える */
             box-sizing: border-box;
         }
-        .btn-primary { background-color: #0366d6; color: #fff; }
+        .btn-primary { background-color: #0366d6; color: #fff; font-size: 20px; padding: 15px 60px; }
         .btn-primary:hover { background-color: #0256cc; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(3,102,214,0.3); }
-        .btn-secondary { background-color: #586069; color: #fff; }
+        .btn-secondary { background-color: #586069; color: #fff; font-size: 20px; padding: 15px 60px; max-height: 50px; }
         .btn-secondary:hover { background-color: #4c5561; transform: translateY(-1px); }
-        .btn-danger { background-color: #d73a49; color: #fff; }
+        .btn-danger { background-color: #d73a49; color: #fff; font-size: 20px; padding: 15px 60px; max-height: 60px; }
         .btn-danger:hover { background-color: #c62f3c; transform: translateY(-1px); }
 
         .page-title {
@@ -210,9 +211,47 @@
             background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
         }
         .card:hover { transform: translateY(-3px); box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08); }
-        .title { font-size: 1.35rem; font-weight: 900; margin-bottom: 0.25rem; }
-        .sub { color: #586069; font-weight: 700; }
+
+        /* Job header & title (match freelancer view) */
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+        .job-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0060ff;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+        .company-name {
+            color: #586069;
+            font-size: 18px;
+            font-weight: 500;
+        }
         .desc { color: #586069; margin-top: 0.75rem; line-height: 1.65; }
+
+        /* Skills tags (match freelancer view) */
+        .skills-section {
+            margin-top: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        .skill-tag {
+            background-color: #f1f8ff;
+            color: #0366d6;
+            padding: 0.375rem 0.875rem;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 600;
+            border: 1px solid #c8e1ff;
+        }
         .job-details {
             display: grid;
             max-width: 600px;
@@ -529,12 +568,18 @@
                         }
                     @endphp
                     <article class="card">
-                        <div class="inline">
-                            <span class="pill {{ $statusClass }}">{{ $statusText }}</span>
-                            <div class="title">{{ $job->title }}</div>
+                        <div class="job-header">
+                            <div>
+                                <h2 class="job-title">{{ $job->title }}</h2>
+                                <div class="company-name">{{ $company->name }}</div>
+                            </div>
+                            <div class="inline">
+                                <span class="pill {{ $statusClass }}">{{ $statusText }}</span>
+                            </div>
                         </div>
-                        <div class="sub">{{ $company->name }}</div>
+
                         <div class="desc">{{ $job->description }}</div>
+
                         <div class="job-details">
                             <div class="detail-item">
                                 <div class="detail-label">稼働時間</div>
@@ -545,12 +590,18 @@
                                 <div class="detail-value">{{ $rewardDisplay }}</div>
                             </div>
                         </div>
+
                         @if($job->required_skills_text)
+                            @php $skills = explode(',', $job->required_skills_text); @endphp
                             <div class="skills-section">
-                                <div class="skills-label">スキル</div>
-                                <div class="skills-value">{{ $job->required_skills_text }}</div>
+                                <div class="skills">
+                                    @foreach($skills as $skill)
+                                        <span class="skill-tag">{{ trim($skill) }}</span>
+                                    @endforeach
+                                </div>
                             </div>
                         @endif
+
                         <div class="actions">
                             <form method="POST" action="{{ route('company.jobs.status.update', $job) }}" style="margin-right:auto;">
                                 @csrf

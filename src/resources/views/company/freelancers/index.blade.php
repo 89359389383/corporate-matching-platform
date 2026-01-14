@@ -149,15 +149,34 @@
             padding: 3rem;
             gap: 3rem;
         }
-        .sidebar {
+        .sidebar:not(.right) {
             width: 320px;
             flex-shrink: 0;
-            position: sticky;
+            /* 左サイドバーを画面に固定する（スクロールしても動かない） */
+            position: fixed;
+            left: calc((100vw - min(1600px, 100vw)) / 2 + 3rem);
             top: calc(var(--header-height) + 1.5rem);
             align-self: flex-start;
+            z-index: 50;
         }
-        .sidebar.right { width: 380px; }
-        .content-area { flex: 1; min-width: 0; }
+        .sidebar.right {
+            width: 380px;
+            flex-shrink: 0;
+            /* 右サイドバーを画面に固定する（スクロールしても動かない） */
+            position: fixed;
+            right: calc((100vw - min(1600px, 100vw)) / 2 + 3rem);
+            top: calc(var(--header-height) + 1.5rem);
+            align-self: flex-start;
+            z-index: 50;
+        }
+        .content-area {
+            flex: 1;
+            min-width: 0;
+            /* 固定された左サイドバー分の余白を確保 */
+            margin-left: calc(320px + 3rem);
+            /* 固定された右サイドバー分の余白を確保 */
+            margin-right: calc(380px + 3rem);
+        }
 
         /* Panels / Inputs */
         .panel {
@@ -218,6 +237,22 @@
         }
         .btn-primary { background-color: #0366d6; color: white; }
         .btn-primary:hover { background-color: #0256cc; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(3, 102, 214, 0.3); }
+        .search-btn {
+            width: 100%;
+            background-color: #0366d6;
+            color: white;
+            border: none;
+            padding: 0.875rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-size: 16px;
+        }
+        .search-btn:hover {
+            background-color: #0256cc;
+            box-shadow: 0 2px 8px rgba(3, 102, 214, 0.3);
+        }
         .btn-secondary { background-color: #586069; color: white; }
         .btn-secondary:hover { background-color: #4c5561; transform: translateY(-1px); }
 
@@ -253,6 +288,27 @@
         }
         .card:hover { transform: translateY(-3px); box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08); }
         .card.is-selected { outline: 3px solid rgba(3, 102, 214, 0.2); border-color: rgba(3,102,214,0.35); }
+        .card-header {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            display: flex;
+            gap: 0.5rem;
+            z-index: 5;
+        }
+        .card-scout-btn {
+            padding: 0.45rem 0.65rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: all 0.12s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
         .row { display: flex; gap: 1rem; align-items: flex-start; min-width: 0; }
         .avatar {
             width: 52px;
@@ -290,9 +346,54 @@
             overflow: hidden;
         }
         .meta-label { font-size: 0.7rem; color: #6a737d; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; flex-shrink: 0; }
-        .meta-value { font-weight: 800; color: #24292e; word-wrap: break-word; overflow-wrap: break-word; min-width: 0; text-align: right; }
+        .meta-value {
+            font-weight: 800;
+            color: #24292e;
+            min-width: 0;
+            text-align: right;
+            /* 1行に固定して見た目を崩さない（入り切らない場合は …） */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
         /* Right detail */
+        #detailPanel {
+            /* パネル内でスクロール可能にする */
+            max-height: calc(100vh - var(--header-height) - 3rem);
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        #detailPanel h3 {
+            /* タイトルは固定 */
+            flex-shrink: 0;
+        }
+        #detailContent {
+            /* コンテンツ部分がスクロール可能 */
+            flex: 1;
+            min-height: 0;
+        }
+        #detailEmpty {
+            /* 空の状態も固定 */
+            flex-shrink: 0;
+        }
+        /* スクロールバーのスタイリング */
+        #detailPanel::-webkit-scrollbar {
+            width: 8px;
+        }
+        #detailPanel::-webkit-scrollbar-track {
+            background: #f6f8fa;
+            border-radius: 4px;
+        }
+        #detailPanel::-webkit-scrollbar-thumb {
+            background: #c6cbd1;
+            border-radius: 4px;
+        }
+        #detailPanel::-webkit-scrollbar-thumb:hover {
+            background: #959da5;
+        }
         .detail-title { font-size: 0.95rem; font-weight: 800; margin-top: 0.75rem; margin-bottom: 0.5rem; }
         .detail-actions { display: flex; gap: 0.75rem; margin-top: 1.25rem; flex-wrap: wrap; }
         .link { color: #0366d6; text-decoration: none; font-weight: 800; word-break: break-all; overflow-wrap: break-word; display: block; }
@@ -301,8 +402,9 @@
         /* Responsive */
         @media (max-width: 1200px) {
             .main-content { padding: 2rem; gap: 2rem; }
-            .sidebar { width: 260px; }
-            .sidebar.right { width: 320px; }
+            .sidebar:not(.right) { width: 260px; left: calc((100vw - min(1600px, 100vw)) / 2 + 2rem); }
+            .sidebar.right { width: 320px; right: calc((100vw - min(1600px, 100vw)) / 2 + 2rem); }
+            .content-area { margin-left: calc(260px + 2rem); margin-right: calc(320px + 2rem); }
             .nav-links { gap: 1rem; }
             .nav-link { font-size: 0.85rem; padding: 0.55rem 0.85rem; }
             .nav-link.has-badge { padding-right: 2.4rem; }
@@ -312,8 +414,13 @@
             .nav-links { position: static; left: auto; transform: none; justify-content: flex-start; }
             .user-menu { position: static; transform: none; margin-left: auto; }
             .main-content { flex-direction: column; padding: 1.5rem; }
-            .sidebar, .sidebar.right { width: 100%; position: static; top: auto; order: -1; }
+            .sidebar:not(.right), .sidebar.right { width: 100%; position: static; top: auto; left: auto; right: auto; order: -1; }
+            .content-area { margin-left: 0; margin-right: 0; }
             .meta { grid-template-columns: 1fr; }
+            #detailPanel {
+                max-height: none;
+                overflow-y: visible;
+            }
         }
     </style>
     @include('partials.aitech-responsive')
@@ -365,7 +472,7 @@
                         <label for="keyword">フリーワード</label>
                         <input id="keyword" name="keyword" class="input" type="text" placeholder="職種 / スキル / 自己紹介 / 希望単価 など" value="{{ old('keyword', $keyword ?? '') }}">
                     </div>
-                    <button class="btn btn-primary" type="submit">検索</button>
+                    <button class="search-btn" type="submit">検索</button>
                 </form>
             </div>
         </aside>
@@ -378,6 +485,14 @@
                         $avatarText = mb_substr($freelancer->display_name, 0, 1);
                         $allSkills = $freelancer->skills->pluck('name')->merge($freelancer->customSkills->pluck('name'));
                         $workHours = $freelancer->min_hours_per_week . '〜' . $freelancer->max_hours_per_week . 'h';
+                        $dailyText = null;
+                        if (isset($freelancer->hours_per_day) || isset($freelancer->days_per_week)) {
+                            $dailyParts = [];
+                            if (isset($freelancer->hours_per_day)) { $dailyParts[] = $freelancer->hours_per_day . 'h/day'; }
+                            if (isset($freelancer->days_per_week)) { $dailyParts[] = $freelancer->days_per_week . '日/week'; }
+                            $dailyText = implode('・', $dailyParts);
+                        }
+                        $workStyleText = '週' . $workHours . ($dailyText ? '（' . $dailyText . '）' : '');
                         $minRate = $freelancer->min_rate ?: null; // 0は未設定扱い
                         $maxRate = $freelancer->max_rate ?: null; // 0は未設定扱い
                         if ($minRate !== null && $maxRate !== null) {
@@ -388,7 +503,17 @@
                             $rateText = '未設定';
                         }
                     @endphp
+                    @php
+                        $currentThreadId = $scoutThreadMap[$freelancer->id] ?? null;
+                    @endphp
                     <article class="card {{ $index === 0 ? 'is-selected' : '' }}" tabindex="0" role="button" data-id="{{ $freelancer->id }}" aria-pressed="{{ $index === 0 ? 'true' : 'false' }}">
+                        <div class="card-header">
+                            @if($currentThreadId)
+                                <a class="card-scout-btn btn-secondary" href="{{ route('company.threads.show', ['thread' => $currentThreadId]) }}" aria-label="スカウト済み">スカウト済み</a>
+                            @else
+                                <a class="card-scout-btn btn-primary" href="{{ route('company.scouts.create', ['freelancer_id' => $freelancer->id]) }}" aria-label="スカウト">スカウト</a>
+                            @endif
+                        </div>
                         <div class="row">
                             <div class="avatar" aria-hidden="true">{{ $avatarText }}</div>
                             <div style="min-width:0; flex: 1; overflow: hidden;">
@@ -401,19 +526,16 @@
                                         @endforeach
                                     </div>
                                 @endif
-                                @if($freelancer->bio)
-                                    <div class="desc">{{ $freelancer->bio }}</div>
-                                @endif
                             </div>
                         </div>
                         <div class="meta" aria-label="ワークスタイル">
                             <div class="meta-item">
                                 <div class="meta-label">稼働</div>
-                                <div class="meta-value">週{{ $workHours }}</div>
+                                <div class="meta-value" title="{{ $workStyleText }}">{{ $workStyleText }}</div>
                             </div>
                             <div class="meta-item">
                                 <div class="meta-label">希望単価</div>
-                                <div class="meta-value">{{ $rateText }}</div>
+                                <div class="meta-value" title="{{ $rateText }}">{{ $rateText }}</div>
                             </div>
                         </div>
                     </article>
@@ -453,6 +575,9 @@
 
                     <div class="detail-title">ポートフォリオ</div>
                     <div class="desc" id="dPortfolio" style="word-break: break-all; overflow-wrap: break-word;"></div>
+
+                    <div class="detail-title">経験企業</div>
+                    <div class="desc" id="dExperienceCompanies"></div>
 
                     <div class="detail-actions">
                         @php
@@ -513,8 +638,11 @@
                 'bio' => $freelancer->bio ?? '',
                 'skills' => $allSkills->toArray(),
                 'workHours' => $workHours,
+                'hoursPerDay' => $freelancer->hours_per_day ?? null,
+                'daysPerWeek' => $freelancer->days_per_week ?? null,
                 'rateText' => $rateText,
                 'portfolios' => $freelancer->portfolios->pluck('url')->toArray(),
+                'experienceCompanies' => $freelancer->experience_companies ?? '',
                 'threadId' => $scoutThreadMap[$freelancer->id] ?? null,
             ];
         })->values()->toArray();
@@ -535,9 +663,10 @@
             const dSkills = document.getElementById('dSkills');
             const dMeta = document.getElementById('dMeta');
             const dPortfolio = document.getElementById('dPortfolio');
+            const dExperienceCompanies = document.getElementById('dExperienceCompanies');
             const dScoutLink = document.getElementById('dScoutLink');
             
-            if (!list || !detailContent || !detailEmpty || !dAvatar || !dName || !dRole || !dBio || !dSkills || !dMeta || !dPortfolio || !dScoutLink) return;
+            if (!list || !detailContent || !detailEmpty || !dAvatar || !dName || !dRole || !dBio || !dSkills || !dMeta || !dPortfolio || !dExperienceCompanies || !dScoutLink) return;
 
             // データをIDでマッピング
             const dataMap = {};
@@ -563,23 +692,32 @@
                 dSkills.innerHTML = x.skills.length > 0 
                     ? x.skills.map(s => `<span class="tag">${s}</span>`).join('')
                     : '<span style="color: #586069;">（未設定）</span>';
+                const dailyPart = ((x.hoursPerDay || x.daysPerWeek) ? ((x.hoursPerDay ? `${x.hoursPerDay}h/day` : '') + (x.hoursPerDay && x.daysPerWeek ? '・' : '') + (x.daysPerWeek ? `${x.daysPerWeek}日/week` : '')) : '');
+                const workStyleText = `週${x.workHours}${dailyPart ? '（' + dailyPart + '）' : ''}`;
+
                 dMeta.innerHTML = `
                     <div class="meta-item">
                         <div class="meta-label">稼働</div>
-                        <div class="meta-value">週${x.workHours}</div>
+                        <div class="meta-value" title="${workStyleText.replaceAll('"','&quot;')}">${workStyleText}</div>
                     </div>
                     <div class="meta-item">
                         <div class="meta-label">希望単価</div>
-                        <div class="meta-value">${x.rateText}</div>
+                        <div class="meta-value" title="${String(x.rateText ?? '').replaceAll('"','&quot;')}">${x.rateText}</div>
                     </div>
                 `;
                 
                 if (x.portfolios && x.portfolios.length > 0) {
-                    dPortfolio.innerHTML = x.portfolios.map(url => 
+                    dPortfolio.innerHTML = x.portfolios.map(url =>
                         `<a class="link" href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
                     ).join('<br>');
                 } else {
                     dPortfolio.innerHTML = '<span style="color: #586069;">（未設定）</span>';
+                }
+
+                if (x.experienceCompanies && x.experienceCompanies.trim()) {
+                    dExperienceCompanies.innerHTML = x.experienceCompanies.replace(/\n/g, '<br>');
+                } else {
+                    dExperienceCompanies.innerHTML = '<span style="color: #586069;">（未設定）</span>';
                 }
                 
                 // スカウト済みかどうかでボタンの表示とリンクを変更
@@ -615,12 +753,16 @@
             }
 
             list.addEventListener('click', (e) => {
+                // スカウトボタンがクリックされた場合はカード選択をしない
+                if (e.target.closest('.card-scout-btn')) return;
                 const card = e.target.closest('.card');
                 if (!card) return;
                 selectCard(card);
             });
             list.addEventListener('keydown', (e) => {
                 if (e.key !== 'Enter' && e.key !== ' ') return;
+                // スカウトボタンにフォーカスがある場合はカード選択をしない
+                if (e.target.closest('.card-scout-btn')) return;
                 const card = e.target.closest('.card');
                 if (!card) return;
                 e.preventDefault();

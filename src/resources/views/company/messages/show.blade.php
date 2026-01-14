@@ -9,7 +9,7 @@
             --header-height: 104px;       /* 80px * 1.3 */
             --header-height-mobile: 91px; /* 70px * 1.3 */
 
-            /* UI tokens (messages/show.blade.php より統一) */
+            /* UI tokens (high readability / production-grade) */
             --bg: #f6f8fb;
             --surface: #ffffff;
             --surface-2: #fbfcfe;
@@ -26,25 +26,20 @@
             --radius-sm: 12px;
             --focus: 0 0 0 4px rgba(3, 102, 214, 0.14);
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { font-size: 100%; }
+        html { font-size: 97.5%; }
         body {
             font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background:
-                radial-gradient(1200px 600px at 20% 0%, rgba(3, 102, 214, 0.08), transparent 60%),
-                radial-gradient(900px 500px at 90% 10%, rgba(102, 126, 234, 0.10), transparent 55%),
-                var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-            text-rendering: optimizeLegibility;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            background-color: #fafbfc;
+            color: #24292e;
+            line-height: 1.5;
         }
 
-        /* Header（基準UIと統一） */
+        /* Header */
         .header {
             background-color: #ffffff;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid #e1e4e8;
             padding: 0 3rem;
             position: sticky;
             top: 0;
@@ -55,6 +50,7 @@
         .header-content {
             max-width: 1600px;
             margin: 0 auto;
+            border-bottom: 1px solid #e1e4e8;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -63,13 +59,13 @@
         }
         .nav-links {
             display: flex;
-            flex-direction: row;
             gap: 3rem;
             align-items: center;
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
             justify-content: center;
+            flex-wrap: nowrap;
         }
         .nav-link {
             text-decoration: none;
@@ -120,6 +116,8 @@
             border: none; padding: 0; appearance: none;
         }
         .user-avatar:hover { transform: scale(1.08); box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+
+        /* Dropdown Menu */
         .dropdown { position: relative; }
         .dropdown-content {
             display: none;
@@ -148,7 +146,7 @@
         .dropdown-item:hover { background-color: #f6f8fa; color: #24292e; }
         .dropdown-divider { height: 1px; background-color: #e1e4e8; margin: 0.5rem 0; }
 
-        /* Page（基準UIと統一） */
+        /* Page */
         .main-content {
             max-width: 1200px;
             margin: 0 auto;
@@ -166,6 +164,7 @@
             font-size: 1rem;
             margin-bottom: 2.25rem;
         }
+
         .panel {
             background-color: white;
             border-radius: 16px;
@@ -174,6 +173,7 @@
             border: 1px solid #e1e4e8;
             overflow: hidden;
         }
+
         .chat-header {
             padding: 1.25rem 1.5rem;
             border-bottom: 1px solid var(--border);
@@ -202,31 +202,10 @@
             font-size: 0.9rem;
             font-weight: 700;
         }
-        .chat-tools {
-            display: inline-flex;
-            gap: 0.75rem;
-            align-items: center;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-        }
-        .select {
-            padding: 0.7rem 0.85rem;
-            border: 2px solid #e1e4e8;
-            border-radius: 10px;
-            background: #fafbfc;
-            font-weight: 900;
-            color: #24292e;
-            cursor: pointer;
-        }
-        .select:focus {
-            outline: none;
-            border-color: #0366d6;
-            box-shadow: 0 0 0 3px rgba(3,102,214,0.1);
-            background: #fff;
-        }
+
         .btn {
-            padding: 0.7rem 1rem;
-            border-radius: 10px;
+            padding: 0.72rem 1rem;
+            border-radius: 12px;
             font-weight: 800;
             text-decoration: none;
             display: inline-flex;
@@ -234,50 +213,35 @@
             justify-content: center;
             transition: all 0.15s ease;
             cursor: pointer;
-            border: 1px solid #e1e4e8;
-            background: #fafbfc;
-            color: #24292e;
-            font-size: 0.9rem;
+            border: 1px solid var(--border-2);
+            background: linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%);
+            color: var(--text);
+            font-size: 0.92rem;
             white-space: nowrap;
         }
-        .btn:hover { background: #f6f8fa; transform: translateY(-1px); }
+        .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+        .btn:focus-visible { outline: none; box-shadow: var(--focus), var(--shadow-sm); }
 
         .messages {
-            padding: 70px;
+            padding: 1.25rem 1.25rem 1rem;
             overflow-y: auto;
             display: grid;
             gap: 0.85rem;
-            background: 
+            background:
                 radial-gradient(900px 420px at 10% 0%, rgba(3, 102, 214, 0.06), transparent 60%),
                 linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
             position: relative;
             scrollbar-gutter: stable;
             flex: 1 1 auto;
         }
+
         .bubble-row { display: flex; align-items: flex-end; gap: 0.75rem; }
         .bubble-row.me { justify-content: flex-end; }
         .bubble-row.first-message {
             justify-content: flex-end;
             width: 100%;
             margin-left: auto;
-            position: sticky; /* メッセージ欄の右上に固定表示（見た目のみ） */
-            top: 1rem;
-            z-index: 3;
         }
-
-        .avatar {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: grid;
-            place-items: center;
-            color: white;
-            font-weight: 900;
-            font-size: 0.95rem;
-            flex-shrink: 0;
-        }
-
         .bubble {
             max-width: 74%;
             width: 80%;
@@ -297,86 +261,150 @@
             padding: 20px;
         }
         .bubble.first-message {
+            max-width: 74%;
             width: 80%;
-            background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,250,252,0.98) 100%);
-            margin-bottom: 50px;
-            border: 1px solid var(--border-2);
-            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.14);
-            padding: 1rem 1.1rem 0.9rem;
+            padding: 20px;
+            border-radius: 16px;
+            border-color: #cfe4ff;
+            background: linear-gradient(180deg, rgba(241,248,255,0.98) 0%, rgba(236,246,255,0.98) 100%);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 0.85rem;
             position: relative;
-            border-radius: 18px;
         }
-        .bubble p { color: #24292e; font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap; }
-        .bubble small { display: block; margin-top: 0.4rem; color: #6a737d; font-weight: 800; font-size: 0.8rem; }
-        .del {
-            background: none;
-            border: none;
-            color: #d73a49;
-            font-weight: 900;
-            cursor: pointer;
-            padding: 0;
+        .bubble.first-message::before {
+            display: none;
+            content: "";
+        }
+        .bubble.first-message p {
+            color: var(--text);
+            font-weight: 650;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+        .bubble.first-message small {
+            color: var(--muted);
+            font-weight: 800;
+        }
+        .bubble p { color: var(--text); font-size: 0.95rem; line-height: 1.7; white-space: pre-wrap; }
+        .bubble small {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            margin-top: 0.45rem;
+            color: var(--muted);
+            font-weight: 800;
+            font-size: 0.82rem;
         }
 
         .composer {
-            padding: 1.25rem 1.5rem;
-            border-top: 1px solid #e1e4e8;
+            padding: 1rem 1.25rem 1.25rem;
+            border-top: 1px solid var(--border);
             display: grid;
             grid-template-columns: 1fr;
             gap: 0.75rem;
-            background: #ffffff;
+            background: linear-gradient(180deg, var(--surface-2) 0%, var(--surface) 100%);
         }
         .input {
             width: 100%;
-            padding: 0.875rem 1rem;
-            border: 2px solid #e1e4e8;
-            border-radius: 12px;
-            font-size: 0.95rem;
+            padding: 0.95rem 1rem;
+            border: 1px solid var(--border-2);
+            border-radius: 14px;
+            font-size: 0.98rem;
             transition: all 0.15s ease;
-            background-color: #fafbfc;
-            min-height: 14rem;
+            background-color: #ffffff;
+            min-height: 7.25rem;
+            max-height: 18rem;
             resize: vertical;
+            line-height: 1.7;
+            box-shadow: inset 0 1px 0 rgba(15, 23, 42, 0.03);
         }
         .input:focus {
             outline: none;
-            border-color: #0366d6;
-            box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.1);
-            background-color: white;
+            border-color: rgba(3, 102, 214, 0.55);
+            box-shadow: var(--focus);
         }
         .send {
-            padding: 0.875rem 1.25rem;
-            border-radius: 12px;
+            padding: 14px 40px;
+            border-radius: 14px;
             font-weight: 900;
             border: none;
-            background: #0366d6;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-2) 100%);
             color: white;
             cursor: pointer;
             transition: all 0.15s ease;
-            font-size: 0.95rem;
-            width: 500px;
+            font-size: 20px;
+            min-width: 260px;
             max-width: 100%;
-            margin: 0 auto;
+            margin-left: auto;
+            box-shadow: 0 10px 20px rgba(3, 102, 214, 0.22);
         }
-        .send:hover { background: #0256cc; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(3, 102, 214, 0.3); }
+        .send:hover { transform: translateY(-1px); box-shadow: 0 14px 26px rgba(3, 102, 214, 0.26); }
+        .send:active { transform: translateY(0px); }
+        .send:focus-visible { outline: none; box-shadow: var(--focus), 0 14px 26px rgba(3, 102, 214, 0.26); }
 
-        @media (max-width: 920px) {
-            .header-content { height: var(--header-height-mobile); }
-            .nav-links { position: static; left: auto; transform: none; justify-content: flex-start; }
-            .user-menu { position: static; transform: none; margin-left: auto; }
-            .main-content { padding: 1.5rem; }
-            .messages { padding: 1.5rem; max-height: 520px; }
-            .bubble { max-width: 92%; }
-            .bubble-row.first-message {
-                max-width: calc(100% - 1rem);
-                margin-left: auto;
-            }
-            .bubble.first-message {
-                max-width: 100%;
-            }
-        }
+        /* Responsive */
         @media (max-width: 1200px) {
-            .nav-links { gap: 1.5rem; }
-            .nav-link { font-size: 1rem; padding: 0.6rem 0.9rem; }
-            .nav-link.has-badge { padding-right: 2.6rem; }
+            .main-content { padding: 2rem 1.25rem 2.5rem; }
+        }
+        @media (max-width: 900px) {
+            .messages { max-height: 500px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; scroll-behavior: auto !important; }
+        }
+        /* Delete confirmation modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(2,6,23,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .modal-overlay.is-open { display: flex; }
+        .modal-dialog {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1.5rem;
+            max-width: 420px;
+            width: calc(100% - 2rem);
+            box-shadow: 0 14px 40px rgba(2,6,23,0.18);
+            border: 1px solid var(--border-2);
+            text-align: left;
+        }
+        .modal-dialog h2 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: var(--text);
+        }
+        .modal-dialog p { color: var(--muted); margin: 0 0 1rem 0; }
+        .modal-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        .modal-actions > button {
+            flex: 1;
+            min-width: 0; /* allow shrinking in flex */
+            font-size: 0.92rem; /* match .btn */
+            padding: 0.72rem 1rem;
+            font-weight: 800;
+            border-radius: 10px;
+        }
+        .btn-danger {
+            background: linear-gradient(180deg, #d73a49 0%, #c5303f 100%);
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+        .modal-actions .btn {
+            background: linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%);
+            color: var(--text);
+            border: 1px solid var(--border-2);
         }
     </style>
     @include('partials.aitech-responsive')
@@ -482,9 +510,6 @@
                         </div>
                     @else
                         <div class="bubble-row {{ $isMe ? 'me' : '' }}">
-                            @if(!$isMe)
-                                <div class="avatar">{{ $freelancerInitial }}</div>
-                            @endif
                             <div class="bubble {{ $isMe ? 'me' : '' }}">
                                 <p>{{ $message->body }}</p>
                                 <small>

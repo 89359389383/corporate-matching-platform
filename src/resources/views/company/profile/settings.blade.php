@@ -112,7 +112,8 @@
         }
         .textarea { min-height: 140px; resize: vertical; }
         .input:focus, .textarea:focus { outline: none; border-color: #0366d6; box-shadow: 0 0 0 3px rgba(3,102,214,0.1); background-color: #fff; }
-        .btn-row { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.25rem; flex-wrap: wrap; }
+        .btn-row { display: flex; gap: 0.75rem; margin-top: 1.25rem; flex-wrap: wrap; }
+        .btn-row .btn { flex: 1; }
         .btn {
             padding: 0.875rem 1.75rem; border-radius: 10px; font-weight: 900;
             text-decoration: none; display: inline-flex; align-items: center; justify-content: center;

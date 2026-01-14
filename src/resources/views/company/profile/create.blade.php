@@ -257,6 +257,7 @@
         .btn-primary {
             background: linear-gradient(135deg, #1e88e5 0%, #1976d2 100%);
             color: #fff;
+            font-size: 16px;
             box-shadow: 0 4px 12px rgba(30, 136, 229, 0.25);
         }
 
@@ -269,6 +270,7 @@
         .btn-secondary {
             background: rgba(15, 23, 42, 0.08);
             color: #0f172a;
+            font-size: 16px;
         }
 
         .btn-secondary:hover {

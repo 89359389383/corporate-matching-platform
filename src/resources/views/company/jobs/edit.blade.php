@@ -115,7 +115,8 @@
         .textarea { min-height: 140px; resize: vertical; }
         .input:focus, .textarea:focus, .select:focus { outline: none; border-color: #0366d6; box-shadow: 0 0 0 3px rgba(3,102,214,0.1); background-color: #fff; }
         .help { margin-top: 0.5rem; color: #6a737d; font-weight: 800; font-size: 0.85rem; }
-        .btn-row { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.25rem; flex-wrap: wrap; }
+        .btn-row { display: flex; gap: 1rem; margin-top: 2rem; }
+        .btn-row .btn { flex: 1; padding: 1rem; font-size: 16px; }
         .btn {
             padding: 0.875rem 1.75rem; border-radius: 10px; font-weight: 900;
             text-decoration: none; display: inline-flex; align-items: center; justify-content: center;
@@ -133,7 +134,6 @@
             .main-content { padding: 1.5rem; }
             .grid { grid-template-columns: 1fr; }
             .grid-3 { grid-template-columns: 1fr; }
-            .btn-row .btn { width: 100%; }
         }
         @media (max-width: 1200px) {
             .nav-links { gap: 1rem; }

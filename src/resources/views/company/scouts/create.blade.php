@@ -113,7 +113,8 @@
         .textarea { min-height: 160px; resize: vertical; }
         .input:focus, .textarea:focus { outline: none; border-color: #0366d6; box-shadow: 0 0 0 3px rgba(3,102,214,0.1); background-color: #fff; }
         .help { margin-top: 0.5rem; color: #6a737d; font-weight: 800; font-size: 0.85rem; line-height: 1.5; }
-        .btn-row { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.25rem; flex-wrap: wrap; }
+        .btn-row { display: flex; gap: 0.75rem; margin-top: 1.25rem; flex-wrap: wrap; }
+        .btn-row .btn { flex: 1; }
         .btn {
             padding: 0.875rem 1.75rem; border-radius: 10px; font-weight: 900;
             text-decoration: none; display: inline-flex; align-items: center; justify-content: center;
@@ -223,13 +224,9 @@
                     @error('message')
                         <div style="color: #d73a49; font-size: 0.85rem; margin-top: 0.5rem;">{{ $message }}</div>
                     @enderror
-                    <div class="help">
-                        送信時の裏側（想定）：スカウトレコード作成 → <strong>企業 × フリーランス</strong> のチャットスレッド自動生成 → 最初のメッセージとして保存。
-                        送信完了後はチャット画面へ遷移します。
-                    </div>
                 </div>
                 <div class="btn-row">
-                    <a class="btn btn-secondary" href="{{ route('company.freelancers.show', $freelancer) }}">キャンセル</a>
+                    <a class="btn btn-secondary" href="{{ route('company.freelancers.index') }}">キャンセル</a>
                     <button class="btn btn-primary" type="submit">送信</button>
                 </div>
             </form>

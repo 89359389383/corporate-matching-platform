@@ -188,8 +188,8 @@
             align-items: flex-start;
             margin-bottom: 1rem;
         }
-        .title { font-size: 1.4rem; font-weight: 900; line-height: 1.2; margin-bottom: 0.25rem; }
-        .sub { color: #586069; font-weight: 700; font-size: 1rem; }
+        .title { font-size: 24px; font-weight: 700; color: #0060ff; margin-bottom: 0.5rem; line-height: 1.3; }
+        .sub { color: #586069; font-weight: 500; font-size: 18px; }
         .row { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
         .avatar {
             width: 36px; height: 36px; border-radius: 50%;
@@ -218,6 +218,7 @@
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 1rem;
             margin-top: 1rem;
+            max-width: 500px;
         }
         .meta-item {
             padding: 0.85rem;
@@ -228,9 +229,28 @@
             gap: 0.75rem;
             align-items: center;
         }
-        .meta-label { font-size: 0.75rem; color: #6a737d; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+        .meta-label { font-size: 16px; color: #6a737d; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
         .meta-value { font-weight: 900; color: #24292e; white-space: nowrap; font-size: 1.05rem; }
-        .meta-value.skills { white-space: normal; word-break: break-word; line-height: 1.6; }
+        .skills-section {
+            margin-top: 1rem;
+            padding: 0.85rem;
+            background-color: #f6f8fa;
+            border-radius: 10px;
+        }
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        .skill-tag {
+            background-color: #f1f8ff;
+            color: #0366d6;
+            padding: 0.375rem 0.875rem;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 600;
+            border: 1px solid #c8e1ff;
+        }
         .desc { color: #586069; margin-top: 0.75rem; line-height: 1.65; font-size: 1rem; }
         .actions {
             display: flex;
@@ -244,7 +264,7 @@
         .btn {
             padding: 0.875rem 1.75rem;
             border-radius: 8px;
-            font-weight: 800;
+            font-weight: 600;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -256,9 +276,9 @@
             letter-spacing: -0.01em;
             white-space: nowrap;
         }
-        .btn-primary { background-color: #0366d6; color: #fff; }
+        .btn-primary { background-color: #0366d6; color: #fff; font-size: 20px; padding: 15px 60px; }
         .btn-primary:hover { background-color: #0256cc; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(3, 102, 214, 0.3); }
-        .btn-secondary { background-color: #586069; color: #fff; }
+        .btn-secondary { background-color: #586069; color: #fff; font-size: 20px; padding: 15px 60px; }
         .btn-secondary:hover { background-color: #4c5561; transform: translateY(-1px); }
 
         @media (max-width: 920px) {
@@ -404,7 +424,22 @@
                                 <div class="title">{{ $job->title }}</div>
                                 <div class="sub">{{ $company->name ?? '企業名不明' }}</div>
                                 <div class="row" style="margin-top:0.75rem;">
-                                    <span class="pill status">応募ステータス：{{ $statusText }}</span>
+                                    @if($application->status === \App\Models\Application::STATUS_PENDING)
+                                        <form method="POST" action="{{ route('company.applications.update', ['application' => $application->id]) }}" class="status-form" style="display:inline;">
+                                            @csrf
+                                            @method('PATCH')
+                                            <label class="pill status" style="cursor:pointer;">
+                                                応募ステータス：
+                                                <select name="status" class="status-select" onchange="this.form.submit()" style="background:transparent;border:none;font-weight:900;color:inherit;">
+                                                    <option value="{{ \App\Models\Application::STATUS_PENDING }}" selected>未対応</option>
+                                                    <option value="{{ \App\Models\Application::STATUS_IN_PROGRESS }}">対応中</option>
+                                                    <option value="{{ \App\Models\Application::STATUS_CLOSED }}">クローズ</option>
+                                                </select>
+                                            </label>
+                                        </form>
+                                    @else
+                                        <span class="pill status">応募ステータス：{{ $statusText }}</span>
+                                    @endif
                                     @if($application->is_unread ?? false)
                                         <span class="pill unread">未読</span>
                                     @else
@@ -421,15 +456,22 @@
                         <div class="meta" aria-label="案件情報">
                             <div class="meta-item"><div class="meta-label">報酬</div><div class="meta-value">{{ $rewardText }}</div></div>
                             <div class="meta-item"><div class="meta-label">稼働</div><div class="meta-value">{{ $job->work_time_text }}</div></div>
-                            @if($job->required_skills_text)
-                                <div class="meta-item"><div class="meta-label">スキル</div><div class="meta-value skills">{{ $job->required_skills_text }}</div></div>
-                            @endif
                         </div>
+                        @if($job->required_skills_text)
+                            @php $skills = explode(',', $job->required_skills_text); @endphp
+                            <div class="skills-section">
+                                <div class="skills">
+                                    @foreach($skills as $skill)
+                                        <span class="skill-tag">{{ trim($skill) }}</span>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
                         <div class="actions">
                             @if($application->thread)
-                                <a href="{{ $chatUrl }}" class="btn btn-primary">チャットへ</a>
+                                <a href="{{ $chatUrl }}" class="btn btn-primary">チャットを開く</a>
                             @else
-                                <span class="btn btn-secondary" style="opacity: 0.5; cursor: not-allowed;">チャット未開始</span>
+                                <span class="btn btn-primary" style="opacity: 0.6; cursor: not-allowed;">チャット（準備中）</span>
                             @endif
                         </div>
                     </article>
@@ -497,16 +539,23 @@
                         <div class="meta" aria-label="案件情報">
                             <div class="meta-item"><div class="meta-label">報酬</div><div class="meta-value">{{ $rewardText }}</div></div>
                             <div class="meta-item"><div class="meta-label">稼働</div><div class="meta-value">{{ $job->work_time_text }}</div></div>
-                            @if($job->required_skills_text)
-                                <div class="meta-item"><div class="meta-label">スキル</div><div class="meta-value skills">{{ $job->required_skills_text }}</div></div>
-                            @endif
                         </div>
+                        @if($job->required_skills_text)
+                            @php $skills = explode(',', $job->required_skills_text); @endphp
+                            <div class="skills-section">
+                                <div class="skills">
+                                    @foreach($skills as $skill)
+                                        <span class="skill-tag">{{ trim($skill) }}</span>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
                         <div class="actions">
-                            <a href="{{ route('freelancer.jobs.show', ['job' => $job->id]) }}" class="btn btn-secondary">詳細</a>
+                            <a href="{{ route('freelancer.jobs.show', ['job' => $job->id]) }}" class="btn btn-secondary" style="margin-right: 1rem;">案件詳細</a>
                             @if($application->thread)
                                 <a href="{{ $chatUrl }}" class="btn btn-primary">チャット履歴</a>
                             @else
-                                <span class="btn btn-secondary" style="opacity: 0.5; cursor: not-allowed;">チャット未開始</span>
+                                <span class="btn btn-primary" style="opacity: 0.6; cursor: not-allowed;">チャット履歴（なし）</span>
                             @endif
                         </div>
                     </article>
