@@ -112,6 +112,17 @@
         }
         .textarea { min-height: 140px; resize: vertical; }
         .input:focus, .textarea:focus { outline: none; border-color: #0366d6; box-shadow: 0 0 0 3px rgba(3,102,214,0.1); background-color: #fff; }
+        .input.is-invalid, .textarea.is-invalid {
+            border-color: rgba(239, 68, 68, 0.8);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.10);
+        }
+        .error-message {
+            display: block;
+            margin-top: 6px;
+            font-size: 13px;
+            font-weight: 800;
+            color: #dc2626;
+        }
         .btn-row { display: flex; gap: 0.75rem; margin-top: 1.25rem; flex-wrap: wrap; }
         .btn-row .btn { flex: 1; }
         .btn {
@@ -179,6 +190,7 @@
 
     <main class="main-content">
         <h1 class="page-title">企業プロフィール設定</h1>
+        @include('partials.error-panel')
         
         @if(session('success'))
             <div style="background-color: #d4edda; color: #155724; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border: 1px solid #c3e6cb;">
@@ -192,38 +204,44 @@
             </div>
         @endif
 
-        @if($errors->any())
-            <div style="background-color: #f8d7da; color: #721c24; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border: 1px solid #f5c6cb;">
-                <ul style="margin: 0; padding-left: 1.5rem;">
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
 
         <div class="panel">
             <form action="{{ route('company.profile.settings.update') }}" method="post">
                 @csrf
                 <div class="field">
                     <label for="name">企業名（必須）</label>
-                    <input id="name" name="name" class="input" type="text" value="{{ old('name', $company->name ?? '') }}">
+                    <input id="name" name="name" class="input @error('name') is-invalid @enderror" type="text" value="{{ old('name', $company->name ?? '') }}">
+                    @error('name')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
                 </div>
                 <div class="field">
                     <label for="overview">会社概要（任意）</label>
-                    <textarea id="overview" name="overview" class="textarea">{{ old('overview', $company->overview ?? '') }}</textarea>
+                    <textarea id="overview" name="overview" class="textarea @error('overview') is-invalid @enderror">{{ old('overview', $company->overview ?? '') }}</textarea>
+                    @error('overview')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
                 </div>
                 <div class="field">
                     <label for="contact_name">担当者名（任意）</label>
-                    <input id="contact_name" name="contact_name" class="input" type="text" value="{{ old('contact_name', $company->contact_name ?? '') }}">
+                    <input id="contact_name" name="contact_name" class="input @error('contact_name') is-invalid @enderror" type="text" value="{{ old('contact_name', $company->contact_name ?? '') }}">
+                    @error('contact_name')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
                 </div>
                 <div class="field">
                     <label for="department">部署（任意）</label>
-                    <input id="department" name="department" class="input" type="text" value="{{ old('department', $company->department ?? '') }}">
+                    <input id="department" name="department" class="input @error('department') is-invalid @enderror" type="text" value="{{ old('department', $company->department ?? '') }}">
+                    @error('department')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
                 </div>
                 <div class="field">
                     <label for="introduction">自己紹介（任意）</label>
-                    <textarea id="introduction" name="introduction" class="textarea">{{ old('introduction', $company->introduction ?? '') }}</textarea>
+                    <textarea id="introduction" name="introduction" class="textarea @error('introduction') is-invalid @enderror">{{ old('introduction', $company->introduction ?? '') }}</textarea>
+                    @error('introduction')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
                 </div>
                 <div class="btn-row">
                     <a class="btn btn-secondary" href="{{ route('company.freelancers.index') }}">キャンセル</a>

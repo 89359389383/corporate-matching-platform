@@ -355,6 +355,7 @@
     <div class="container">
         <div class="register-card">
             <div class="page-title">フリーランス登録（ログイン情報登録）</div>
+            @include('partials.error-panel')
 
             @if (session('success'))
             <div class="success-box">

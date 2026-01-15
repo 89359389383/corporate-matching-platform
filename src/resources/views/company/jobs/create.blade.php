@@ -114,6 +114,17 @@
         }
         .textarea { min-height: 140px; resize: vertical; }
         .input:focus, .textarea:focus, .select:focus { outline: none; border-color: #0366d6; box-shadow: 0 0 0 3px rgba(3,102,214,0.1); background-color: #fff; }
+        .input.is-invalid, .textarea.is-invalid, .select.is-invalid {
+            border-color: rgba(239, 68, 68, 0.8);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.10);
+        }
+        .error-message {
+            display: block;
+            margin-top: 6px;
+            font-size: 13px;
+            font-weight: 800;
+            color: #dc2626;
+        }
         .help { margin-top: 0.5rem; color: #6a737d; font-weight: 800; font-size: 0.85rem; }
         .btn-row { display: flex; gap: 1rem; margin-top: 2rem; }
         .btn-row .btn { flex: 1; padding: 1rem; font-size: 16px; }
@@ -139,6 +150,32 @@
             .nav-links { gap: 1rem; }
             .nav-link { font-size: 0.95rem; padding: 0.6rem 0.9rem; }
             .nav-link.has-badge { padding-right: 2.6rem; }
+        }
+
+        .error-panel {
+            margin: 0 auto 1.5rem auto;
+            background-color: rgb(255, 255, 255);
+            border-color: rgb(255, 0, 0);
+            padding: 14px 30px;
+            max-width: 600px;
+        }
+
+        .error-panel .error-title {
+            color: rgb(255, 0, 0);
+            font-weight: 700;
+        }
+
+        .error-panel ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+
+        .error-panel li {
+            margin-bottom: 8px;
+        }
+
+        .error-panel li:last-child {
+            margin-bottom: 0;
         }
     </style>
     @include('partials.aitech-responsive')
@@ -184,17 +221,7 @@
     <main class="main-content">
         <h1 class="page-title">案件 新規登録</h1>
         
-        @if ($errors->any())
-            <div class="panel" style="margin-bottom: 1.5rem; background-color: #fff3cd; border-color: #ffc107;">
-                <div style="color: #856404; font-weight: 700;">
-                    <ul style="margin: 0; padding-left: 1.5rem;">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            </div>
-        @endif
+        @include('partials.error-panel')
 
         @if (session('success'))
             <div class="panel" style="margin-bottom: 1.5rem; background-color: #d4edda; border-color: #28a745;">
@@ -208,9 +235,9 @@
                 <div class="grid">
                     <div class="field">
                         <label for="title">タイトル（必須）</label>
-                        <input id="title" name="title" class="input" type="text" placeholder="例: ECサイト機能拡張プロジェクト" value="{{ old('title') }}">
+                        <input id="title" name="title" class="input @error('title') is-invalid @enderror" type="text" placeholder="例: ECサイト機能拡張プロジェクト" value="{{ old('title') }}">
                         @error('title')
-                            <div class="help" style="color: #d73a49;">{{ $message }}</div>
+                            <span class="error-message">{{ $message }}</span>
                         @enderror
                     </div>
                     <div class="field">
@@ -225,69 +252,69 @@
 
                 <div class="field">
                     <label for="description">案件概要（必須）</label>
-                    <textarea id="description" name="description" class="textarea" placeholder="案件の概要を入力してください">{{ old('description') }}</textarea>
+                    <textarea id="description" name="description" class="textarea @error('description') is-invalid @enderror" placeholder="案件の概要を入力してください">{{ old('description') }}</textarea>
                     @error('description')
-                        <div class="help" style="color: #d73a49;">{{ $message }}</div>
+                        <span class="error-message">{{ $message }}</span>
                     @enderror
                 </div>
 
                 <div class="field">
                     <label for="required_skills_text">必要スキル（自由入力）</label>
-                    <input id="required_skills_text" name="required_skills_text" class="input" type="text" placeholder="例: PHP, Laravel, Vue.js, MySQL" value="{{ old('required_skills_text') }}">
+                    <input id="required_skills_text" name="required_skills_text" class="input @error('required_skills_text') is-invalid @enderror" type="text" placeholder="例: PHP, Laravel, Vue.js, MySQL" value="{{ old('required_skills_text') }}">
                     <div class="help">カンマ区切りで入力してください</div>
                     @error('required_skills_text')
-                        <div class="help" style="color: #d73a49;">{{ $message }}</div>
+                        <span class="error-message">{{ $message }}</span>
                     @enderror
                 </div>
 
                 <div class="grid-3">
                     <div class="field">
                         <label for="reward_type">報酬タイプ（必須）</label>
-                        <select id="reward_type" name="reward_type" class="select">
+                        <select id="reward_type" name="reward_type" class="select @error('reward_type') is-invalid @enderror">
                             <option value="monthly" {{ old('reward_type', 'monthly') === 'monthly' ? 'selected' : '' }}>月額/案件単価</option>
                             <option value="hourly" {{ old('reward_type') === 'hourly' ? 'selected' : '' }}>時給</option>
                         </select>
                         @error('reward_type')
-                            <div class="help" style="color: #d73a49;">{{ $message }}</div>
+                            <span class="error-message">{{ $message }}</span>
                         @enderror
                     </div>
                     <div class="field">
                         <label for="min_rate">最低単価（必須）</label>
-                        <input id="min_rate" name="min_rate" class="input" type="number" placeholder="例: 300000" value="{{ old('min_rate') }}" min="0">
+                        <input id="min_rate" name="min_rate" class="input @error('min_rate') is-invalid @enderror" type="number" placeholder="例: 300000" value="{{ old('min_rate') }}" min="0">
                         <div class="help">円単位で入力してください</div>
                         @error('min_rate')
-                            <div class="help" style="color: #d73a49;">{{ $message }}</div>
+                            <span class="error-message">{{ $message }}</span>
                         @enderror
                     </div>
                     <div class="field">
                         <label for="max_rate">最高単価（必須）</label>
-                        <input id="max_rate" name="max_rate" class="input" type="number" placeholder="例: 500000" value="{{ old('max_rate') }}" min="0">
+                        <input id="max_rate" name="max_rate" class="input @error('max_rate') is-invalid @enderror" type="number" placeholder="例: 500000" value="{{ old('max_rate') }}" min="0">
                         <div class="help">円単位で入力してください</div>
                         @error('max_rate')
-                            <div class="help" style="color: #d73a49;">{{ $message }}</div>
+                            <span class="error-message">{{ $message }}</span>
                         @enderror
                     </div>
                 </div>
 
                 <div class="field">
                     <label for="work_time_text">稼働条件（必須）</label>
-                    <input id="work_time_text" name="work_time_text" class="input" type="text" placeholder="例: 週10〜20時間、2〜3ヶ月" value="{{ old('work_time_text') }}">
+                    <input id="work_time_text" name="work_time_text" class="input @error('work_time_text') is-invalid @enderror" type="text" placeholder="例: 週10〜20時間、2〜3ヶ月" value="{{ old('work_time_text') }}">
                     <div class="help">稼働時間や期間などを自由に入力してください</div>
                     @error('work_time_text')
-                        <div class="help" style="color: #d73a49;">{{ $message }}</div>
+                        <span class="error-message">{{ $message }}</span>
                     @enderror
                 </div>
 
                 <div class="field">
                     <label for="status">ステータス（必須）</label>
-                    <select id="status" name="status" class="select">
+                    <select id="status" name="status" class="select @error('status') is-invalid @enderror">
                         <option value="{{ App\Models\Job::STATUS_PUBLISHED }}" {{ old('status', App\Models\Job::STATUS_PUBLISHED) == App\Models\Job::STATUS_PUBLISHED ? 'selected' : '' }}>公開</option>
                         <option value="{{ App\Models\Job::STATUS_DRAFT }}" {{ old('status') == App\Models\Job::STATUS_DRAFT ? 'selected' : '' }}>下書き</option>
                         <option value="{{ App\Models\Job::STATUS_STOPPED }}" {{ old('status') == App\Models\Job::STATUS_STOPPED ? 'selected' : '' }}>停止</option>
                     </select>
                     <div class="help">公開のみフリーランス側の案件一覧に表示される想定</div>
                     @error('status')
-                        <div class="help" style="color: #d73a49;">{{ $message }}</div>
+                        <span class="error-message">{{ $message }}</span>
                     @enderror
                 </div>
 

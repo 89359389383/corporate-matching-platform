@@ -295,6 +295,7 @@
         <!-- Form -->
         <div class="content-area">
             <h1 class="page-title">プロフィール作成</h1>
+            @include('partials.error-panel')
 
             <div class="panel">
                 <div class="panel-title">基本情報</div>

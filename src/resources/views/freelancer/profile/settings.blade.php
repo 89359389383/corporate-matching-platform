@@ -596,6 +596,7 @@
 
         <div class="content-area">
             <h1 class="page-title">プロフィール設定</h1>
+            @include('partials.error-panel')
             <p class="page-subtitle">プロフィール（メール/パスワード以外）を編集します。</p>
 
             <section class="panel" aria-label="プロフィール編集">

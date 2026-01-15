@@ -181,16 +181,7 @@
     <main class="main-content">
         <h1 class="page-title">スカウト送信</h1>
         <div class="panel">
-            @if ($errors->any())
-                <div style="background-color: #ffeef0; border: 1px solid #d73a49; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
-                    <div style="color: #d73a49; font-weight: 700; margin-bottom: 0.5rem;">入力エラーがあります</div>
-                    <ul style="margin-left: 1.5rem; color: #d73a49;">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+            @include('partials.error-panel')
 
             @php
                 $freelancerName = $freelancer->display_name ?? '（未設定）';
@@ -222,7 +213,7 @@
                     <label for="message">スカウトメッセージ</label>
                     <textarea id="message" name="message" class="textarea @error('message') is-invalid @enderror" placeholder="例: ぜひ案件のご相談をさせてください。まずは要件を共有します。">{{ old('message') }}</textarea>
                     @error('message')
-                        <div style="color: #d73a49; font-size: 0.85rem; margin-top: 0.5rem;">{{ $message }}</div>
+                        <span class="error-message">{{ $message }}</span>
                     @enderror
                 </div>
                 <div class="btn-row">

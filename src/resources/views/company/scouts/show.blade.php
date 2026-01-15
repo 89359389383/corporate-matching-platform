@@ -286,6 +286,17 @@
             box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.1);
             background-color: white;
         }
+        .input.is-invalid {
+            border-color: rgba(239, 68, 68, 0.8);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.10);
+        }
+        .error-message {
+            display: block;
+            margin-top: 6px;
+            font-size: 13px;
+            font-weight: 800;
+            color: #dc2626;
+        }
         .send {
             padding: 14px 40px;
             border-radius: 14px;
@@ -432,6 +443,7 @@
 
     <main class="main-content">
         <h1 class="page-title">スカウトチャット</h1>
+        @include('partials.error-panel')
         <p class="page-subtitle">スカウト送信時のメッセージを先頭に表示します。開いた時点で未読が解除されます。</p>
 
         <section class="panel chat-pane" aria-label="スカウトチャット">
@@ -505,11 +517,9 @@
 
             <form class="composer" action="{{ route('company.threads.messages.store', ['thread' => $thread->id]) }}" method="POST">
                 @csrf
-                <textarea class="input" name="content" placeholder="メッセージを入力…" aria-label="メッセージ入力"></textarea>
+                <textarea class="input @error('content') is-invalid @enderror" name="content" placeholder="メッセージを入力…" aria-label="メッセージ入力"></textarea>
                 @error('content')
-                    <div class="error" style="color: #e11d48; font-weight: 700; font-size: 0.9rem; margin-top: 0.25rem;">
-                        {{ $message }}
-                    </div>
+                    <span class="error-message">{{ $message }}</span>
                 @enderror
                 <button class="send" type="submit">送信</button>
             </form>

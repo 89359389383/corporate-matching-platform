@@ -459,6 +459,17 @@
             border-color: rgba(3, 102, 214, 0.55);
             box-shadow: var(--focus);
         }
+        .input.is-invalid {
+            border-color: rgba(239, 68, 68, 0.8);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.10);
+        }
+        .error-message {
+            display: block;
+            margin-top: 6px;
+            font-size: 13px;
+            font-weight: 800;
+            color: #dc2626;
+        }
         .send {
             padding: 14px 40px;
             border-radius: 14px;
@@ -607,6 +618,7 @@
 
     <main class="main-content">
         <h1 class="page-title">応募案件チャット</h1>
+        @include('partials.error-panel')
         <p class="page-subtitle">応募に関するやり取りを確認できます。開いた時点で未読が解除されます。</p>
 
         <section class="panel chat-pane" aria-label="チャット">
@@ -673,11 +685,9 @@
 
     <form class="composer" action="{{ route('freelancer.threads.messages.store', ['thread' => $thread->id]) }}" method="post">
                 @csrf
-        <textarea class="input" name="content" placeholder="メッセージを入力…" aria-label="メッセージを入力"></textarea>
+        <textarea class="input @error('content') is-invalid @enderror" name="content" placeholder="メッセージを入力…" aria-label="メッセージを入力"></textarea>
         @error('content')
-            <div class="error" style="color: #e11d48; font-weight: 700; font-size: 0.9rem; margin-top: 0.25rem;">
-                {{ $message }}
-            </div>
+            <span class="error-message">{{ $message }}</span>
         @enderror
         <button class="send" type="submit">送信</button>
             </form>

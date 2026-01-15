@@ -44,6 +44,33 @@
         .nav-links { gap: 0.75rem; }
         .nav-link { padding: 0.5rem 0.75rem; }
     }
+
+    /* Error panel (shared) */
+    .error-panel {
+        margin: 0 auto 1.5rem auto;
+        background-color: rgb(255, 255, 255);
+        border-color: rgb(255, 0, 0);
+        padding: 14px 30px;
+        max-width: 600px;
+    }
+
+    .error-panel .error-title {
+        color: rgb(255, 0, 0);
+        font-weight: 700;
+    }
+
+    .error-panel ul {
+        margin: 0;
+        padding-left: 1.5rem;
+    }
+
+    .error-panel li {
+        margin-bottom: 8px;
+    }
+
+    .error-panel li:last-child {
+        margin-bottom: 0;
+    }
 </style>
 
 

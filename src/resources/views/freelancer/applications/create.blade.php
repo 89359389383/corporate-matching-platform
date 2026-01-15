@@ -243,6 +243,17 @@
             box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.1);
             background-color: white;
         }
+        .input.is-invalid, .textarea.is-invalid, .select.is-invalid {
+            border-color: rgba(239, 68, 68, 0.8);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.10);
+        }
+        .error-message {
+            display: block;
+            margin-top: 6px;
+            font-size: 13px;
+            font-weight: 800;
+            color: #dc2626;
+        }
         .help {
             color: #6a737d;
             font-size: 0.85rem;
@@ -378,6 +389,7 @@
     <main class="main-content">
         <div class="content-area">
             <h1 class="page-title">応募する</h1>
+            @include('partials.error-panel')
             <p class="page-subtitle">応募メッセージを入力して応募を送信します。送信後はチャット画面へ遷移します。</p>
 
             <!-- 応募先案件 -->
@@ -432,9 +444,9 @@
                     @csrf
                     <div class="form-row">
                         <label class="label" for="message">応募メッセージ <span class="required">必須</span></label>
-                        <textarea id="message" class="textarea" name="message" placeholder="例) 要件の◯◯に対して、Laravel + Vueでの実装経験があります。稼働は週25h、開始は1月上旬から可能です。実績: https://...">{{ old('message') }}</textarea>
+                        <textarea id="message" class="textarea @error('message') is-invalid @enderror" name="message" placeholder="例) 要件の◯◯に対して、Laravel + Vueでの実装経験があります。稼働は週25h、開始は1月上旬から可能です。実績: https://...">{{ old('message') }}</textarea>
                         @error('message')
-                            <div class="help" style="color: #d73a49;">{{ $message }}</div>
+                            <span class="error-message">{{ $message }}</span>
                         @enderror
                     </div>
 

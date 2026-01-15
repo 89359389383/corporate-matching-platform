@@ -33,7 +33,7 @@ class FreelancerProfileUpdateRequest extends FormRequest
 
             // その他（任意）
             'experience_companies' => ['nullable', 'string', 'max:5000'],
-            'icon' => ['sometimes', 'file', 'image', 'max:5120'],
+            'icon' => ['required', 'file', 'image', 'max:5120'],
 
              // スキル関連（任意）
             'skills' => ['sometimes', 'array'],
@@ -123,6 +123,7 @@ class FreelancerProfileUpdateRequest extends FormRequest
             'experience_companies.string' => '経験企業は文字列で入力してください。',
             'experience_companies.max' => '経験企業は5000文字以内で入力してください。',
 
+            'icon.required' => 'アイコン画像を選択してください。',
             'icon.file' => 'アイコン画像はファイルを選択してください。',
             'icon.image' => 'アイコン画像は画像ファイルを選択してください。',
             'icon.max' => 'アイコン画像は5MB以下のファイルを選択してください。',
@@ -132,11 +133,11 @@ class FreelancerProfileUpdateRequest extends FormRequest
 
             'custom_skills.array' => '自由入力スキルは配列形式で送信してください。',
             'custom_skills.*.string' => '自由入力スキルは文字列で入力してください。',
-            'custom_skills.*.max' => '自由入力スキルは255文字以内で入力してください。',
+            'custom_skills.*.max' => '自由入力スキルは255文字以内で入力してください。（空欄も可）',
 
             'portfolio_urls.array' => 'ポートフォリオURLは配列形式で送信してください。',
             'portfolio_urls.*.string' => 'ポートフォリオURLは文字列で入力してください。',
-            'portfolio_urls.*.max' => 'ポートフォリオURLは2000文字以内で入力してください。',
+            'portfolio_urls.*.max' => 'ポートフォリオURLは2000文字以内で入力してください。（空欄も可）',
         ];
     }
 }

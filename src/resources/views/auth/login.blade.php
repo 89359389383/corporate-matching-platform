@@ -358,6 +358,7 @@
     <div class="container">
         <div class="login-card">
             <div class="page-title">ログイン</div>
+            @include('partials.error-panel')
 
             @if (session('success'))
             <div class="success-box">
