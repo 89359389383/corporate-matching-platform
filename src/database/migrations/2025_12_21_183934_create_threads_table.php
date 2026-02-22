@@ -22,9 +22,9 @@ class CreateThreadsTable extends Migration
                 ->constrained('companies')
                 ->cascadeOnDelete();
 
-            // フリーランサーID（外部キー）
-            $table->foreignId('freelancer_id')
-                ->constrained('freelancers')
+            // 法人ID（外部キー）
+            $table->foreignId('corporate_id')
+                ->constrained('corporates')
                 ->cascadeOnDelete();
 
             // 案件ID（外部キー、任意）
@@ -33,8 +33,8 @@ class CreateThreadsTable extends Migration
                 ->constrained('jobs')
                 ->nullOnDelete();
 
-            // 最新送信者のタイプ（企業/フリーランサー）
-            $table->enum('latest_sender_type', ['company', 'freelancer'])->nullable();
+            // 最新送信者のタイプ（企業/法人）
+            $table->enum('latest_sender_type', ['company', 'corporate'])->nullable();
             
             // 最新送信者のID
             $table->unsignedBigInteger('latest_sender_id')->nullable();
@@ -45,11 +45,11 @@ class CreateThreadsTable extends Migration
             // 企業側の未読フラグ
             $table->boolean('is_unread_for_company')->default(false);
             
-            // フリーランサー側の未読フラグ
-            $table->boolean('is_unread_for_freelancer')->default(false);
+            // 法人側の未読フラグ
+            $table->boolean('is_unread_for_corporate')->default(false);
 
-            // インデックス：企業、フリーランサー、案件の組み合わせ
-            $table->index(['company_id', 'freelancer_id', 'job_id']);
+            // インデックス：企業、法人、案件の組み合わせ
+            $table->index(['company_id', 'corporate_id', 'job_id']);
             
             // 作成日時・更新日時
             $table->timestamps();

@@ -496,7 +496,7 @@
             <div class="chat-header">
                 <div class="chat-title">
                     <strong>{{ $thread->job ? $thread->job->title : '案件' }}</strong>
-                    <span>{{ $thread->freelancer->display_name ?? '不明' }}とのチャット</span>
+                    <span>{{ $thread->corporate->display_name ?? '不明' }}とのチャット</span>
                 </div>
                 <div class="chat-tools flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
                     @if($application)
@@ -519,7 +519,7 @@
                 @php
                     $activeMessages = $messages->whereNull('deleted_at')->sortBy('sent_at')->values();
                     $latestMessage = $activeMessages->last();
-                    $freelancerInitial = mb_substr($thread->freelancer->display_name ?? 'F', 0, 1);
+                    $freelancerInitial = mb_substr($thread->corporate->display_name ?? 'F', 0, 1);
                 @endphp
 
                 @forelse($activeMessages as $message)

@@ -482,19 +482,19 @@
                 </div>
             </div>
 
-            <nav class="nav-links" role="navigation" aria-label="フリーランスナビゲーション">
-                <a href="{{ route('freelancer.jobs.index') }}" class="nav-link {{ Request::routeIs('freelancer.jobs.*') ? 'active' : '' }}">案件一覧</a>
+            <nav class="nav-links" role="navigation" aria-label="法人ナビゲーション">
+                <a href="{{ route('corporate.jobs.index') }}" class="nav-link {{ Request::routeIs('corporate.jobs.*') ? 'active' : '' }}">案件一覧</a>
                 @php
                     $appUnread = ($unreadApplicationCount ?? 0);
                     $scoutUnread = ($unreadScoutCount ?? 0);
                 @endphp
-                <a href="{{ route('freelancer.applications.index') }}" class="nav-link {{ Request::routeIs('freelancer.applications.*') ? 'active' : '' }} {{ $appUnread > 0 ? 'has-badge' : '' }}">
+                <a href="{{ route('corporate.applications.index') }}" class="nav-link {{ Request::routeIs('corporate.applications.*') ? 'active' : '' }} {{ $appUnread > 0 ? 'has-badge' : '' }}">
                     応募した案件
                     @if($appUnread > 0)
                         <span class="badge" aria-live="polite">{{ $appUnread }}</span>
                     @endif
                 </a>
-                <a href="{{ route('freelancer.scouts.index') }}" class="nav-link {{ Request::routeIs('freelancer.scouts.*') ? 'active' : '' }} {{ $scoutUnread > 0 ? 'has-badge' : '' }}">
+                <a href="{{ route('corporate.scouts.index') }}" class="nav-link {{ Request::routeIs('corporate.scouts.*') ? 'active' : '' }} {{ $scoutUnread > 0 ? 'has-badge' : '' }}">
                     スカウト
                     @if($scoutUnread > 0)
                         <span class="badge" aria-hidden="false">{{ $scoutUnread }}</span>
@@ -522,14 +522,14 @@
                 <div class="user-menu">
                     <div class="dropdown" id="userDropdown">
                         <button class="user-avatar" id="userDropdownToggle" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="userDropdownMenu">
-                            @if(isset($freelancer) && $freelancer && $freelancer->icon_path)
-                                <img src="{{ asset('storage/' . $freelancer->icon_path) }}" alt="プロフィール画像" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                            @if(isset($corporate) && $corporate && $corporate->icon_path)
+                                <img src="{{ asset('storage/' . $corporate->icon_path) }}" alt="プロフィール画像" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                             @else
                                 {{ $userInitial ?? 'U' }}
                             @endif
                         </button>
                         <div class="dropdown-content" id="userDropdownMenu" role="menu" aria-label="ユーザーメニュー">
-                            <a href="{{ route('freelancer.profile.settings') }}" class="dropdown-item" role="menuitem">プロフィール設定</a>
+                            <a href="{{ route('corporate.profile.settings') }}" class="dropdown-item" role="menuitem">プロフィール設定</a>
                             <div class="dropdown-divider"></div>
                             <form method="POST" action="{{ route('auth.logout') }}" style="display: inline;">
                                 @csrf
@@ -569,7 +569,7 @@
                 <div class="list grid grid-cols-1 gap-5 lg:gap-6">
                     @foreach($threads as $thread)
                         @php
-                            $threadUrl = route('freelancer.threads.show', ['thread' => $thread->id]);
+                                $threadUrl = route('corporate.threads.show', ['thread' => $thread->id]);
                         @endphp
                         <article class="card rounded-2xl bg-white border border-slate-200 shadow-sm p-5 md:p-7 relative overflow-hidden" role="link" tabindex="0" onclick="window.location.href='{{ $threadUrl }}'" style="cursor: pointer;">
                             <div class="card-head">
@@ -592,7 +592,7 @@
                             @endphp
                             <p class="desc">{{ $displayMessage }}</p>
                             <div class="actions flex flex-col md:flex-row justify-end gap-3 border-t border-slate-200 pt-4 mt-5">
-                                <a class="btn btn-primary w-full md:w-auto" href="{{ route('freelancer.threads.show', ['thread' => $thread->id]) }}">チャットへ</a>
+                                <a class="btn btn-primary w-full md:w-auto" href="{{ route('corporate.threads.show', ['thread' => $thread->id]) }}">チャットへ</a>
                             </div>
                         </article>
                     @endforeach

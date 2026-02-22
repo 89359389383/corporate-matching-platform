@@ -356,8 +356,8 @@
                 <button
                     type="submit"
                     class="login-button"
-                    formaction="{{ route('auth.login.freelancer') }}">
-                    フリーランスでログイン
+                    formaction="{{ route('auth.login.corporate') }}">
+                    法人でログイン
                 </button>
 
                 <button
@@ -369,7 +369,7 @@
 
                 <div class="register-links">
                     <a href="{{ route('password.request') }}">パスワードを忘れた方はこちら</a>
-                    <a href="{{ route('auth.register.freelancer.form') }}">フリーランスとして新規登録</a>
+                    <a href="{{ route('auth.register.corporate.form') }}">法人として新規登録</a>
                     <a href="{{ route('auth.register.company.form') }}">企業として新規登録</a>
                 </div>
             </form>

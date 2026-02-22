@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\Company;
-use App\Models\Freelancer;
+use App\Models\Corporate;
 use App\Models\Job;
 use App\Models\Message;
 use App\Models\Scout;
@@ -22,7 +22,7 @@ class ScoutService
      * - 既存スレッドがあれば再利用し、なければ新規作成する
      * - 途中失敗時に不整合を残さないため、トランザクションでまとめる
      */
-    public function send(int $companyId, int $freelancerId, ?int $jobId, string $messageBody): Thread
+    public function send(int $companyId, int $corporateId, ?int $jobId, string $messageBody): Thread
     {
         // 入力の空白を取り除き、「空メッセージ」を弾きやすくする
         $messageBody = trim($messageBody);
@@ -38,7 +38,7 @@ class ScoutService
         Company::query()->findOrFail($companyId);
 
         // フリーランスが存在するかを確認する（設計：存在確認）
-        Freelancer::query()->findOrFail($freelancerId);
+        Corporate::query()->findOrFail($corporateId);
 
         // job_id が指定されている場合は、案件が存在するかを確認する（設計：任意の案件紐付け）
         if ($jobId !== null) {
@@ -54,7 +54,7 @@ class ScoutService
         }
 
         // 複数テーブル更新をまとめるため、トランザクションで行う
-        return DB::transaction(function () use ($companyId, $freelancerId, $jobId, $messageBody): Thread {
+        return DB::transaction(function () use ($companyId, $corporateId, $jobId, $messageBody): Thread {
             // 時刻を1回だけ作って、thread/messageの整合を取りやすくする
             $now = Carbon::now();
 
@@ -63,7 +63,7 @@ class ScoutService
                 // 送信した企業
                 'company_id' => $companyId,
                 // 送信先フリーランス
-                'freelancer_id' => $freelancerId,
+                'corporate_id' => $corporateId,
                 // 任意の案件（紐付けがない場合はnull）
                 'job_id' => $jobId,
                 // スカウト本文
@@ -77,7 +77,7 @@ class ScoutService
                 // 企業
                 ->where('company_id', $companyId)
                 // フリーランス
-                ->where('freelancer_id', $freelancerId);
+                ->where('corporate_id', $corporateId);
 
             // job_id がnullならwhereNullで一致させる（設計：案件紐付けなしスカウトもOK）
             if ($jobId === null) {
@@ -96,7 +96,7 @@ class ScoutService
                     // 相手企業
                     'company_id' => $companyId,
                     // 相手フリーランス
-                    'freelancer_id' => $freelancerId,
+                    'corporate_id' => $corporateId,
                     // 任意の案件
                     'job_id' => $jobId,
                     // 最後に送ったのは企業
@@ -108,7 +108,7 @@ class ScoutService
                     // 企業側は既読（自分が送った直後）
                     'is_unread_for_company' => false,
                     // フリーランス側は未読（相手が読むべき）
-                    'is_unread_for_freelancer' => true,
+                    'is_unread_for_corporate' => true,
                 ]);
             }
 
@@ -137,7 +137,7 @@ class ScoutService
                 // 企業側は既読のまま
                 'is_unread_for_company' => false,
                 // フリーランス側は未読にする
-                'is_unread_for_freelancer' => true,
+                'is_unread_for_corporate' => true,
             ])->save();
 
             // Controllerはこのthreadへ遷移する（設計：送信後は即チャット）

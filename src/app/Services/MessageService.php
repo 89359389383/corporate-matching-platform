@@ -20,11 +20,11 @@ class MessageService
      */
     public function markRead(Thread $thread, string $viewerType): void
     {
-        // viewerType は 'company' または 'freelancer' を想定する（設計：当事者種別）
-        if ($viewerType !== 'company' && $viewerType !== 'freelancer') {
+        // viewerType は 'company' または 'corporate' を想定する（設計：当事者種別）
+        if ($viewerType !== 'company' && $viewerType !== 'corporate') {
             // 想定外の文字列はバグになりやすいので、ここで明示的に止める
             throw ValidationException::withMessages([
-                'viewer_type' => 'viewerType は company または freelancer を指定してください',
+                'viewer_type' => 'viewerType は company または corporate を指定してください',
             ]);
         }
 
@@ -40,10 +40,10 @@ class MessageService
             return;
         }
 
-        // フリーランス側が画面を開いた場合の未読解除（企業側と同じ考え方）
-        if ($thread->latest_sender_type !== 'freelancer') {
-            // フリーランス側の未読フラグをOFFにする
-            $thread->forceFill(['is_unread_for_freelancer' => false])->save();
+        // 法人側が画面を開いた場合の未読解除（企業側と同じ考え方）
+        if ($thread->latest_sender_type !== 'corporate') {
+            // 法人側の未読フラグをOFFにする
+            $thread->forceFill(['is_unread_for_corporate' => false])->save();
         }
     }
 
@@ -66,11 +66,11 @@ class MessageService
             ]);
         }
 
-        // senderType は 'company' または 'freelancer' を想定する
-        if ($senderType !== 'company' && $senderType !== 'freelancer') {
+        // senderType は 'company' または 'corporate' を想定する
+        if ($senderType !== 'company' && $senderType !== 'corporate') {
             // 想定外の文字列は不正なので止める
             throw ValidationException::withMessages([
-                'sender_type' => 'senderType は company または freelancer を指定してください',
+                'sender_type' => 'senderType は company または corporate を指定してください',
             ]);
         }
 
@@ -82,11 +82,11 @@ class MessageService
             ]);
         }
 
-        // 送信者がスレッド当事者かを確認する（フリーランス側）
-        if ($senderType === 'freelancer' && (int) $senderId !== (int) $thread->freelancer_id) {
-            // freelancerはthread.freelancer_idと一致している必要がある
+        // 送信者がスレッド当事者かを確認する（法人側）
+        if ($senderType === 'corporate' && (int) $senderId !== (int) $thread->corporate_id) {
+            // corporateはthread.corporate_idと一致している必要がある
             throw ValidationException::withMessages([
-                'sender_id' => '送信者がこのスレッドのフリーランスと一致しません',
+                'sender_id' => '送信者がこのスレッドの法人と一致しません',
             ]);
         }
 
@@ -101,7 +101,7 @@ class MessageService
                 'thread_id' => $thread->id,
                 // 送信者の種別
                 'sender_type' => $senderType,
-                // 送信者ID（company_id or freelancer_id）
+                // 送信者ID（company_id or corporate_id）
                 'sender_id' => $senderId,
                 // メッセージ本文
                 'body' => $body,
@@ -111,21 +111,21 @@ class MessageService
 
             // 未読フラグを「送信者に基づいて」更新する（設計：最後の送信者が自分以外なら未読）
             $isUnreadForCompany = $senderType !== 'company';
-            // フリーランス側は「送信者がフリーランス以外なら未読」
-            $isUnreadForFreelancer = $senderType !== 'freelancer';
+            // 法人側は「送信者が法人以外なら未読」
+            $isUnreadForCorporate = $senderType !== 'corporate';
 
             // threads 側の最新情報（last_sender/last_message_at）を更新する（設計：threadsテーブル更新）
             $thread->forceFill([
                 // 最後に送った側
                 'latest_sender_type' => $senderType,
-                // 最後に送った人（company_id or freelancer_id）
+                // 最後に送った人（company_id or corporate_id）
                 'latest_sender_id' => $senderId,
                 // 最終送信時刻
                 'latest_message_at' => $now,
                 // 企業側の未読フラグ（相手が送ったらtrue）
                 'is_unread_for_company' => $isUnreadForCompany,
-                // フリーランス側の未読フラグ（相手が送ったらtrue）
-                'is_unread_for_freelancer' => $isUnreadForFreelancer,
+                // 法人側の未読フラグ（相手が送ったらtrue）
+                'is_unread_for_corporate' => $isUnreadForCorporate,
             ])->save();
 
             // 作成したメッセージを返す（Controllerは基本的にredirectする）

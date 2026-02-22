@@ -42,8 +42,8 @@ class CompanyMessageController extends Controller
 
         // 表示に必要な関連データを取得する（eager load）
         $thread->load([
-            // チャット相手フリーランス
-            'freelancer',
+            // チャット相手法人
+            'corporate',
             // 案件（応募スレッドなら存在する）
             'job',
             // 企業情報
@@ -58,18 +58,18 @@ class CompanyMessageController extends Controller
 
         // job_id がnullならスカウトスレッド扱い
         if ($thread->job_id === null) {
-            // Scout は company_id + freelancer_id + job_id(null) で導出する
+            // Scout は company_id + corporate_id + job_id(null) で導出する
             $scout = Scout::query()
                 ->where('company_id', $thread->company_id)
-                ->where('freelancer_id', $thread->freelancer_id)
+                ->where('corporate_id', $thread->corporate_id)
                 ->whereNull('job_id')
                 ->latest('id')
                 ->first();
         } else {
-            // 応募は job_id + freelancer_id で導出する
+            // 応募は job_id + corporate_id で導出する
             $application = Application::query()
                 ->where('job_id', $thread->job_id)
-                ->where('freelancer_id', $thread->freelancer_id)
+                ->where('corporate_id', $thread->corporate_id)
                 ->latest('id')
                 ->first();
 
@@ -77,7 +77,7 @@ class CompanyMessageController extends Controller
             if ($application === null) {
                 $scout = Scout::query()
                     ->where('company_id', $thread->company_id)
-                    ->where('freelancer_id', $thread->freelancer_id)
+                    ->where('corporate_id', $thread->corporate_id)
                     ->where('job_id', $thread->job_id)
                     ->latest('id')
                     ->first();
@@ -280,7 +280,7 @@ class CompanyMessageController extends Controller
         // 応募を取得する
         $application = Application::query()
             ->where('job_id', $thread->job_id)
-            ->where('freelancer_id', $thread->freelancer_id)
+            ->where('corporate_id', $thread->corporate_id)
             ->first();
 
         // 応募が存在しない場合はエラー

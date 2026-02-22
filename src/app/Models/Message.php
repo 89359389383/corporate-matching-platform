@@ -46,8 +46,8 @@ class Message extends Model
     /**
      * 繝｡繝・そ繝ｼ繧ｸ騾∽ｿ｡閠・′繝輔Μ繝ｼ繝ｩ繝ｳ繧ｵ繝ｼ縺ｮ蝣ｴ蜷医・繝輔Μ繝ｼ繝ｩ繝ｳ繧ｵ繝ｼ諠・ｱ繧貞叙蠕・     * 菴ｿ逕ｨ蝣ｴ髱｢: 繝｡繝・そ繝ｼ繧ｸ陦ｨ遉ｺ譎ゅ↓騾∽ｿ｡閠・錐繧・い繧､繧ｳ繝ｳ繧定｡ｨ遉ｺ縺吶ｋ髫帙↑縺ｩ
      */
-    public function senderFreelancer(): BelongsTo
+    public function senderCorporate(): BelongsTo
     {
-        return $this->belongsTo(Freelancer::class, 'sender_id');
+        return $this->belongsTo(Corporate::class, 'sender_id');
     }
 }

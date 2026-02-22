@@ -42,7 +42,7 @@ return [
         ],
 
         // フリーランス用ログイン状態（セッション上の“箱”を分ける）
-        'freelancer' => [
+        'corporate' => [
             'driver' => 'session',
             'provider' => 'users',
         ],

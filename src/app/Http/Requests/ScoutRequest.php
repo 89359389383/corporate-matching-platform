@@ -15,8 +15,8 @@ class ScoutRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // 対象フリーランス（必須）
-            'freelancer_id' => ['required', 'integer', 'exists:freelancers,id'],
+            // 対象法人（必須）
+            'corporate_id' => ['required', 'integer', 'exists:corporates,id'],
             // 任意の案件（任意）
             'job_id' => ['nullable', 'integer', 'exists:jobs,id'],
             // スカウト時に送るメッセージ本文（必須・文字列・2000文字以内）
@@ -27,9 +27,9 @@ class ScoutRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'freelancer_id.required' => 'スカウトするフリーランスを選択してください。',
-            'freelancer_id.integer' => 'フリーランスの指定が不正です。',
-            'freelancer_id.exists' => '選択されたフリーランスが見つかりません。',
+            'corporate_id.required' => 'スカウトする法人を選択してください。',
+            'corporate_id.integer' => '法人の指定が不正です。',
+            'corporate_id.exists' => '選択された法人が見つかりません。',
 
             'job_id.integer' => '案件の指定が不正です。',
             'job_id.exists' => '選択された案件が見つかりません。',

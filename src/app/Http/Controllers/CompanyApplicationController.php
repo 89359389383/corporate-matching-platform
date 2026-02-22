@@ -44,7 +44,7 @@ class CompanyApplicationController extends Controller
                 $q->where('company_id', $company->id);
             })
             // 表示に必要なリレーションを先読みする
-            ->with(['job.company', 'freelancer']);
+            ->with(['job.company', 'corporate']);
 
         // status に応じて絞り込む
         if ($status === 'closed') {
@@ -60,8 +60,8 @@ class CompanyApplicationController extends Controller
 
         // 一覧に対応する thread をまとめて取得する（thread単位の未読表示に使用）
         $threadKeys = $applications->getCollection()->map(function (Application $app) {
-            // thread は job_id + freelancer_id の組み合わせで導出する
-            return $app->job_id . ':' . $app->freelancer_id;
+            // thread は job_id + corporate_id の組み合わせで導出する
+            return $app->job_id . ':' . $app->corporate_id;
         })->unique()->values();
 
         // thread をキー付きで引けるようにする（N+1回避）
@@ -70,14 +70,14 @@ class CompanyApplicationController extends Controller
             ->whereIn('job_id', $applications->getCollection()->pluck('job_id')->unique()->values())
             ->get()
             ->keyBy(function (Thread $t) {
-                // job_id:freelancer_id のキーでまとめる
-                return $t->job_id . ':' . $t->freelancer_id;
+                // job_id:corporate_id のキーでまとめる
+                return $t->job_id . ':' . $t->corporate_id;
             });
 
         // 応募に thread と未読フラグを付与する（未読=相手が最新送信者）
         $applications->getCollection()->transform(function (Application $app) use ($threadsByKey) {
             // thread を導出して紐付ける
-            $thread = $threadsByKey->get($app->job_id . ':' . $app->freelancer_id);
+            $thread = $threadsByKey->get($app->job_id . ':' . $app->corporate_id);
 
             // viewで使えるように動的プロパティを付ける
             $app->thread = $thread;

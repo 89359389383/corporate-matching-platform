@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\ScoutRequest;
-use App\Models\Freelancer;
+use App\Models\Corporate;
 use App\Models\Job;
 use App\Models\Scout;
 use App\Models\Thread;
@@ -36,16 +36,16 @@ class ScoutController extends Controller
             return redirect('/company/profile')->with('error', '先に企業プロフィールを登録してください');
         }
 
-        // クエリから freelancer_id を取得する
-        $freelancerId = $request->query('freelancer_id');
+        // クエリから corporate_id を取得する
+        $corporateId = $request->query('corporate_id');
 
-        // freelancer_id が無い場合は一覧へ戻す
-        if ($freelancerId === null) {
-            return redirect('/company/freelancers')->with('error', 'スカウト対象のフリーランスが指定されていません');
+        // corporate_id が無い場合は一覧へ戻す
+        if ($corporateId === null) {
+            return redirect('/company/corporates')->with('error', 'スカウト対象の法人が指定されていません');
         }
 
-        // 対象フリーランスを取得する（表示用）
-        $freelancer = Freelancer::query()->findOrFail($freelancerId);
+        // 対象法人を取得する（表示用）
+        $corporate = Corporate::query()->findOrFail($corporateId);
 
         // job_id は任意
         $jobId = $request->query('job_id');
@@ -83,8 +83,8 @@ class ScoutController extends Controller
 
         // 入力フォームビューを返す
         return view('company.scouts.create', [
-            // 表示用フリーランス
-            'freelancer' => $freelancer,
+            // 表示用法人
+            'corporate' => $corporate,
             // 任意の紐付け案件
             'job' => $job,
             // ヘッダー用未読数
@@ -140,7 +140,7 @@ class ScoutController extends Controller
         // 既存スレッド有無チェック〜作成はServiceに委譲する（ScoutService::send）
         $thread = $scoutService->send(
             $company->id,
-            (int) $validated['freelancer_id'],
+            (int) $validated['corporate_id'],
             $jobId === null ? null : (int) $jobId,
             $validated['message']
         );
@@ -178,8 +178,8 @@ class ScoutController extends Controller
         $threads = Thread::query()
             ->where('company_id', $company->id)
             ->whereNull('job_id') // スカウトはjob_idがnull
-            // 企業側は相手フリーランス・案件を表示する
-            ->with(['freelancer', 'job'])
+            // 企業側は相手法人・案件を表示する
+            ->with(['corporate', 'job'])
             // 最新メッセージを取得
             ->with(['messages' => function ($query) {
                 $query->whereNull('deleted_at')
@@ -194,12 +194,12 @@ class ScoutController extends Controller
         foreach ($threads->items() as $thread) {
             $thread->is_unread = (bool) $thread->is_unread_for_company;
 
-            // 未読メッセージ数を計算（企業側から見て、フリーランスが送信したメッセージ数）
+            // 未読メッセージ数を計算（企業側から見て、法人が送信したメッセージ数）
             if ($thread->is_unread) {
                 $thread->unread_count = \App\Models\Message::query()
                     ->where('thread_id', $thread->id)
                     ->whereNull('deleted_at')
-                    ->where('sender_type', 'freelancer')
+                    ->where('sender_type', 'corporate')
                     ->count();
             } else {
                 $thread->unread_count = 0;
@@ -208,7 +208,7 @@ class ScoutController extends Controller
             // スカウト情報を取得（job_idがnullのスカウト）
             $scout = Scout::query()
                 ->where('company_id', $company->id)
-                ->where('freelancer_id', $thread->freelancer_id)
+                ->where('corporate_id', $thread->corporate_id)
                 ->whereNull('job_id')
                 ->latest('id')
                 ->first();

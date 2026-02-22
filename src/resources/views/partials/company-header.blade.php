@@ -14,7 +14,7 @@
         </div>
 
         <nav class="nav-links" id="desktopNav" aria-label="グローバルナビゲーション">
-            <a href="{{ route('company.freelancers.index') }}" class="nav-link {{ request()->routeIs('company.freelancers.*') ? 'active' : '' }}">フリーランス一覧</a>
+            <a href="{{ route('company.corporates.index') }}" class="nav-link {{ request()->routeIs('company.corporates.*') ? 'active' : '' }}">法人一覧</a>
             <a href="{{ route('company.jobs.index') }}" class="nav-link {{ request()->routeIs('company.jobs.*') ? 'active' : '' }}">案件一覧</a>
             @php
                 $appUnread = ($unreadApplicationCount ?? 0);

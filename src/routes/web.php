@@ -2,14 +2,14 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\FreelancerProfileController;
-use App\Http\Controllers\FreelancerJobController;
+use App\Http\Controllers\CorporateProfileController;
+use App\Http\Controllers\CorporateJobController;
 use App\Http\Controllers\ApplicationController;
-use App\Http\Controllers\FreelancerApplicationController;
-use App\Http\Controllers\FreelancerMessageController;
-use App\Http\Controllers\FreelancerScoutController;
+use App\Http\Controllers\CorporateApplicationController;
+use App\Http\Controllers\CorporateMessageController;
+use App\Http\Controllers\CorporateScoutController;
 use App\Http\Controllers\CompanyProfileController;
-use App\Http\Controllers\CompanyFreelancerController;
+use App\Http\Controllers\CompanyCorporateController;
 use App\Http\Controllers\CompanyJobController;
 use App\Http\Controllers\ScoutController;
 use App\Http\Controllers\CompanyApplicationController;
@@ -39,7 +39,7 @@ Route::get('/', function () {
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('auth.login.form');
 
 // ログイン処理（guard別）
-Route::post('/login/freelancer', [AuthController::class, 'loginFreelancer'])->name('auth.login.freelancer');
+Route::post('/login/corporate', [AuthController::class, 'loginCorporate'])->name('auth.login.corporate');
 Route::post('/login/company', [AuthController::class, 'loginCompany'])->name('auth.login.company');
 
 // ログアウト（クリック導線用：POST）
@@ -61,11 +61,11 @@ Route::get('/reset-password/{token}', [AuthController::class, 'showResetForm'])
 Route::post('/reset-password', [AuthController::class, 'resetPassword'])
     ->name('password.update');
 
-// フリーランス 新規登録 表示（ログイン情報登録）
-Route::get('/register/freelancer', [AuthController::class, 'showFreelancerRegister'])->name('auth.register.freelancer.form');
+// 法人 新規登録 表示（ログイン情報登録）
+Route::get('/register/corporate', [AuthController::class, 'showCorporateRegister'])->name('auth.register.corporate.form');
 
-// フリーランス 新規登録 保存（ログイン情報登録）
-Route::post('/register/freelancer', [AuthController::class, 'storeFreelancer'])->name('auth.register.freelancer.store');
+// 法人 新規登録 保存（ログイン情報登録）
+Route::post('/register/corporate', [AuthController::class, 'storeCorporate'])->name('auth.register.corporate.store');
 
 // 企業 新規登録 表示（ログイン情報登録）
 Route::get('/register/company', [AuthController::class, 'showCompanyRegister'])->name('auth.register.company.form');
@@ -73,45 +73,45 @@ Route::get('/register/company', [AuthController::class, 'showCompanyRegister'])-
 // 企業 新規登録 保存（ログイン情報登録）
 Route::post('/register/company', [AuthController::class, 'storeCompany'])->name('auth.register.company.store');
 
-Route::middleware(['auth:freelancer', 'freelancer'])->group(function () {
-    // フリーランス プロフィール 表示
-    Route::get('/freelancer/profile', [FreelancerProfileController::class, 'create'])->name('freelancer.profile.create');
+Route::middleware(['auth:corporate', 'corporate'])->group(function () {
+    // 法人 プロフィール 表示
+    Route::get('/corporate/profile', [CorporateProfileController::class, 'create'])->name('corporate.profile.create');
 
-    // フリーランス プロフィール 保存・更新
-    Route::post('/freelancer/profile', [FreelancerProfileController::class, 'store'])->name('freelancer.profile.store');
+    // 法人 プロフィール 保存・更新
+    Route::post('/corporate/profile', [CorporateProfileController::class, 'store'])->name('corporate.profile.store');
 
-    // フリーランス プロフィール設定 表示
-    Route::get('/freelancer/profile/settings', [FreelancerProfileController::class, 'edit'])->name('freelancer.profile.settings');
+    // 法人 プロフィール設定 表示
+    Route::get('/corporate/profile/settings', [CorporateProfileController::class, 'edit'])->name('corporate.profile.settings');
 
-    // フリーランス プロフィール設定 保存・更新
-    Route::post('/freelancer/profile/settings', [FreelancerProfileController::class, 'update'])->name('freelancer.profile.settings.update');
+    // 法人 プロフィール設定 保存・更新
+    Route::post('/corporate/profile/settings', [CorporateProfileController::class, 'update'])->name('corporate.profile.settings.update');
 
     // 案件一覧
-    Route::get('/freelancer/jobs', [FreelancerJobController::class, 'index'])->name('freelancer.jobs.index');
+    Route::get('/corporate/jobs', [CorporateJobController::class, 'index'])->name('corporate.jobs.index');
 
     // 案件詳細
-    Route::get('/freelancer/jobs/{job}', [FreelancerJobController::class, 'show'])->name('freelancer.jobs.show');
+    Route::get('/corporate/jobs/{job}', [CorporateJobController::class, 'show'])->name('corporate.jobs.show');
 
     // 応募入力画面
-    Route::get('/freelancer/jobs/{job}/apply', [ApplicationController::class, 'create'])->name('freelancer.jobs.apply.create');
+    Route::get('/corporate/jobs/{job}/apply', [ApplicationController::class, 'create'])->name('corporate.jobs.apply.create');
 
     // 応募処理
-    Route::post('/freelancer/jobs/{job}/apply', [ApplicationController::class, 'store'])->name('freelancer.jobs.apply.store');
+    Route::post('/corporate/jobs/{job}/apply', [ApplicationController::class, 'store'])->name('corporate.jobs.apply.store');
 
     // 応募一覧
-    Route::get('/freelancer/applications', [FreelancerApplicationController::class, 'index'])->name('freelancer.applications.index');
+    Route::get('/corporate/applications', [CorporateApplicationController::class, 'index'])->name('corporate.applications.index');
 
     // チャット画面(応募・スカウト)
-    Route::get('/freelancer/threads/{thread}', [FreelancerMessageController::class, 'show'])->name('freelancer.threads.show');
+    Route::get('/corporate/threads/{thread}', [CorporateMessageController::class, 'show'])->name('corporate.threads.show');
 
     // メッセージ送信
-    Route::post('/freelancer/threads/{thread}/messages', [FreelancerMessageController::class, 'store'])->name('freelancer.threads.messages.store');
+    Route::post('/corporate/threads/{thread}/messages', [CorporateMessageController::class, 'store'])->name('corporate.threads.messages.store');
 
     // メッセージ削除
-    Route::delete('/freelancer/messages/{message}', [FreelancerMessageController::class, 'destroy'])->name('freelancer.messages.destroy');
+    Route::delete('/corporate/messages/{message}', [CorporateMessageController::class, 'destroy'])->name('corporate.messages.destroy');
 
     // スカウト一覧
-    Route::get('/freelancer/scouts', [FreelancerScoutController::class, 'index'])->name('freelancer.scouts.index');
+    Route::get('/corporate/scouts', [CorporateScoutController::class, 'index'])->name('corporate.scouts.index');
 });
 
 Route::middleware(['auth:company', 'company'])->group(function () {
@@ -127,11 +127,11 @@ Route::middleware(['auth:company', 'company'])->group(function () {
     // 企業 プロフィール設定 保存・更新
     Route::post('/company/profile/settings', [CompanyProfileController::class, 'update'])->name('company.profile.settings.update');
 
-    // フリーランス一覧
-    Route::get('/company/freelancers', [CompanyFreelancerController::class, 'index'])->name('company.freelancers.index');
+    // 法人一覧
+    Route::get('/company/corporates', [CompanyCorporateController::class, 'index'])->name('company.corporates.index');
 
-    // フリーランス詳細
-    Route::get('/company/freelancers/{freelancer}', [CompanyFreelancerController::class, 'show'])->name('company.freelancers.show');
+    // 法人詳細
+    Route::get('/company/corporates/{corporate}', [CompanyCorporateController::class, 'show'])->name('company.corporates.show');
 
     // 案件一覧
     Route::get('/company/jobs', [CompanyJobController::class, 'index'])->name('company.jobs.index');

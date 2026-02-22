@@ -23,7 +23,7 @@ class CreateMessagesTable extends Migration
                 ->cascadeOnDelete();
 
             // 送信者のタイプ（企業/フリーランサー）
-            $table->enum('sender_type', ['company', 'freelancer']);
+            $table->enum('sender_type', ['company', 'corporate']);
             
             // 送信者のID
             $table->unsignedBigInteger('sender_id');

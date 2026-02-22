@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateFreelancerPortfoliosTable extends Migration
+class CreateCorporatePortfoliosTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,13 @@ class CreateFreelancerPortfoliosTable extends Migration
      */
     public function up()
     {
-        Schema::create('freelancer_portfolios', function (Blueprint $table) {
+        Schema::create('corporate_portfolios', function (Blueprint $table) {
             // ID
             $table->id();
 
-            // フリーランサーID（外部キー）
-            $table->foreignId('freelancer_id')
-                ->constrained('freelancers')
+            // 法人ID（外部キー）
+            $table->foreignId('corporate_id')
+                ->constrained('corporates')
                 ->cascadeOnDelete();
 
             // ポートフォリオURL
@@ -40,6 +40,6 @@ class CreateFreelancerPortfoliosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('freelancer_portfolios');
+        Schema::dropIfExists('corporate_portfolios');
     }
 }

@@ -58,8 +58,8 @@ class Kernel extends HttpKernel
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
-        // フリーランスのみアクセス可能にする（role='freelancer'を想定）
-        'freelancer' => \App\Http\Middleware\EnsureFreelancerRole::class,
+        // 法人のみアクセス可能にする（role='corporate'を想定）
+        'corporate' => \App\Http\Middleware\EnsureCorporateRole::class,
         // 企業のみアクセス可能にする（role='company'を想定）
         'company' => \App\Http\Middleware\EnsureCompanyRole::class,
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,

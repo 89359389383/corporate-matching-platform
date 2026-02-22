@@ -17,10 +17,10 @@ class Skill extends Model
     /**
      * こ�Eスキルを持つフリーランサー一覧を取征E     * 使用場面: スキル検索で該当するフリーランサーを探す際など
      */
-    public function freelancers(): BelongsToMany
+    public function corporates(): BelongsToMany
     {
-        return $this->belongsToMany(Freelancer::class, 'freelancer_skill')
-            ->using(FreelancerSkill::class)
+        return $this->belongsToMany(Corporate::class, 'corporate_skill')
+            ->using(CorporateSkill::class)
             ->withTimestamps();
     }
 }

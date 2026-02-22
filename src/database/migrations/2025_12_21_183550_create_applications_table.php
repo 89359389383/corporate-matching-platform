@@ -22,9 +22,9 @@ class CreateApplicationsTable extends Migration
                 ->constrained('jobs')
                 ->cascadeOnDelete();
 
-            // フリーランサーID（外部キー）
-            $table->foreignId('freelancer_id')
-                ->constrained('freelancers')
+            // 法人ID（外部キー）
+            $table->foreignId('corporate_id')
+                ->constrained('corporates')
                 ->cascadeOnDelete();
 
             // 応募メッセージ
@@ -33,8 +33,8 @@ class CreateApplicationsTable extends Migration
             // ステータス：0:未対応 / 1:対応中 / 2:クローズ
             $table->unsignedTinyInteger('status')->default(0);
 
-            // ユニーク制約：案件とフリーランサーの組み合わせ
-            $table->unique(['job_id', 'freelancer_id']);
+            // ユニーク制約：案件と法人の組み合わせ
+            $table->unique(['job_id', 'corporate_id']);
             
             // 作成日時・更新日時
             $table->timestamps();

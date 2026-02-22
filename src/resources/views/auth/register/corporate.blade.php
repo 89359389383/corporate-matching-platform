@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>フリーランス登録（ログイン情報登録） - AITECH</title>
+    <title>法人登録（ログイン情報登録） - AITECH</title>
     <style>
         /* リセット & ベース */
         * {
@@ -291,7 +291,7 @@
 
     <div class="container px-4 md:px-6 lg:px-8 py-10">
         <div class="register-card p-6 md:p-10 lg:p-12">
-            <div class="page-title text-lg md:text-xl font-black text-center">フリーランス登録（ログイン情報登録）</div>
+            <div class="page-title text-lg md:text-xl font-black text-center">法人登録（ログイン情報登録）</div>
             @include('partials.error-panel')
 
             @if (session('success'))
@@ -306,7 +306,7 @@
             </div>
             @endif
 
-            <form class="register-form" method="POST" action="{{ route('auth.register.freelancer.store') }}">
+            <form class="register-form" method="POST" action="{{ route('auth.register.corporate.store') }}">
                 @csrf
 
                 <div class="form-group">

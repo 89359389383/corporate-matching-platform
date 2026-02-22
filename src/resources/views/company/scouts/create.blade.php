@@ -324,24 +324,24 @@
             @include('partials.error-panel')
 
             @php
-                $freelancerName = $freelancer->display_name ?? '（未設定）';
-                $freelancerJobTitle = $freelancer->job_title ?? '';
-                $freelancerDisplayText = $freelancerName;
-                if ($freelancerJobTitle) {
-                    $freelancerDisplayText .= '（' . $freelancerJobTitle . '）';
+                $corporateName = $corporate->display_name ?? '（未設定）';
+                $corporateJobTitle = $corporate->job_title ?? '';
+                $corporateDisplayText = $corporateName;
+                if ($corporateJobTitle) {
+                    $corporateDisplayText .= '（' . $corporateJobTitle . '）';
                 }
             @endphp
 
             <form action="{{ route('company.scouts.store') }}" method="post">
                 @csrf
-                <input type="hidden" name="freelancer_id" value="{{ $freelancer->id }}">
+                <input type="hidden" name="corporate_id" value="{{ $corporate->id }}">
                 @if($job)
                     <input type="hidden" name="job_id" value="{{ $job->id }}">
                 @endif
 
                 <div class="field">
                     <label>宛先フリーランス</label>
-                    <input class="input" type="text" value="{{ $freelancerDisplayText }}" readonly>
+                    <input class="input" type="text" value="{{ $corporateDisplayText }}" readonly>
                 </div>
                 @if($job)
                 <div class="field">
@@ -357,7 +357,7 @@
                     @enderror
                 </div>
                 <div class="btn-row flex flex-col md:flex-row gap-3 md:gap-4">
-                    <a class="btn btn-secondary w-full md:flex-1" href="{{ route('company.freelancers.index') }}">キャンセル</a>
+                    <a class="btn btn-secondary w-full md:flex-1" href="{{ route('company.corporates.index') }}">キャンセル</a>
                     <button class="btn btn-primary w-full md:flex-1" type="submit">送信</button>
                 </div>
             </form>

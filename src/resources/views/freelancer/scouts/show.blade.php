@@ -544,19 +544,19 @@
                 </div>
             </div>
 
-            <nav class="nav-links" role="navigation" aria-label="フリーランスナビゲーション">
-                <a href="{{ route('freelancer.jobs.index') }}" class="nav-link">案件一覧</a>
+            <nav class="nav-links" role="navigation" aria-label="法人ナビゲーション">
+                <a href="{{ route('corporate.jobs.index') }}" class="nav-link">案件一覧</a>
                 @php
                     $appUnread = ($unreadApplicationCount ?? 0);
                     $scoutUnread = ($unreadScoutCount ?? 0);
                 @endphp
-                <a href="{{ route('freelancer.applications.index') }}" class="nav-link {{ (Request::routeIs('freelancer.applications.*') || (isset($thread) && $thread->job_id !== null)) ? 'active' : '' }} {{ $appUnread > 0 ? 'has-badge' : '' }}">
+                <a href="{{ route('corporate.applications.index') }}" class="nav-link {{ (Request::routeIs('corporate.applications.*') || (isset($thread) && $thread->job_id !== null)) ? 'active' : '' }} {{ $appUnread > 0 ? 'has-badge' : '' }}">
                     応募した案件
                     @if($appUnread > 0)
                         <span class="badge" aria-live="polite">{{ $appUnread }}</span>
                     @endif
                 </a>
-                <a href="{{ route('freelancer.scouts.index') }}" class="nav-link {{ (Request::routeIs('freelancer.scouts.*') || (isset($thread) && $thread->job_id === null)) ? 'active' : '' }} {{ $scoutUnread > 0 ? 'has-badge' : '' }}">
+                <a href="{{ route('corporate.scouts.index') }}" class="nav-link {{ (Request::routeIs('corporate.scouts.*') || (isset($thread) && $thread->job_id === null)) ? 'active' : '' }} {{ $scoutUnread > 0 ? 'has-badge' : '' }}">
                     スカウト
                     @if($scoutUnread > 0)
                         <span class="badge" aria-hidden="false">{{ $scoutUnread }}</span>
@@ -584,14 +584,14 @@
                 <div class="user-menu">
                     <div class="dropdown" id="userDropdown">
                         <button class="user-avatar" id="userDropdownToggle" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="userDropdownMenu">
-                            @if(isset($freelancer) && $freelancer && $freelancer->icon_path)
-                                <img src="{{ asset('storage/' . $freelancer->icon_path) }}" alt="プロフィール画像" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                            @if(isset($corporate) && $corporate && $corporate->icon_path)
+                                <img src="{{ asset('storage/' . $corporate->icon_path) }}" alt="プロフィール画像" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                             @else
                                 {{ $userInitial ?? 'U' }}
                             @endif
                         </button>
                         <div class="dropdown-content" id="userDropdownMenu" role="menu" aria-label="ユーザーメニュー">
-                            <a href="{{ route('freelancer.profile.settings') }}" class="dropdown-item" role="menuitem">プロフィール設定</a>
+                            <a href="{{ route('corporate.profile.settings') }}" class="dropdown-item" role="menuitem">プロフィール設定</a>
                             <div class="dropdown-divider"></div>
                             <form method="POST" action="{{ route('auth.logout') }}" style="display: inline;">
                                 @csrf
@@ -605,7 +605,7 @@
 
         <div class="mobile-nav" id="mobileNav" role="menu" aria-label="モバイルナビゲーション">
             <div class="mobile-nav-inner">
-                <a href="{{ route('freelancer.jobs.index') }}" class="nav-link">案件一覧</a>
+                <a href="{{ route('corporate.jobs.index') }}" class="nav-link">案件一覧</a>
                 <a href="{{ route('freelancer.applications.index') }}" class="nav-link {{ (Request::routeIs('freelancer.applications.*') || (isset($thread) && $thread->job_id !== null)) ? 'active' : '' }} {{ $appUnread > 0 ? 'has-badge' : '' }}">
                     応募した案件
                     @if($appUnread > 0)
@@ -634,17 +634,17 @@
             <div class="messages max-h-[70vh] md:max-h-[64vh] lg:max-h-[66vh]" id="messages" aria-label="メッセージ一覧">
                 @forelse($messages as $message)
                     @php
-                        $isMe = $message->sender_type === 'freelancer';
+                            $isMe = $message->sender_type === 'corporate';
                         $isFirst = $loop->first;
                         $senderName = '';
                         if ($message->sender_type === 'company') {
                             $senderName = mb_substr($thread->company->name ?? '企業', 0, 1);
-                        } elseif ($message->sender_type === 'freelancer') {
-                            $senderName = mb_substr(auth()->user()->freelancer->display_name ?? auth()->user()->email ?? 'U', 0, 1);
+                        } elseif ($message->sender_type === 'corporate') {
+                            $senderName = mb_substr(auth()->user()->corporate->display_name ?? auth()->user()->email ?? 'U', 0, 1);
                         }
                         $sentAt = $message->sent_at ? $message->sent_at->format('m/d H:i') : '';
                         $isLatest = $loop->last;
-                        $canDelete = $isMe && $message->sender_type === 'freelancer';
+                            $canDelete = $isMe && $message->sender_type === 'corporate';
                     @endphp
                     <div class="bubble-row {{ $isMe ? 'me' : '' }} {{ $isFirst ? 'is-first' : '' }}">
                         <div class="bubble {{ $isMe ? 'me' : '' }}">
@@ -653,7 +653,7 @@
                                 {{ $sentAt }}
                                 @if($canDelete && $isLatest)
                                     <span style="margin-left:0.75rem;">
-                                        <form action="{{ route('freelancer.messages.destroy', ['message' => $message->id]) }}" method="POST" style="display:inline;" class="delete-form" data-message-id="{{ $message->id }}">
+                                <form action="{{ route('corporate.messages.destroy', ['message' => $message->id]) }}" method="POST" style="display:inline;" class="delete-form" data-message-id="{{ $message->id }}">
                                             @csrf
                                             @method('DELETE')
                                             <button type="button" class="delete-trigger" style="background:none;border:none;color:#d73a49;font-weight:900;cursor:pointer;">削除</button>
@@ -670,7 +670,7 @@
                 @endforelse
             </div>
 
-            <form class="composer" action="{{ route('freelancer.threads.messages.store', ['thread' => $thread->id]) }}" method="post">
+            <form class="composer" action="{{ route('corporate.threads.messages.store', ['thread' => $thread->id]) }}" method="post">
                 @csrf
                 <textarea class="input @error('content') is-invalid @enderror" name="content" placeholder="メッセージを入力…" aria-label="メッセージを入力"></textarea>
                 @error('content')

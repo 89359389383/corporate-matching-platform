@@ -24,32 +24,28 @@ class AuthController extends Controller
     }
 
     /**
-     * フリーランスとしてログインする（freelancer guard）
+     * 法人としてログインする（corporate guard）
      */
-    public function loginFreelancer(LoginRequest $request)
+    public function loginCorporate(LoginRequest $request)
     {
         // 入力を最低限チェックする（FormRequest に委譲）
         $credentials = $request->validated();
 
-        // freelancer guard で認証を試みる
-        if (!Auth::guard('freelancer')->attempt($credentials)) {
+        // corporate guard で認証を試みる
+        if (!Auth::guard('corporate')->attempt($credentials)) {
             throw ValidationException::withMessages(['email' => 'メールアドレスまたはパスワードが正しくありません']);
         }
 
         // セッション固定化攻撃を防ぐため、ログイン成功時にセッションIDを再生成します。
-        // セッション固定化攻撃とは、攻撃者が事前に取得したセッションIDをユーザーに使用させ、
-        // そのセッションIDでログインされた状態を乗っ取る攻撃手法です。
-        // regenerate()を呼ぶことで、古いセッションIDは無効化され、新しいセッションIDが発行されます。
-        // これにより、ログイン前のセッションIDではアクセスできなくなり、セキュリティが向上します。
         $request->session()->regenerate();
 
         // ログインしたユーザーを取得する
         /** @var User $user */
-        $user = Auth::guard('freelancer')->user();
+        $user = Auth::guard('corporate')->user();
 
         // 想定外のroleなら安全側に倒してログアウトし、ログインへ戻す
-        if (!$user || $user->role !== 'freelancer') {
-            Auth::guard('freelancer')->logout();
+        if (!$user || $user->role !== 'corporate') {
+            Auth::guard('corporate')->logout();
 
             // セッションを無効化して安全にする
             $request->session()->invalidate();
@@ -57,11 +53,11 @@ class AuthController extends Controller
             // CSRFトークンも再生成する
             $request->session()->regenerateToken();
 
-            return redirect('/login')->withErrors(['email' => 'フリーランスアカウントではありません']);
+            return redirect('/login')->withErrors(['email' => '法人アカウントではありません']);
         }
 
-        // フリーランスは案件一覧へ
-        return redirect('/freelancer/jobs');
+        // 法人は案件一覧へ
+        return redirect('/corporate/jobs');
     }
 
     /**
@@ -87,43 +83,43 @@ class AuthController extends Controller
             return redirect('/login')->withErrors(['email' => '企業アカウントではありません']);
         }
 
-        // 企業はフリーランス一覧へ
-        return redirect('/company/freelancers');
+        // 企業は法人一覧へ
+        return redirect('/company/corporates');
     }
 
     /**
-     * フリーランス登録画面を表示する（表示のみ）
+     * 法人登録画面を表示する（表示のみ）
      */
-    public function showFreelancerRegister()
+    public function showCorporateRegister()
     {
         // 登録画面のBladeを返すだけ（DB更新はしない）
-        return view('auth.register.freelancer');
+        return view('auth.register.corporate');
     }
 
     /**
-     * フリーランスユーザーを作成し、プロフィール入力へ遷移する
+     * 法人ユーザーを作成し、プロフィール入力へ遷移する
      */
-    public function storeFreelancer(RegisterRequest $request)
+    public function storeCorporate(RegisterRequest $request)
     {
         // 入力をバリデーションする（RegisterRequest に委譲）
         $validated = $request->validated();
 
-        // ユーザーを作成する（role=freelancer）
+        // ユーザーを作成する（role=corporate）
         $user = User::create([
             // メールアドレスを保存する
             'email' => $validated['email'],
             // パスワードをハッシュ化して保存する（平文では保存しない）
             'password' => Hash::make($validated['password']),
-            // 役割をフリーランスにする
-            'role' => 'freelancer',
+            // 役割を法人にする
+            'role' => 'corporate',
         ]);
 
         // 作成したユーザーでログインさせる
-        Auth::guard('freelancer')->login($user);
+        Auth::guard('corporate')->login($user);
         $request->session()->regenerate();
 
-        // プロフィール登録画面へリダイレクトする（/freelancer/profile 相当）
-        return redirect('/freelancer/profile');
+        // プロフィール登録画面へリダイレクトする（/corporate/profile 相当）
+        return redirect('/corporate/profile');
     }
 
     /**
@@ -231,7 +227,7 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         // どちらでログインしていても確実に落とす（同時ログインは要件外だが、安全側）
-        Auth::guard('freelancer')->logout();
+        Auth::guard('corporate')->logout();
         Auth::guard('company')->logout();
         Auth::logout();
 

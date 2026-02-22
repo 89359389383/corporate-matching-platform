@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateFreelancerCustomSkillsTable extends Migration
+class CreateCorporateCustomSkillsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,13 @@ class CreateFreelancerCustomSkillsTable extends Migration
      */
     public function up()
     {
-        Schema::create('freelancer_custom_skills', function (Blueprint $table) {
+        Schema::create('corporate_custom_skills', function (Blueprint $table) {
             // ID
             $table->id();
 
-            // フリーランサーID（外部キー）
-            $table->foreignId('freelancer_id')
-                ->constrained('freelancers')
+            // 法人ID（外部キー）
+            $table->foreignId('corporate_id')
+                ->constrained('corporates')
                 ->cascadeOnDelete();
 
             // 自由入力スキル名（検索対象）
@@ -43,6 +43,6 @@ class CreateFreelancerCustomSkillsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('freelancer_custom_skills');
+        Schema::dropIfExists('corporate_custom_skills');
     }
 }
