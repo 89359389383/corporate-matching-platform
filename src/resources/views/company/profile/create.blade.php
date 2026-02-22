@@ -320,6 +320,21 @@
                 </div>
 
                 <div class="form-group">
+                    <label class="label" for="company_name_kana">企業名カナ（任意）</label>
+                    <input
+                        id="company_name_kana"
+                        type="text"
+                        name="company_name_kana"
+                        value="{{ old('company_name_kana') }}"
+                        class="form-input @error('company_name_kana') is-invalid @enderror"
+                        placeholder="例: カブシキガイシャエーアイテック"
+>
+                    @error('company_name_kana')
+                    <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="form-group">
                     <label class="label" for="overview">会社概要（任意）</label>
                     <textarea
                         id="overview"
@@ -374,6 +389,201 @@
                     <div class="help">登録後は「プロフィール設定」から更新できます</div>
                 </div>
 
+                <div class="form-group">
+                    <label class="label" for="email">メールアドレス（必須）</label>
+                    <input
+                        id="email"
+                        type="email"
+                        name="email"
+                        value="{{ old('email') }}"
+                        class="form-input @error('email') is-invalid @enderror"
+                        placeholder="例: info@example.com"
+>
+                    @error('email')
+                    <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <label class="label" for="corporate_number">法人番号（必須）</label>
+                    <input
+                        id="corporate_number"
+                        type="text"
+                        name="corporate_number"
+                        value="{{ old('corporate_number') }}"
+                        class="form-input @error('corporate_number') is-invalid @enderror"
+                        placeholder="例: 1234567890123（13桁）"
+>
+                    @error('corporate_number')
+                    <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <label class="label" for="representative_phone">代表電話番号（必須）</label>
+                    <input
+                        id="representative_phone"
+                        type="text"
+                        name="representative_phone"
+                        value="{{ old('representative_phone') }}"
+                        class="form-input @error('representative_phone') is-invalid @enderror"
+                        placeholder="例: 03-1234-5678"
+>
+                    @error('representative_phone')
+                    <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <div class="label">※本社所在地</div>
+                </div>
+
+                <div class="two-col grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="label" for="hq_postal_code">郵便番号（必須）</label>
+                        <input
+                            id="hq_postal_code"
+                            type="text"
+                            name="hq_postal_code"
+                            value="{{ old('hq_postal_code') }}"
+                            class="form-input @error('hq_postal_code') is-invalid @enderror"
+                            placeholder="例: 100-0001"
+>
+                        @error('hq_postal_code')
+                        <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label class="label" for="hq_prefecture">都道府県（必須）</label>
+                        <input
+                            id="hq_prefecture"
+                            type="text"
+                            name="hq_prefecture"
+                            value="{{ old('hq_prefecture') }}"
+                            class="form-input @error('hq_prefecture') is-invalid @enderror"
+                            placeholder="例: 東京都"
+>
+                        @error('hq_prefecture')
+                        <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="two-col grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="label" for="hq_city">市区町村（必須）</label>
+                        <input
+                            id="hq_city"
+                            type="text"
+                            name="hq_city"
+                            value="{{ old('hq_city') }}"
+                            class="form-input @error('hq_city') is-invalid @enderror"
+                            placeholder="例: 千代田区"
+>
+                        @error('hq_city')
+                        <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label class="label" for="hq_address">住所（必須）</label>
+                        <input
+                            id="hq_address"
+                            type="text"
+                            name="hq_address"
+                            value="{{ old('hq_address') }}"
+                            class="form-input @error('hq_address') is-invalid @enderror"
+                            placeholder="例: 1-1-1（番地・建物名など）"
+>
+                        @error('hq_address')
+                        <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="label">※代表者</div>
+                </div>
+
+                <div class="two-col grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="label" for="representative_last_name">代表者名（姓 / 0-20文字）（必須）</label>
+                        <input
+                            id="representative_last_name"
+                            type="text"
+                            name="representative_last_name"
+                            value="{{ old('representative_last_name') }}"
+                            class="form-input @error('representative_last_name') is-invalid @enderror"
+                            placeholder="例: 山田"
+>
+                        @error('representative_last_name')
+                        <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label class="label" for="representative_first_name">代表者名（名 / 0-20文字）（必須）</label>
+                        <input
+                            id="representative_first_name"
+                            type="text"
+                            name="representative_first_name"
+                            value="{{ old('representative_first_name') }}"
+                            class="form-input @error('representative_first_name') is-invalid @enderror"
+                            placeholder="例: 太郎"
+>
+                        @error('representative_first_name')
+                        <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="two-col grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="label" for="representative_last_name_kana">代表者名カナ（セイ / 0-20文字）（必須）</label>
+                        <input
+                            id="representative_last_name_kana"
+                            type="text"
+                            name="representative_last_name_kana"
+                            value="{{ old('representative_last_name_kana') }}"
+                            class="form-input @error('representative_last_name_kana') is-invalid @enderror"
+                            placeholder="例: ヤマダ"
+>
+                        @error('representative_last_name_kana')
+                        <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label class="label" for="representative_first_name_kana">代表者名カナ（メイ / 0-20文字）（必須）</label>
+                        <input
+                            id="representative_first_name_kana"
+                            type="text"
+                            name="representative_first_name_kana"
+                            value="{{ old('representative_first_name_kana') }}"
+                            class="form-input @error('representative_first_name_kana') is-invalid @enderror"
+                            placeholder="例: タロウ"
+>
+                        @error('representative_first_name_kana')
+                        <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="label" for="representative_birthdate">代表者の生年月日（任意）</label>
+                    <input
+                        id="representative_birthdate"
+                        type="date"
+                        name="representative_birthdate"
+                        value="{{ old('representative_birthdate') }}"
+                        class="form-input @error('representative_birthdate') is-invalid @enderror"
+>
+                    @error('representative_birthdate')
+                    <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+
                 <div class="btn-row flex flex-col md:flex-row gap-3">
                     <a class="btn btn-secondary w-full md:flex-1" href="{{ url()->previous() }}">戻る</a>
                     <button class="btn btn-primary w-full md:flex-1" type="submit">登録</button>
@@ -382,4 +592,201 @@
         </div>
     </div>
 </body>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const hiddenInput = document.getElementById('representative_birthdate');
+    if (!hiddenInput) return;
+
+    const widget = document.createElement('div');
+    widget.className = 'birthday-widget';
+    widget.setAttribute('aria-label', '代表者の生年月日入力');
+    widget.style.marginTop = '6px';
+
+    const row = document.createElement('div');
+    row.style.display = 'flex';
+    row.style.gap = '8px';
+    row.style.alignItems = 'center';
+
+    const year = document.createElement('select');
+    year.id = 'rep_birth_year';
+    year.className = 'form-input birthday-select';
+    year.style.width = '34%';
+    year.innerHTML = '<option value=\"\">年</option>';
+
+    const month = document.createElement('select');
+    month.id = 'rep_birth_month';
+    month.className = 'form-input birthday-select';
+    month.style.width = '20%';
+    month.innerHTML = '<option value=\"\">月</option>';
+
+    const day = document.createElement('select');
+    day.id = 'rep_birth_day';
+    day.className = 'form-input birthday-select';
+    day.style.width = '20%';
+    day.innerHTML = '<option value=\"\">日</option>';
+
+    const text = document.createElement('input');
+    text.type = 'text';
+    text.id = 'rep_birth_text';
+    text.className = 'form-input birthday-text';
+    text.placeholder = 'YYYY/MM/DD（例: 1990/01/23）';
+    text.style.width = '40%';
+
+    const clearBtn = document.createElement('button');
+    clearBtn.type = 'button';
+    clearBtn.id = 'rep_birth_clear';
+    clearBtn.className = 'btn btn-secondary';
+    clearBtn.style.padding = '8px 10px';
+    clearBtn.style.fontWeight = '700';
+    clearBtn.textContent = 'クリア';
+
+    row.appendChild(year);
+    row.appendChild(month);
+    row.appendChild(day);
+    row.appendChild(text);
+    row.appendChild(clearBtn);
+    widget.appendChild(row);
+
+    const help = document.createElement('div');
+    help.className = 'help';
+    help.style.marginTop = '6px';
+    help.textContent = 'プルダウンまたは手入力（YYYY/MM/DD）で入力できます。';
+    widget.appendChild(help);
+
+    hiddenInput.parentNode.insertBefore(widget, hiddenInput);
+    hiddenInput.style.display = 'none';
+
+    const pad2 = (n) => String(n).padStart(2, '0');
+    const isValidDate = (y, m, d) => {
+        const dt = new Date(y, m - 1, d);
+        return dt.getFullYear() === y && (dt.getMonth() + 1) === m && dt.getDate() === d;
+    };
+    const lastDayOfMonth = (y, m) => new Date(y, m, 0).getDate();
+
+    const fillYears = () => {
+        const currentYear = new Date().getFullYear();
+        const maxYear = currentYear - 10;
+        const minYear = currentYear - 100;
+        for (let y = maxYear; y >= minYear; y--) {
+            const opt = document.createElement('option');
+            opt.value = String(y);
+            opt.textContent = String(y);
+            year.appendChild(opt);
+        }
+    };
+    const fillMonths = () => {
+        for (let m = 1; m <= 12; m++) {
+            const opt = document.createElement('option');
+            opt.value = String(m);
+            opt.textContent = String(m);
+            month.appendChild(opt);
+        }
+    };
+    const fillDays = (y, m, selectedDay = '') => {
+        const placeholder = day.querySelector('option[value=\"\"]');
+        day.innerHTML = '';
+        if (placeholder) day.appendChild(placeholder);
+        if (!y || !m) return;
+        const max = lastDayOfMonth(y, m);
+        for (let d = 1; d <= max; d++) {
+            const opt = document.createElement('option');
+            opt.value = String(d);
+            opt.textContent = String(d);
+            day.appendChild(opt);
+        }
+        if (selectedDay) day.value = selectedDay;
+    };
+
+    const syncToHidden = () => {
+        const y = parseInt(year.value, 10);
+        const m = parseInt(month.value, 10);
+        const d = parseInt(day.value, 10);
+        if (!y || !m || !d || !isValidDate(y, m, d)) {
+            hiddenInput.value = '';
+            return;
+        }
+        hiddenInput.value = `${y}-${pad2(m)}-${pad2(d)}`;
+    };
+    const syncText = () => {
+        const y = parseInt(year.value, 10);
+        const m = parseInt(month.value, 10);
+        const d = parseInt(day.value, 10);
+        if (!y || !m || !d || !isValidDate(y, m, d)) {
+            text.value = '';
+            return;
+        }
+        text.value = `${y}/${pad2(m)}/${pad2(d)}`;
+    };
+
+    const parseTextToISO = (txt) => {
+        const raw = (txt || '').trim();
+        if (!raw) return '';
+        const m = raw.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+        if (!m) return '';
+        const y = parseInt(m[1], 10);
+        const mo = parseInt(m[2], 10);
+        const d = parseInt(m[3], 10);
+        if (!isValidDate(y, mo, d)) return '';
+        return `${y}-${pad2(mo)}-${pad2(d)}`;
+    };
+
+    fillYears();
+    fillMonths();
+    if (hiddenInput.value) {
+        const iso = hiddenInput.value.match(/^\d{4}-\d{2}-\d{2}$/) ? hiddenInput.value : parseTextToISO(hiddenInput.value);
+        if (iso) {
+            hiddenInput.value = iso;
+            const parts = iso.split('-');
+            year.value = parts[0];
+            month.value = String(parseInt(parts[1],10));
+            fillDays(parseInt(parts[0],10), parseInt(parts[1],10), String(parseInt(parts[2],10)));
+            day.value = String(parseInt(parts[2],10));
+            syncText();
+        }
+    }
+
+    year.addEventListener('change', () => {
+        const y = parseInt(year.value, 10);
+        const m = parseInt(month.value, 10);
+        const currentDay = day.value;
+        fillDays(y || 0, m || 0, currentDay);
+        syncToHidden();
+        syncText();
+    });
+    month.addEventListener('change', () => {
+        const y = parseInt(year.value, 10);
+        const m = parseInt(month.value, 10);
+        const currentDay = day.value;
+        fillDays(y || 0, m || 0, currentDay);
+        syncToHidden();
+        syncText();
+    });
+    day.addEventListener('change', () => {
+        syncToHidden();
+        syncText();
+    });
+
+    text.addEventListener('blur', () => {
+        const iso = parseTextToISO(text.value);
+        if (!iso) return;
+        hiddenInput.value = iso;
+        const parts = iso.split('-');
+        year.value = parts[0];
+        month.value = String(parseInt(parts[1],10));
+        fillDays(parseInt(parts[0],10), parseInt(parts[1],10), String(parseInt(parts[2],10)));
+        day.value = String(parseInt(parts[2],10));
+    });
+
+    clearBtn.addEventListener('click', () => {
+        year.value = '';
+        month.value = '';
+        day.value = '';
+        text.value = '';
+        hiddenInput.value = '';
+        fillDays(0,0);
+    });
+});
+</script>
+
 </html>

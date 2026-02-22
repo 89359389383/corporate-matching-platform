@@ -14,10 +14,27 @@ class Company extends Model
     protected $fillable = [
         'user_id',
         'name',
+        'name_kana',
         'overview',
         'contact_name',
         'department',
         'introduction',
+        'email',
+        'corporate_number',
+        'representative_phone',
+        'hq_postal_code',
+        'hq_prefecture',
+        'hq_city',
+        'hq_address',
+        'representative_last_name',
+        'representative_first_name',
+        'representative_last_name_kana',
+        'representative_first_name_kana',
+        'representative_birthdate',
+    ];
+
+    protected $casts = [
+        'representative_birthdate' => 'date',
     ];
 
     /**

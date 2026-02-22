@@ -344,6 +344,13 @@
                     @enderror
                 </div>
                 <div class="field">
+                    <label for="name_kana">企業名カナ（任意）</label>
+                    <input id="name_kana" name="name_kana" class="input @error('name_kana') is-invalid @enderror" type="text" value="{{ old('name_kana', $company->name_kana ?? '') }}">
+                    @error('name_kana')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="field">
                     <label for="overview">会社概要（任意）</label>
                     <textarea id="overview" name="overview" class="textarea @error('overview') is-invalid @enderror">{{ old('overview', $company->overview ?? '') }}</textarea>
                     @error('overview')
@@ -371,8 +378,132 @@
                         <span class="error-message">{{ $message }}</span>
                     @enderror
                 </div>
+                <div class="field">
+                    <label for="email">メールアドレス（必須）</label>
+                    <input id="email" name="email" class="input @error('email') is-invalid @enderror" type="email" value="{{ old('email', $company->email ?? '') }}">
+                    @error('email')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="field">
+                    <label for="corporate_number">法人番号（必須）</label>
+                    <input id="corporate_number" name="corporate_number" class="input @error('corporate_number') is-invalid @enderror" type="text" value="{{ old('corporate_number', $company->corporate_number ?? '') }}">
+                    @error('corporate_number')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="field">
+                    <label for="representative_phone">代表電話番号（必須）</label>
+                    <input id="representative_phone" name="representative_phone" class="input @error('representative_phone') is-invalid @enderror" type="text" value="{{ old('representative_phone', $company->representative_phone ?? '') }}">
+                    @error('representative_phone')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="field" style="margin-top: 1.75rem;">
+                    <div style="font-weight: 900; color: #111827;">※本社所在地</div>
+                </div>
+                <div class="field">
+                    <label for="hq_postal_code">郵便番号（必須）</label>
+                    <input id="hq_postal_code" name="hq_postal_code" class="input @error('hq_postal_code') is-invalid @enderror" type="text" value="{{ old('hq_postal_code', $company->hq_postal_code ?? '') }}">
+                    @error('hq_postal_code')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="field">
+                    <label for="hq_prefecture">都道府県（必須）</label>
+                    <input id="hq_prefecture" name="hq_prefecture" class="input @error('hq_prefecture') is-invalid @enderror" type="text" value="{{ old('hq_prefecture', $company->hq_prefecture ?? '') }}">
+                    @error('hq_prefecture')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="field">
+                    <label for="hq_city">市区町村（必須）</label>
+                    <input id="hq_city" name="hq_city" class="input @error('hq_city') is-invalid @enderror" type="text" value="{{ old('hq_city', $company->hq_city ?? '') }}">
+                    @error('hq_city')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="field">
+                    <label for="hq_address">住所（必須）</label>
+                    <input id="hq_address" name="hq_address" class="input @error('hq_address') is-invalid @enderror" type="text" value="{{ old('hq_address', $company->hq_address ?? '') }}">
+                    @error('hq_address')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="field" style="margin-top: 1.75rem;">
+                    <div style="font-weight: 900; color: #111827;">※代表者</div>
+                </div>
+                <div class="field">
+                    <label for="representative_last_name">代表者名（姓 / 0-20文字）（必須）</label>
+                    <input id="representative_last_name" name="representative_last_name" class="input @error('representative_last_name') is-invalid @enderror" type="text" value="{{ old('representative_last_name', $company->representative_last_name ?? '') }}">
+                    @error('representative_last_name')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="field">
+                    <label for="representative_first_name">代表者名（名 / 0-20文字）（必須）</label>
+                    <input id="representative_first_name" name="representative_first_name" class="input @error('representative_first_name') is-invalid @enderror" type="text" value="{{ old('representative_first_name', $company->representative_first_name ?? '') }}">
+                    @error('representative_first_name')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="field">
+                    <label for="representative_last_name_kana">代表者名カナ（セイ / 0-20文字）（必須）</label>
+                    <input id="representative_last_name_kana" name="representative_last_name_kana" class="input @error('representative_last_name_kana') is-invalid @enderror" type="text" value="{{ old('representative_last_name_kana', $company->representative_last_name_kana ?? '') }}">
+                    @error('representative_last_name_kana')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="field">
+                    <label for="representative_first_name_kana">代表者名カナ（メイ / 0-20文字）（必須）</label>
+                    <input id="representative_first_name_kana" name="representative_first_name_kana" class="input @error('representative_first_name_kana') is-invalid @enderror" type="text" value="{{ old('representative_first_name_kana', $company->representative_first_name_kana ?? '') }}">
+                    @error('representative_first_name_kana')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="field">
+                    <label>代表者の生年月日（任意）</label>
+                    <div class="birthday-widget" aria-label="代表者の生年月日入力">
+                        <div class="birthday-row birthday-row--single" style="display:flex;gap:8px;align-items:center;">
+                            <select id="representativeBirthYear" class="input birthday-select" aria-label="年" style="width:34%;">
+                                <option value="">年</option>
+                            </select>
+                            <select id="representativeBirthMonth" class="input birthday-select" aria-label="月" style="width:20%;">
+                                <option value="">月</option>
+                            </select>
+                            <select id="representativeBirthDay" class="input birthday-select" aria-label="日" style="width:20%;">
+                                <option value="">日</option>
+                            </select>
+
+                            <input
+                                type="text"
+                                id="representativeBirthText"
+                                class="input birthday-text"
+                                inputmode="numeric"
+                                autocomplete="bday"
+                                placeholder="YYYY/MM/DD（例: 1990/01/23）"
+                                style="width:40%;">
+                            <button type="button" class="btn btn-secondary" id="representativeBirthClearBtn" style="padding:8px 10px; font-weight:700;">クリア</button>
+                        </div>
+
+                        <input
+                            type="date"
+                            name="representative_birthdate"
+                            id="representativeBirthHidden"
+                            class="input birthday-hidden @error('representative_birthdate') is-invalid @enderror"
+                            value="{{ old('representative_birthdate', optional($company->representative_birthdate ?? null)->format('Y-m-d')) }}"
+                            style="display:none;">
+
+                        <div style="margin-top:6px; font-size:13px; font-weight:800; color:#64748b;">プルダウンまたは手入力（YYYY/MM/DD）で入力できます。</div>
+                    </div>
+                    @error('representative_birthdate')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
                 <div class="btn-row flex flex-col md:flex-row gap-3 md:gap-4">
-                    <a class="btn btn-secondary w-full md:flex-1" href="{{ route('company.freelancers.index') }}">キャンセル</a>
+                    <a class="btn btn-secondary w-full md:flex-1" href="{{ route('company.corporates.index') }}">キャンセル</a>
                     <button class="btn btn-primary w-full md:flex-1" type="submit">更新</button>
                 </div>
             </form>
@@ -391,6 +522,157 @@
             toggle.addEventListener('click', (e) => { e.stopPropagation(); isOpen() ? close() : open(); });
             document.addEventListener('click', (e) => { if (!dropdown.contains(e.target)) close(); });
             document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+        })();
+
+        (function () {
+            const hiddenInput = document.getElementById('representativeBirthHidden');
+            const yearSelect = document.getElementById('representativeBirthYear');
+            const monthSelect = document.getElementById('representativeBirthMonth');
+            const daySelect = document.getElementById('representativeBirthDay');
+            const textInput = document.getElementById('representativeBirthText');
+            const clearBtn = document.getElementById('representativeBirthClearBtn');
+            if (!hiddenInput || !yearSelect || !monthSelect || !daySelect || !textInput || !clearBtn) return;
+
+            const pad2 = (n) => String(n).padStart(2, '0');
+            const isValidDate = (y, m, d) => {
+                const dt = new Date(y, m - 1, d);
+                return dt.getFullYear() === y && (dt.getMonth() + 1) === m && dt.getDate() === d;
+            };
+            const lastDayOfMonth = (y, m) => new Date(y, m, 0).getDate();
+
+            const fillYears = () => {
+                const currentYear = new Date().getFullYear();
+                const maxYear = currentYear - 10;
+                const minYear = currentYear - 100;
+                for (let y = maxYear; y >= minYear; y--) {
+                    const opt = document.createElement('option');
+                    opt.value = String(y);
+                    opt.textContent = String(y);
+                    yearSelect.appendChild(opt);
+                }
+            };
+
+            const fillMonths = () => {
+                for (let m = 1; m <= 12; m++) {
+                    const opt = document.createElement('option');
+                    opt.value = String(m);
+                    opt.textContent = String(m);
+                    monthSelect.appendChild(opt);
+                }
+            };
+
+            const fillDays = (y, m, selectedDay = '') => {
+                const placeholder = daySelect.querySelector('option[value=""]');
+                daySelect.innerHTML = '';
+                if (placeholder) daySelect.appendChild(placeholder);
+                if (!y || !m) return;
+
+                const max = lastDayOfMonth(y, m);
+                for (let d = 1; d <= max; d++) {
+                    const opt = document.createElement('option');
+                    opt.value = String(d);
+                    opt.textContent = String(d);
+                    daySelect.appendChild(opt);
+                }
+                if (selectedDay) daySelect.value = selectedDay;
+            };
+
+            const syncToHidden = () => {
+                const y = parseInt(yearSelect.value, 10);
+                const m = parseInt(monthSelect.value, 10);
+                const d = parseInt(daySelect.value, 10);
+                if (!y || !m || !d || !isValidDate(y, m, d)) {
+                    hiddenInput.value = '';
+                    return;
+                }
+                hiddenInput.value = `${y}-${pad2(m)}-${pad2(d)}`;
+            };
+
+            const syncText = () => {
+                const y = parseInt(yearSelect.value, 10);
+                const m = parseInt(monthSelect.value, 10);
+                const d = parseInt(daySelect.value, 10);
+                if (!y || !m || !d || !isValidDate(y, m, d)) {
+                    textInput.value = '';
+                    return;
+                }
+                textInput.value = `${y}/${pad2(m)}/${pad2(d)}`;
+            };
+
+            const setFromISO = (iso) => {
+                const match = (iso || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+                if (!match) return;
+                const y = parseInt(match[1], 10);
+                const m = parseInt(match[2], 10);
+                const d = parseInt(match[3], 10);
+                if (!isValidDate(y, m, d)) return;
+                yearSelect.value = String(y);
+                monthSelect.value = String(m);
+                fillDays(y, m, String(d));
+                daySelect.value = String(d);
+                syncText();
+            };
+
+            const parseTextToISO = (txt) => {
+                const raw = (txt || '').trim();
+                if (!raw) return '';
+                const match = raw.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+                if (!match) return '';
+                const y = parseInt(match[1], 10);
+                const m = parseInt(match[2], 10);
+                const d = parseInt(match[3], 10);
+                if (!isValidDate(y, m, d)) return '';
+                return `${y}-${pad2(m)}-${pad2(d)}`;
+            };
+
+            fillYears();
+            fillMonths();
+            if (hiddenInput.value) {
+                const normalized = hiddenInput.value.match(/^\d{4}-\d{2}-\d{2}$/)
+                    ? hiddenInput.value
+                    : parseTextToISO(hiddenInput.value);
+                if (normalized) {
+                    hiddenInput.value = normalized;
+                    setFromISO(normalized);
+                }
+            }
+
+            yearSelect.addEventListener('change', () => {
+                const y = parseInt(yearSelect.value, 10);
+                const m = parseInt(monthSelect.value, 10);
+                const currentDay = daySelect.value;
+                fillDays(y || 0, m || 0, currentDay);
+                syncToHidden();
+                syncText();
+            });
+            monthSelect.addEventListener('change', () => {
+                const y = parseInt(yearSelect.value, 10);
+                const m = parseInt(monthSelect.value, 10);
+                const currentDay = daySelect.value;
+                fillDays(y || 0, m || 0, currentDay);
+                syncToHidden();
+                syncText();
+            });
+            daySelect.addEventListener('change', () => {
+                syncToHidden();
+                syncText();
+            });
+
+            textInput.addEventListener('blur', () => {
+                const iso = parseTextToISO(textInput.value);
+                if (!iso) return;
+                hiddenInput.value = iso;
+                setFromISO(iso);
+            });
+
+            clearBtn.addEventListener('click', () => {
+                yearSelect.value = '';
+                monthSelect.value = '';
+                daySelect.value = '';
+                textInput.value = '';
+                hiddenInput.value = '';
+                fillDays(0, 0);
+            });
         })();
     </script>
 </body>
