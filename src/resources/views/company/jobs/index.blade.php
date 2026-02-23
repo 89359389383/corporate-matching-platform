@@ -403,6 +403,43 @@
         }
         .desc { color: #586069; margin-top: 0.75rem; line-height: 1.65; }
 
+        .job-meta-line {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            color: #586069;
+            font-weight: 800;
+            font-size: 16px;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .job-meta-strong { color: #24292e; font-weight: 900; }
+        .meta-bold { font-weight: 900; }
+        .meta-days { color: #dc2626; } /* 赤 */
+        .meta-date { color: #16a34a; } /* 緑 */
+
+        .persona-section {
+            margin-top: 0.75rem;
+            background-color: #f6f8fa;
+            border: 1px solid #e1e4e8;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+        }
+        .persona-title {
+            font-size: 0.8rem;
+            color: #6a737d;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+        .persona-text {
+            color: #24292e;
+            font-weight: 800;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
         /* Skills tags (match freelancer view) */
         .skills-section {
             margin-top: 1rem;
@@ -742,19 +779,62 @@
                         } else {
                             $rewardDisplay = number_format($job->min_rate) . '〜' . number_format($job->max_rate) . '円/時';
                         }
+
+                        // 掲載終了までの日数 / 稼働開始日（表示用）
+                        $today = \Illuminate\Support\Carbon::today();
+                        $daysUntilPublishEnd = null;
+                        if (!empty($job->publish_end_date)) {
+                            $end = ($job->publish_end_date instanceof \Illuminate\Support\Carbon)
+                                ? $job->publish_end_date
+                                : \Illuminate\Support\Carbon::parse($job->publish_end_date);
+                            $daysUntilPublishEnd = $today->diffInDays($end, false);
+                        }
+
+                        $publishEndText = null;
+                        if ($daysUntilPublishEnd !== null) {
+                            $publishEndText = ($daysUntilPublishEnd >= 0)
+                                ? 'あと' . $daysUntilPublishEnd . '日で掲載終了'
+                                : '掲載終了（' . abs($daysUntilPublishEnd) . '日前）';
+                        }
+
+                        $workStartDate = null;
+                        if (!empty($job->work_start_date)) {
+                            $start = ($job->work_start_date instanceof \Illuminate\Support\Carbon)
+                                ? $job->work_start_date
+                                : \Illuminate\Support\Carbon::parse($job->work_start_date);
+                            $workStartDate = $start->format('m/d');
+                        }
                     @endphp
                     <article class="card rounded-2xl bg-white border border-slate-200 shadow-sm p-5 md:p-7 relative overflow-hidden">
+                        @if($daysUntilPublishEnd !== null || $workStartText)
+                            <div class="job-meta-line" aria-label="掲載終了までの日数と稼働開始日">
+                                @if($daysUntilPublishEnd !== null)
+                                    @if($daysUntilPublishEnd >= 0)
+                                        <span class="meta-bold">あと <span class="meta-days">{{ $daysUntilPublishEnd }}日</span>で掲載終了</span>
+                                    @else
+                                        <span class="meta-bold">掲載終了（<span class="meta-days">{{ abs($daysUntilPublishEnd) }}日</span>前）</span>
+                                    @endif
+                                @endif
+                                @if($workStartDate)
+                                    <span class="meta-bold"><span class="meta-date">{{ $workStartDate }}</span>稼働開始</span>
+                                @endif
+                            </div>
+                        @endif
                         <div class="job-header">
                             <div>
                                 <h2 class="job-title">{{ $job->title }}</h2>
-                                <div class="company-name">{{ $company->name }}</div>
+                                <div class="company-name">#{{ $job->subtitle }}</div>
+                                <div class="persona-section">
+                                    <div class="persona-title">求めている人物像</div>
+                                    <div class="persona-text">{{ $job->desired_persona }}</div>
+                                </div>
                             </div>
                             <div class="inline">
                                 <span class="pill {{ $statusClass }}">{{ $statusText }}</span>
                             </div>
                         </div>
 
-                        <div class="desc">{{ $job->description }}</div>
+                        {{-- 案件概要は表示しない指定のため非表示 --}}
 
                         <div class="job-details grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                             <div class="detail-item">

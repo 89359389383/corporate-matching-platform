@@ -340,6 +340,120 @@
             color: #0366d6;
         }
 
+        /* Match corporate/jobs/index meta line (work start / publish end) */
+        .job-meta-line {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            color: #586069;
+            font-weight: 800;
+            font-size: 16px;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .meta-bold { font-weight: 900; }
+        .meta-days { color: #dc2626; } /* 赤 */
+        .meta-date { color: #16a34a; } /* 緑 */
+        .meta-muted { color: #6a737d; font-weight: 900; }
+
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-top: 0.25rem;
+            margin-bottom: 1rem;
+        }
+        .inline { display: inline-flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.35rem 0.75rem;
+            border-radius: 999px;
+            font-weight: 900;
+            border: 1px solid #e1e4e8;
+            background: #fafbfc;
+            white-space: nowrap;
+            font-size: 0.85rem;
+        }
+        .pill.public { background: #e6ffed; border-color: #b7f5c3; color: #1a7f37; }
+        .pill.draft { background: #fff8c5; border-color: #f5e58a; color: #7a5d00; }
+        .pill.stopped { background: #fff5f5; border-color: #ffccd2; color: #b31d28; }
+
+        .hero-subtitle {
+            color: #586069;
+            font-size: 18px;
+            font-weight: 800;
+        }
+        .hero-company-label {
+            color: #6a737d;
+            font-size: 0.85rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.5rem;
+        }
+        .hero-company {
+            color: #24292e;
+            font-size: 18px;
+            font-weight: 900;
+        }
+
+        .persona-section {
+            margin-top: 0.9rem;
+            background-color: #f6f8fa;
+            border: 1px solid #e1e4e8;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+        }
+        .overview-section {
+            margin-top: 0.9rem;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+            border: 1px solid #d8e8ff;
+            border-radius: 12px;
+            padding: 1rem 1.1rem;
+        }
+        .persona-title {
+            font-size: 0.8rem;
+            color: #6a737d;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+        .overview-title {
+            font-size: 0.8rem;
+            color: #4b5563;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.55rem;
+        }
+        .overview-text {
+            color: #1f2937;
+            font-weight: 700;
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+        .persona-text {
+            color: #24292e;
+            font-weight: 800;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
+        .skills-block { margin-top: 1.25rem; }
+        .skills-label {
+            font-size: 0.8rem;
+            color: #6a737d;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+        .prose { white-space: pre-wrap; }
+
         .section {
             background-color: white;
             border-radius: 16px;
@@ -613,14 +727,6 @@
             </div>
 
             <section class="hero" aria-label="案件概要">
-                <div>
-                    <h1 class="hero-title">{{ $job->title }}</h1>
-                    <div class="hero-company">{{ $job->company->name }}</div>
-                </div>
-                <div class="hero-meta" aria-label="タグ">
-                    <span class="chip primary">公開中</span>
-                </div>
-
                 @php
                     $rewardText = '';
                     if ($job->reward_type === 'monthly') {
@@ -628,15 +734,90 @@
                     } elseif ($job->reward_type === 'hourly') {
                         $rewardText = number_format($job->min_rate) . '〜' . number_format($job->max_rate) . '円/時';
                     }
+
+                    // ステータス pill（index と同じ）
+                    $statusClass = '';
+                    $statusText = '';
+                    switch($job->status) {
+                        case \App\Models\Job::STATUS_PUBLISHED:
+                            $statusClass = 'public';
+                            $statusText = '公開';
+                            break;
+                        case \App\Models\Job::STATUS_DRAFT:
+                            $statusClass = 'draft';
+                            $statusText = '下書き';
+                            break;
+                        case \App\Models\Job::STATUS_STOPPED:
+                            $statusClass = 'stopped';
+                            $statusText = '停止';
+                            break;
+                    }
+
+                    // 掲載終了までの日数 / 稼働開始日（index と同じ見え方）
+                    $today = \Illuminate\Support\Carbon::today();
+                    $daysUntilPublishEnd = null;
+                    if (!empty($job->publish_end_date)) {
+                        $end = ($job->publish_end_date instanceof \Illuminate\Support\Carbon)
+                            ? $job->publish_end_date
+                            : \Illuminate\Support\Carbon::parse($job->publish_end_date);
+                        $daysUntilPublishEnd = $today->diffInDays($end, false);
+                    }
+
+                    $workStartDate = null;
+                    if (!empty($job->work_start_date)) {
+                        $start = ($job->work_start_date instanceof \Illuminate\Support\Carbon)
+                            ? $job->work_start_date
+                            : \Illuminate\Support\Carbon::parse($job->work_start_date);
+                        $workStartDate = $start->format('m/d');
+                    }
                 @endphp
+
+                <div class="job-meta-line" aria-label="掲載終了までの日数と稼働開始日">
+                    @if($daysUntilPublishEnd !== null)
+                        @if($daysUntilPublishEnd >= 0)
+                            <span class="meta-bold">あと <span class="meta-days">{{ $daysUntilPublishEnd }}日</span>で掲載終了</span>
+                        @else
+                            <span class="meta-bold">掲載終了（<span class="meta-days">{{ abs($daysUntilPublishEnd) }}日</span>前）</span>
+                        @endif
+                    @else
+                        <span class="meta-muted">掲載終了 未設定</span>
+                    @endif
+                    @if($workStartDate)
+                        <span class="meta-bold"><span class="meta-date">{{ $workStartDate }}</span>稼働開始</span>
+                    @else
+                        <span class="meta-muted">稼働開始 未定</span>
+                    @endif
+                </div>
+
+                <div class="job-header">
+                    <div>
+                        <h1 class="hero-title">{{ $job->title }}</h1>
+                        <div class="hero-subtitle">#{{ $job->subtitle }}</div>
+                        <div class="hero-company-label">会社名</div>
+                        <div class="hero-company">{{ $job->company->name ?? '' }}</div>
+
+                        <div class="overview-section" aria-label="案件概要">
+                            <div class="overview-title">案件概要</div>
+                            <div class="overview-text">{{ $job->description ?: '未設定' }}</div>
+                        </div>
+
+                        <div class="persona-section" aria-label="求めている人物像">
+                            <div class="persona-title">求めている人物像</div>
+                            <div class="persona-text">{{ $job->desired_persona ?: '未設定' }}</div>
+                        </div>
+                    </div>
+                    <div class="inline" aria-label="ステータス">
+                        <span class="pill {{ $statusClass }}">{{ $statusText }}</span>
+                    </div>
+                </div>
 
                 <div class="job-details grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4" aria-label="主要条件">
                     <div class="detail-item">
-                        <div class="detail-label">報酬目安</div>
+                        <div class="detail-label">報酬</div>
                         <div class="detail-value">{{ $rewardText }}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">想定稼働時間／期間</div>
+                        <div class="detail-label">稼働条件</div>
                         <div class="detail-value">{{ $job->work_time_text }}</div>
                     </div>
                 </div>
@@ -645,17 +826,20 @@
                     @php
                         $skills = explode(',', $job->required_skills_text);
                     @endphp
-                    <div class="skills" aria-label="必要スキル">
-                        @foreach($skills as $skill)
-                            <span class="skill-tag">{{ trim($skill) }}</span>
-                        @endforeach
+                    <div class="skills-block" aria-label="必要スキル">
+                        <div class="skills-label">必要スキル</div>
+                        <div class="skills">
+                            @foreach($skills as $skill)
+                                <span class="skill-tag">{{ trim($skill) }}</span>
+                            @endforeach
+                        </div>
+                    </div>
+                @else
+                    <div class="skills-block" aria-label="必要スキル">
+                        <div class="skills-label">必要スキル</div>
+                        <div class="help">未設定</div>
                     </div>
                 @endif
-            </section>
-
-            <section class="section" aria-label="業務内容">
-                <div class="section-title">業務内容</div>
-                <p>{{ $job->description }}</p>
             </section>
 
             <section class="section" aria-label="応募">

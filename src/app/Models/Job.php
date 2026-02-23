@@ -18,18 +18,24 @@ class Job extends Model
     protected $fillable = [
         'company_id',
         'title',
+        'subtitle',
         'description',
+        'desired_persona',
         'required_skills_text',
         'reward_type',
         'min_rate',
         'max_rate',
         'work_time_text',
+        'work_start_date',
+        'publish_end_date',
         'status',
     ];
 
     protected $casts = [
         'min_rate' => 'integer',
         'max_rate' => 'integer',
+        'work_start_date' => 'date',
+        'publish_end_date' => 'date',
         'status' => 'integer',
     ];
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>フリーランス案件一覧 - AITECH</title>
+    <title>法人案件一覧 - AITECH</title>
     {{-- ヘッダーに必要なスタイルのみをここに記載 --}}
     <style>
         /* Header (企業側と同じレスポンシブ構造: 640 / 768 / 1024 / 1280) */
@@ -462,6 +462,83 @@
             line-height: 1.6;
             font-size: 1rem;
         }
+
+        /* Match company/jobs/index card meta & persona */
+        .card {
+            background-color: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            transition: all 0.2s ease;
+            border: 1px solid #e1e4e8;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .job-meta-line {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            color: #586069;
+            font-weight: 800;
+            font-size: 16px;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .meta-bold { font-weight: 900; }
+        .meta-days { color: #dc2626; } /* 赤 */
+        .meta-date { color: #16a34a; } /* 緑 */
+
+        .persona-section {
+            margin-top: 0.75rem;
+            background-color: #f6f8fa;
+            border: 1px solid #e1e4e8;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+        }
+        .persona-title {
+            font-size: 0.8rem;
+            color: #6a737d;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+        .persona-text {
+            color: #24292e;
+            font-weight: 800;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.35rem 0.75rem;
+            border-radius: 999px;
+            font-weight: 900;
+            border: 1px solid #e1e4e8;
+            background: #fafbfc;
+            white-space: nowrap;
+            font-size: 0.85rem;
+        }
+        .pill.public { background: #e6ffed; border-color: #b7f5c3; color: #1a7f37; }
+        .pill.draft { background: #fff8c5; border-color: #f5e58a; color: #7a5d00; }
+        .pill.stopped { background: #fff5f5; border-color: #ffccd2; color: #b31d28; }
+        .inline { display: inline-flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
         .job-details {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -729,23 +806,81 @@
                 @forelse($jobs as $job)
                     @php
                         $isApplied = in_array($job->id, $appliedJobIds ?? []);
+
+                        // 報酬の表示フォーマット
                         $rewardText = '';
                         if ($job->reward_type === 'monthly') {
                             $rewardText = ($job->min_rate / 10000) . '〜' . ($job->max_rate / 10000) . '万円';
                         } else {
                             $rewardText = number_format($job->min_rate) . '〜' . number_format($job->max_rate) . '円/時';
                         }
+
+                        // ステータス表示（company/jobs/index と同じpill）
+                        $statusClass = '';
+                        $statusText = '';
+                        switch($job->status) {
+                            case \App\Models\Job::STATUS_PUBLISHED:
+                                $statusClass = 'public';
+                                $statusText = '公開';
+                                break;
+                            case \App\Models\Job::STATUS_DRAFT:
+                                $statusClass = 'draft';
+                                $statusText = '下書き';
+                                break;
+                            case \App\Models\Job::STATUS_STOPPED:
+                                $statusClass = 'stopped';
+                                $statusText = '停止';
+                                break;
+                        }
+
+                        // 掲載終了までの日数 / 稼働開始日（表示用）
+                        $today = \Illuminate\Support\Carbon::today();
+                        $daysUntilPublishEnd = null;
+                        if (!empty($job->publish_end_date)) {
+                            $end = ($job->publish_end_date instanceof \Illuminate\Support\Carbon)
+                                ? $job->publish_end_date
+                                : \Illuminate\Support\Carbon::parse($job->publish_end_date);
+                            $daysUntilPublishEnd = $today->diffInDays($end, false);
+                        }
+
+                        $workStartDate = null;
+                        if (!empty($job->work_start_date)) {
+                            $start = ($job->work_start_date instanceof \Illuminate\Support\Carbon)
+                                ? $job->work_start_date
+                                : \Illuminate\Support\Carbon::parse($job->work_start_date);
+                            $workStartDate = $start->format('m/d');
+                        }
+
                         $skills = $job->required_skills_text ? explode(',', $job->required_skills_text) : [];
                     @endphp
-                    <div class="job-card p-5 md:p-7">
+                    <article class="card rounded-2xl bg-white border border-slate-200 shadow-sm p-5 md:p-7 relative overflow-hidden">
+                        @if($daysUntilPublishEnd !== null || $workStartDate)
+                            <div class="job-meta-line" aria-label="掲載終了までの日数と稼働開始日">
+                                @if($daysUntilPublishEnd !== null)
+                                    @if($daysUntilPublishEnd >= 0)
+                                        <span class="meta-bold">あと <span class="meta-days">{{ $daysUntilPublishEnd }}日</span>で掲載終了</span>
+                                    @else
+                                        <span class="meta-bold">掲載終了（<span class="meta-days">{{ abs($daysUntilPublishEnd) }}日</span>前）</span>
+                                    @endif
+                                @endif
+                                @if($workStartDate)
+                                    <span class="meta-bold"><span class="meta-date">{{ $workStartDate }}</span>稼働開始</span>
+                                @endif
+                            </div>
+                        @endif
                         <div class="job-header">
                             <div>
                                 <h2 class="job-title">{{ $job->title }}</h2>
-                                <div class="company-name">{{ $job->company->name }}</div>
+                                <div class="company-name">#{{ $job->subtitle }}</div>
+                                <div class="persona-section">
+                                    <div class="persona-title">求めている人物像</div>
+                                    <div class="persona-text">{{ $job->desired_persona }}</div>
+                                </div>
+                            </div>
+                            <div class="inline">
+                                <span class="pill {{ $statusClass }}">{{ $statusText }}</span>
                             </div>
                         </div>
-
-                        <p class="job-description">{{ $job->description }}</p>
 
                         <div class="job-details grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                             <div class="detail-item">
@@ -768,7 +903,7 @@
                         </div>
                         @endif
 
-                        <div class="job-actions flex flex-col md:flex-row gap-3 border-t border-slate-200 pt-4 mt-5">
+                        <div class="actions flex flex-col md:flex-row md:items-center gap-3 md:gap-4 border-t border-slate-200 pt-4 mt-5">
                             <a href="{{ route('corporate.jobs.show', $job->id) }}" class="btn btn-secondary w-full md:flex-1">詳細</a>
                             @if($isApplied)
                                 @php
@@ -783,12 +918,10 @@
                                 <a href="{{ route('corporate.jobs.apply.create', $job->id) }}" class="btn btn-primary w-full md:flex-1">応募</a>
                             @endif
                         </div>
-                    </div>
+                    </article>
                 @empty
-                    <div class="job-card">
-                        <p class="job-description" style="text-align: center; padding: 2rem;">
-                            該当する案件が見つかりませんでした。
-                        </p>
+                    <div class="rounded-2xl bg-white border border-slate-200 shadow-sm p-8 md:p-10 text-center text-slate-600">
+                        <p class="text-base md:text-lg font-semibold">該当する案件が見つかりませんでした。</p>
                     </div>
                 @endforelse
             </div>

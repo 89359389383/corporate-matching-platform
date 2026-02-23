@@ -302,6 +302,33 @@
             color: #dc2626;
         }
         .help { margin-top: 0.5rem; color: #6a737d; font-weight: 800; font-size: 0.85rem; }
+        .ymd-widget { width: 100%; }
+        .ymd-row {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+        .ymd-select {
+            appearance: none;
+            background-image:
+                linear-gradient(45deg, transparent 50%, #6b7280 50%),
+                linear-gradient(135deg, #6b7280 50%, transparent 50%);
+            background-position:
+                calc(100% - 18px) calc(1.15em + 2px),
+                calc(100% - 13px) calc(1.15em + 2px);
+            background-size: 5px 5px, 5px 5px;
+            background-repeat: no-repeat;
+            padding-right: 2.25rem;
+        }
+        .date-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            clip-path: inset(50%);
+        }
         .btn-row { display: flex; gap: 1rem; margin-top: 2rem; }
         .btn-row .btn { flex: 1; padding: 1rem; font-size: 16px; }
         .btn {
@@ -368,6 +395,13 @@
                         @enderror
                     </div>
                     <div class="field">
+                        <label for="subtitle">サブタイトル（必須）</label>
+                        <input id="subtitle" name="subtitle" class="input @error('subtitle') is-invalid @enderror" type="text" placeholder="例: 週2〜/フルリモート/長期" value="{{ old('subtitle') }}">
+                        @error('subtitle')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div class="field">
                         <label for="companyName">会社名</label>
                         <input id="companyName" class="input" type="text" value="{{ Auth::user()->company->name ?? '未登録' }}" disabled>
                         <div class="help">企業プロフィールから自動取得されます</div>
@@ -381,6 +415,14 @@
                     <label for="description">案件概要（必須）</label>
                     <textarea id="description" name="description" class="textarea @error('description') is-invalid @enderror" placeholder="案件の概要を入力してください">{{ old('description') }}</textarea>
                     @error('description')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="field">
+                    <label for="desired_persona">求めている人物像（必須）</label>
+                    <textarea id="desired_persona" name="desired_persona" class="textarea @error('desired_persona') is-invalid @enderror" placeholder="例: 主体的に課題を整理し、チームとコミュニケーションしながら改善できる方">{{ old('desired_persona') }}</textarea>
+                    @error('desired_persona')
                         <span class="error-message">{{ $message }}</span>
                     @enderror
                 </div>
@@ -432,6 +474,49 @@
                     @enderror
                 </div>
 
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                    <div class="field">
+                        <label for="work_start_date">稼働開始（必須）</label>
+                        <div class="ymd-widget" id="work_start_date_widget" data-hidden-input-id="work_start_date">
+                            <div class="ymd-row">
+                                <select class="input select ymd-select @error('work_start_date') is-invalid @enderror" data-role="year" aria-label="稼働開始 年">
+                                    <option value="">年</option>
+                                </select>
+                                <select class="input select ymd-select @error('work_start_date') is-invalid @enderror" data-role="month" aria-label="稼働開始 月">
+                                    <option value="">月</option>
+                                </select>
+                                <select class="input select ymd-select @error('work_start_date') is-invalid @enderror" data-role="day" aria-label="稼働開始 日">
+                                    <option value="">日</option>
+                                </select>
+                            </div>
+                        </div>
+                        <input id="work_start_date" name="work_start_date" class="date-hidden" type="date" value="{{ old('work_start_date') }}">
+                        @error('work_start_date')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div class="field">
+                        <label for="publish_end_date">掲載終了（必須）</label>
+                        <div class="ymd-widget" id="publish_end_date_widget" data-hidden-input-id="publish_end_date">
+                            <div class="ymd-row">
+                                <select class="input select ymd-select @error('publish_end_date') is-invalid @enderror" data-role="year" aria-label="掲載終了 年">
+                                    <option value="">年</option>
+                                </select>
+                                <select class="input select ymd-select @error('publish_end_date') is-invalid @enderror" data-role="month" aria-label="掲載終了 月">
+                                    <option value="">月</option>
+                                </select>
+                                <select class="input select ymd-select @error('publish_end_date') is-invalid @enderror" data-role="day" aria-label="掲載終了 日">
+                                    <option value="">日</option>
+                                </select>
+                            </div>
+                        </div>
+                        <input id="publish_end_date" name="publish_end_date" class="date-hidden" type="date" value="{{ old('publish_end_date') }}">
+                        @error('publish_end_date')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
+
                 <div class="field">
                     <label for="status">ステータス（必須）</label>
                     <select id="status" name="status" class="select @error('status') is-invalid @enderror">
@@ -465,6 +550,108 @@
             toggle.addEventListener('click', (e) => { e.stopPropagation(); isOpen() ? close() : open(); });
             document.addEventListener('click', (e) => { if (!dropdown.contains(e.target)) close(); });
             document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+        })();
+
+        (function () {
+            const pad2 = (n) => String(n).padStart(2, '0');
+            const isValidDate = (y, m, d) => {
+                const dt = new Date(y, m - 1, d);
+                return dt.getFullYear() === y && (dt.getMonth() + 1) === m && dt.getDate() === d;
+            };
+            const lastDayOfMonth = (y, m) => new Date(y, m, 0).getDate();
+
+            const initYmdWidget = (widgetId) => {
+                const widget = document.getElementById(widgetId);
+                if (!widget) return;
+                const hiddenInputId = widget.dataset.hiddenInputId;
+                const hiddenInput = document.getElementById(hiddenInputId);
+                if (!hiddenInput) return;
+
+                const yearSelect = widget.querySelector('[data-role="year"]');
+                const monthSelect = widget.querySelector('[data-role="month"]');
+                const daySelect = widget.querySelector('[data-role="day"]');
+                if (!yearSelect || !monthSelect || !daySelect) return;
+
+                const currentYear = new Date().getFullYear();
+                const minYear = currentYear - 10;
+                const maxYear = currentYear + 10;
+
+                for (let y = maxYear; y >= minYear; y--) {
+                    const opt = document.createElement('option');
+                    opt.value = String(y);
+                    opt.textContent = String(y);
+                    yearSelect.appendChild(opt);
+                }
+
+                for (let m = 1; m <= 12; m++) {
+                    const opt = document.createElement('option');
+                    opt.value = String(m);
+                    opt.textContent = String(m);
+                    monthSelect.appendChild(opt);
+                }
+
+                const fillDays = (selectedDay = '') => {
+                    const y = parseInt(yearSelect.value, 10);
+                    const m = parseInt(monthSelect.value, 10);
+                    daySelect.innerHTML = '<option value="">日</option>';
+                    if (!y || !m) return;
+
+                    const maxDay = lastDayOfMonth(y, m);
+                    for (let d = 1; d <= maxDay; d++) {
+                        const opt = document.createElement('option');
+                        opt.value = String(d);
+                        opt.textContent = String(d);
+                        daySelect.appendChild(opt);
+                    }
+
+                    if (selectedDay && parseInt(selectedDay, 10) <= maxDay) {
+                        daySelect.value = String(parseInt(selectedDay, 10));
+                    }
+                };
+
+                const syncHiddenInput = () => {
+                    const y = parseInt(yearSelect.value, 10);
+                    const m = parseInt(monthSelect.value, 10);
+                    const d = parseInt(daySelect.value, 10);
+                    if (!y || !m || !d || !isValidDate(y, m, d)) {
+                        hiddenInput.value = '';
+                        return;
+                    }
+                    hiddenInput.value = `${y}-${pad2(m)}-${pad2(d)}`;
+                };
+
+                const setFromIso = (iso) => {
+                    const match = (iso || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+                    if (!match) return;
+
+                    const y = parseInt(match[1], 10);
+                    const m = parseInt(match[2], 10);
+                    const d = parseInt(match[3], 10);
+                    if (!isValidDate(y, m, d)) return;
+
+                    yearSelect.value = String(y);
+                    monthSelect.value = String(m);
+                    fillDays(String(d));
+                    daySelect.value = String(d);
+                };
+
+                if (hiddenInput.value) {
+                    setFromIso(hiddenInput.value);
+                }
+
+                yearSelect.addEventListener('change', () => {
+                    fillDays(daySelect.value);
+                    syncHiddenInput();
+                });
+                monthSelect.addEventListener('change', () => {
+                    fillDays(daySelect.value);
+                    syncHiddenInput();
+                });
+                daySelect.addEventListener('change', syncHiddenInput);
+            };
+
+            initYmdWidget('work_start_date_widget');
+            initYmdWidget('publish_end_date_widget');
         })();
     </script>
 </body>

@@ -25,8 +25,14 @@ class CreateJobsTable extends Migration
             // 案件名
             $table->string('title');
 
+            // サブタイトル
+            $table->string('subtitle')->nullable();
+
             // 案件概要
             $table->text('description');
+
+            // 求めている人物像
+            $table->text('desired_persona')->nullable();
 
             // 必須スキル（テキスト）
             $table->text('required_skills_text')->nullable();
@@ -45,6 +51,12 @@ class CreateJobsTable extends Migration
 
             // 稼働条件（表示用）
             $table->string('work_time_text');
+
+            // 稼働開始
+            $table->date('work_start_date')->nullable();
+
+            // 掲載終了
+            $table->date('publish_end_date')->nullable();
 
             // ステータス：0:下書き / 1:公開中 / 2:停止中
             $table->unsignedTinyInteger('status')->default(0);
