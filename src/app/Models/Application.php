@@ -19,11 +19,21 @@ class Application extends Model
         'job_id',
         'corporate_id',
         'message',
+        'desired_hourly_rate',
+        'work_days',
+        'work_time_from',
+        'work_time_to',
+        'note',
+        'weekly_hours',
+        'available_start',
         'status',
     ];
 
     protected $casts = [
         'status' => 'integer',
+        'work_days' => 'array',
+        'desired_hourly_rate' => 'integer',
+        'weekly_hours' => 'integer',
     ];
 
     /**

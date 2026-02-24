@@ -290,9 +290,53 @@
         }
 
         .job-summary {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        .job-summary-table-wrap {
+            overflow-x: auto;
+            border: 1px solid #e1e4e8;
+            border-radius: 12px;
+            background: #fff;
+        }
+        .job-summary-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .job-summary-table th,
+        .job-summary-table td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #e1e4e8;
+            vertical-align: top;
+            font-size: 20px;
+            line-height: 1.6;
+        }
+        .job-summary-table tr:last-child th,
+        .job-summary-table tr:last-child td {
+            border-bottom: 0;
+        }
+        .job-summary-table th {
+            width: 260px;
+            background: #f6f8fa;
+            color: #6a737d;
+            font-weight: 800;
+            text-align: left;
+            white-space: nowrap;
+        }
+        .job-summary-table td {
+            background: #ffffff;
+            color: #24292e;
+            font-weight: 700;
+        }
+        .job-summary-table .skills {
+            margin-top: 0;
+            gap: 0.6rem;
+        }
+        @media (max-width: 640px) {
+            .job-summary-table th { width: 170px; }
+            .job-summary-table th,
+            .job-summary-table td { padding: 0.85rem 1rem; font-size: 18px; }
         }
         .summary-line {
             display: flex;
@@ -395,6 +439,108 @@
             color: #6a737d;
             font-size: 0.85rem;
             line-height: 1.5;
+        }
+
+        .inline-input {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .inline-input .input {
+            flex: 1 1 220px;
+            min-width: 160px;
+        }
+        .input-unit {
+            color: #24292e;
+            font-weight: 800;
+            font-size: 0.95rem;
+            white-space: nowrap;
+        }
+
+        .weekday-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+        @media (max-width: 900px) {
+            .weekday-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        }
+        @media (max-width: 480px) {
+            .weekday-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
+        .weekday-item {
+            position: relative;
+            display: block;
+        }
+        .weekday-item input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .weekday-box {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.8rem 0.75rem;
+            border-radius: 8px;
+            border: 2px solid #e1e4e8;
+            background: #ffffff;
+            color: #24292e;
+            font-weight: 900;
+            user-select: none;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .weekday-box::before {
+            content: "";
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            border: 2px solid currentColor;
+            display: inline-block;
+            background: transparent;
+            flex: 0 0 auto;
+        }
+        .weekday-item input:checked + .weekday-box {
+            background: #0366d6;
+            border-color: #0366d6;
+            color: #ffffff;
+            box-shadow: 0 6px 18px rgba(3, 102, 214, 0.22);
+            transform: translateY(-1px);
+        }
+        .weekday-item input:checked + .weekday-box::before {
+            content: "✓";
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 900;
+            background: #ffffff;
+            color: #0366d6;
+            border-color: #ffffff;
+        }
+        .weekday-item:focus-within .weekday-box {
+            box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.12);
+        }
+
+        .time-range {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .time-range .input {
+            flex: 1 1 180px;
+            min-width: 160px;
+        }
+        .time-sep {
+            font-weight: 900;
+            color: #586069;
+            white-space: nowrap;
         }
 
         .actions {
@@ -562,45 +708,53 @@
             <div class="panel">
                 <div class="panel-title">応募先案件</div>
                 <div class="job-summary">
-                    <div class="summary-line">
-                        <span class="summary-label">会社名：</span>
-                        <span class="summary-value">{{ $job->company->name }}</span>
+                    <div class="job-summary-table-wrap" role="group" aria-label="応募先案件の概要">
+                        <table class="job-summary-table" role="table" aria-label="応募先案件の概要">
+                            <tbody>
+                                <tr>
+                                    <th scope="row">会社名：</th>
+                                    <td>{{ $job->company->name }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">求人名：</th>
+                                    <td>{{ $job->title }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">報酬：</th>
+                                    <td>
+                                        @php
+                                            $rewardText = '';
+                                            if ($job->reward_type === 'monthly') {
+                                                $rewardText = ($job->min_rate / 10000) . '〜' . ($job->max_rate / 10000) . '万円';
+                                            } else {
+                                                $rewardText = number_format($job->min_rate) . '〜' . number_format($job->max_rate) . '円/時';
+                                            }
+                                        @endphp
+                                        {{ $rewardText }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">想定稼働時間／期間：</th>
+                                    <td>{{ $job->work_time_text }}</td>
+                                </tr>
+                                @if($job->required_skills_text)
+                                    <tr>
+                                        <th scope="row">必要スキル：</th>
+                                        <td>
+                                            <div class="skills" aria-label="必要スキル">
+                                                @php
+                                                    $skills = explode(',', $job->required_skills_text);
+                                                @endphp
+                                                @foreach($skills as $skill)
+                                                    <span class="skill-tag">{{ trim($skill) }}</span>
+                                                @endforeach
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endif
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="summary-line">
-                        <span class="summary-label">求人名：</span>
-                        <span class="summary-value">{{ $job->title }}</span>
-                    </div>
-                    <div class="summary-line">
-                        <span class="summary-label">報酬：</span>
-                        <span class="summary-value">
-                            @php
-                                $rewardText = '';
-                                if ($job->reward_type === 'monthly') {
-                                    $rewardText = ($job->min_rate / 10000) . '〜' . ($job->max_rate / 10000) . '万円';
-                                } else {
-                                    $rewardText = number_format($job->min_rate) . '〜' . number_format($job->max_rate) . '円/時';
-                                }
-                            @endphp
-                            {{ $rewardText }}
-                        </span>
-                    </div>
-                    <div class="summary-line">
-                        <span class="summary-label">想定稼働時間／期間：</span>
-                        <span class="summary-value">{{ $job->work_time_text }}</span>
-                    </div>
-                    @if($job->required_skills_text)
-                    <div class="summary-line">
-                        <span class="summary-label">必要スキル：</span>
-                        <div class="summary-value skills" aria-label="必要スキル">
-                            @php
-                                $skills = explode(',', $job->required_skills_text);
-                            @endphp
-                            @foreach($skills as $skill)
-                                <span class="skill-tag">{{ trim($skill) }}</span>
-                            @endforeach
-                        </div>
-                    </div>
-                    @endif
                 </div>
             </div>
 
@@ -609,6 +763,121 @@
                 <div class="panel-title">応募内容</div>
                 <form class="form" action="{{ route('corporate.jobs.apply.store', $job) }}" method="post">
                     @csrf
+                    <div class="form-row">
+                        <label class="label" for="desired_hourly_rate">希望時間単価 <span class="required">必須</span></label>
+                        <div class="inline-input">
+                            <input
+                                id="desired_hourly_rate"
+                                class="input @error('desired_hourly_rate') is-invalid @enderror"
+                                type="number"
+                                name="desired_hourly_rate"
+                                value="{{ old('desired_hourly_rate') }}"
+                                min="0"
+                                step="100"
+                                inputmode="numeric"
+                                placeholder="2,000"
+                                required
+                            >
+                            <span class="input-unit">円/時間</span>
+                        </div>
+                        @error('desired_hourly_rate')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-row">
+                        <span class="label">稼働曜日（目安） <span class="required">必須</span></span>
+                        @php
+                            $oldDays = old('work_days', []);
+                            if (!is_array($oldDays)) $oldDays = [];
+                            $days = ['月','火','水','木','金','土','日'];
+                        @endphp
+                        <div class="weekday-grid" role="group" aria-label="稼働曜日（目安）">
+                            @foreach($days as $day)
+                                <label class="weekday-item">
+                                    <input type="checkbox" name="work_days[]" value="{{ $day }}" {{ in_array($day, $oldDays, true) ? 'checked' : '' }}>
+                                    <span class="weekday-box">{{ $day }}</span>
+                                </label>
+                            @endforeach
+                        </div>
+                        @error('work_days')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                        @error('work_days.*')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-row">
+                        <label class="label" for="work_time_from">稼働時間帯（目安） <span class="required">必須</span></label>
+                        <div class="time-range" aria-label="稼働時間帯（目安）">
+                            <input
+                                id="work_time_from"
+                                class="input @error('work_time_from') is-invalid @enderror"
+                                type="time"
+                                name="work_time_from"
+                                value="{{ old('work_time_from') }}"
+                                required
+                            >
+                            <span class="time-sep">〜</span>
+                            <input
+                                id="work_time_to"
+                                class="input @error('work_time_to') is-invalid @enderror"
+                                type="time"
+                                name="work_time_to"
+                                value="{{ old('work_time_to') }}"
+                                required
+                            >
+                        </div>
+                        @error('work_time_from')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                        @error('work_time_to')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-row">
+                        <label class="label" for="note">備考</label>
+                        <textarea
+                            id="note"
+                            class="textarea @error('note') is-invalid @enderror"
+                            name="note"
+                            placeholder="稼働曜日・時間帯に関する備考があればご記入ください"
+                        >{{ old('note') }}</textarea>
+                        @error('note')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-row">
+                        <label class="label" for="weekly_hours">合計週稼働時間（目安） <span class="required">必須</span></label>
+                        <select id="weekly_hours" class="select @error('weekly_hours') is-invalid @enderror" name="weekly_hours" required>
+                            <option value="" disabled {{ old('weekly_hours') === null ? 'selected' : '' }}>稼働時間を選択してください</option>
+                            <option value="5" {{ old('weekly_hours') == 5 ? 'selected' : '' }}>週5時間程度（20時間／月）</option>
+                            <option value="10" {{ old('weekly_hours') == 10 ? 'selected' : '' }}>週10時間程度（40時間／月）</option>
+                            <option value="20" {{ old('weekly_hours') == 20 ? 'selected' : '' }}>週20時間程度（80時間／月）</option>
+                            <option value="30" {{ old('weekly_hours') == 30 ? 'selected' : '' }}>週30時間程度（120時間／月）</option>
+                            <option value="40" {{ old('weekly_hours') == 40 ? 'selected' : '' }}>週40時間程度（160時間／月）</option>
+                        </select>
+                        @error('weekly_hours')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-row">
+                        <label class="label" for="available_start">開始可能日 <span class="required">必須</span></label>
+                        <select id="available_start" class="select @error('available_start') is-invalid @enderror" name="available_start" required>
+                            <option value="" disabled {{ old('available_start') === null ? 'selected' : '' }}>稼働可能開始日を選択してください</option>
+                            @foreach(['即日','2週間後','1ヶ月後','3ヶ月後以降'] as $opt)
+                                <option value="{{ $opt }}" {{ old('available_start') === $opt ? 'selected' : '' }}>{{ $opt }}</option>
+                            @endforeach
+                        </select>
+                        @error('available_start')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
                     <div class="form-row">
                         <label class="label" for="message">応募メッセージ <span class="required">必須</span></label>
                         <textarea id="message" class="textarea @error('message') is-invalid @enderror" name="message" placeholder="例) 要件の◯◯に対して、Laravel + Vueでの実装経験があります。稼働は週25h、開始は1月上旬から可能です。実績: https://...">{{ old('message') }}</textarea>

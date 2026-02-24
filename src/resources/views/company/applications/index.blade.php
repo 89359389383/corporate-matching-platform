@@ -297,7 +297,7 @@
             cursor: default;
         }
 
-        /* View Tabs + Filter (案件一覧 / フリーランス一覧 / 未読のみ) */
+        /* View Tabs + Filter (案件一覧 / 法人一覧 / 未読のみ) */
         .view-tabs {
             display: flex;
             justify-content: space-between;
@@ -512,6 +512,133 @@
             cursor: pointer;
         }
         .chat-btn.is-disabled { opacity: 0.55; cursor: not-allowed; pointer-events: none; }
+        .application-info-btn {
+            background: #fff;
+            color: #0366d6;
+            padding: 0.28rem 0.65rem;
+            border-radius: 10px;
+            font-size: 1.04rem;
+            font-weight: 900;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            min-width: 90px;
+            text-decoration: none;
+            border: 1px solid #b6d4fe;
+            cursor: pointer;
+            transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+        }
+        .application-info-btn:hover {
+            background: #eff6ff;
+            border-color: #93c5fd;
+            color: #1d4ed8;
+        }
+        .application-info-btn:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.15);
+        }
+        .application-info-template { display: none; }
+
+        .application-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 1200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .application-modal.is-open { display: flex; }
+        .application-modal-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.56);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+        }
+        .application-modal-dialog {
+            position: relative;
+            width: min(760px, 100%);
+            max-height: min(88vh, 900px);
+            overflow: auto;
+            border-radius: 16px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 24px 64px rgba(15, 23, 42, 0.25);
+            padding: 1rem;
+        }
+        .application-modal-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding: 0.25rem 0 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 1rem;
+        }
+        .application-modal-title {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: #111827;
+            letter-spacing: -0.01em;
+        }
+        .application-modal-subtitle {
+            margin-top: 0.25rem;
+            font-size: 0.94rem;
+            color: #6b7280;
+            font-weight: 700;
+        }
+        .application-modal-close {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #334155;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            font-weight: 700;
+            cursor: pointer;
+            flex: 0 0 auto;
+        }
+        .application-modal-close:hover { background: #f1f5f9; }
+        .application-modal-body { display: grid; gap: 0.75rem; }
+        .application-info-grid {
+            display: grid;
+            grid-template-columns: minmax(130px, 170px) 1fr;
+            gap: 0.5rem 0.85rem;
+            align-items: start;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 0.85rem;
+            background: #fbfdff;
+        }
+        .application-info-label {
+            color: #475569;
+            font-size: 0.9rem;
+            font-weight: 900;
+        }
+        .application-info-value {
+            color: #0f172a;
+            font-size: 0.95rem;
+            font-weight: 700;
+            line-height: 1.6;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+        @media (max-width: 640px) {
+            .application-modal { padding: 0.6rem; }
+            .application-modal-dialog { padding: 0.8rem; max-height: 92vh; border-radius: 14px; }
+            .application-modal-title { font-size: 1.06rem; }
+            .application-modal-subtitle { font-size: 0.84rem; }
+            .application-info-grid { grid-template-columns: 1fr; gap: 0.2rem; padding: 0.75rem; }
+            .application-info-label { font-size: 0.82rem; }
+            .application-info-value { font-size: 0.9rem; margin-bottom: 0.35rem; }
+        }
 
         /* Status pill / select (既存更新機能を維持しつつ小さく表示) */
         .status-pill {
@@ -785,7 +912,7 @@
                 <span class="total-unread" id="totalUnread" data-total-unread="{{ $totalUnreadOnPage }}">未読 {{ $totalUnreadOnPage }}</span>
                 <div class="tab-group flex flex-wrap gap-2 md:gap-3" role="tablist" aria-label="表示タブ">
                     <button type="button" class="view-tab active" id="tabJobs" data-view-tab="jobs" aria-selected="true">案件一覧</button>
-                    <button type="button" class="view-tab" id="tabFreelancers" data-view-tab="freelancers" aria-selected="false">フリーランス一覧</button>
+                    <button type="button" class="view-tab" id="tabFreelancers" data-view-tab="freelancers" aria-selected="false">法人一覧</button>
                 </div>
                 <button type="button" class="filter-btn w-full md:w-auto" id="filterBtn" aria-pressed="false">未読のみ</button>
             </div>
@@ -834,10 +961,29 @@
                                 <div class="applicants-title">{{ $job->title ?? '案件名不明' }}</div>
                                 @foreach($group->applications as $application)
                                     @php
-                                        $freelancer = $application->freelancer;
-                                        $freelancerInitial = mb_substr($freelancer->display_name ?? '未', 0, 1);
+                                        $corporate = $application->corporate;
+                                        $corporateInitial = mb_substr($corporate->display_name ?? '未', 0, 1);
                                         $dt = $application->created_at ?? $application->updated_at ?? null;
                                         $timeText = $dt ? $dt->format('Y/m/d H:i') : '';
+                                        $workDays = $application->work_days;
+                                        if (is_string($workDays)) {
+                                            $decoded = json_decode($workDays, true);
+                                            $workDays = is_array($decoded) ? $decoded : [$workDays];
+                                        } elseif (!is_array($workDays)) {
+                                            $workDays = [];
+                                        }
+                                        $workDaysText = count($workDays) ? implode(' / ', $workDays) : '-';
+                                        $weeklyHoursMap = [
+                                            5 => '週5時間程度（20時間/月）',
+                                            10 => '週10時間程度（40時間/月）',
+                                            20 => '週20時間程度（80時間/月）',
+                                            30 => '週30時間程度（120時間/月）',
+                                            40 => '週40時間程度（160時間/月）',
+                                        ];
+                                        $weeklyHoursText = $application->weekly_hours !== null
+                                            ? ($weeklyHoursMap[(int)$application->weekly_hours] ?? ('週' . (int)$application->weekly_hours . '時間'))
+                                            : '-';
+                                        $applicationInfoTarget = 'application-info-job-' . $application->id;
 
                                         $statusText = '';
                                         if ($application->status === \App\Models\Application::STATUS_PENDING) {
@@ -858,10 +1004,10 @@
                                     @else
                                         <div class="freelancer-row" data-unread="{{ ($application->is_unread ?? false) ? '1' : '0' }}" data-job-key="{{ $group->key }}">
                                     @endif
-                                        <div class="avatar" aria-hidden="true">{{ $freelancerInitial }}</div>
+                                        <div class="avatar" aria-hidden="true">{{ $corporateInitial }}</div>
                                         <div class="freelancer-body">
                                             <div class="freelancer-name">
-                                                <span>{{ $freelancer->display_name ?? '名前不明' }}</span>
+                                                <span>{{ $corporate->display_name ?? '名前不明' }}</span>
 
                                                 @if($status === 'pending')
                                                     @if($application->status === \App\Models\Application::STATUS_PENDING)
@@ -891,6 +1037,7 @@
                                                     <span class="badge-pill">未読</span>
                                                 @endif
                                                 <span class="chat-btn {{ $chatUrl ? '' : 'is-disabled' }}">チャット</span>
+                                                <button type="button" class="application-info-btn" data-application-info-target="{{ $applicationInfoTarget }}">応募情報</button>
                                             </div>
                                         </div>
                                     @if($chatUrl)
@@ -898,23 +1045,62 @@
                                     @else
                                         </div>
                                     @endif
+                                    <div class="application-info-template" id="{{ $applicationInfoTarget }}" aria-hidden="true">
+                                        <div class="application-info-grid">
+                                            <div class="application-info-label">法人名</div>
+                                            <div class="application-info-value">{{ $corporate->display_name ?? '名前不明' }}</div>
+                                            <div class="application-info-label">希望時間単価</div>
+                                            <div class="application-info-value">{{ $application->desired_hourly_rate !== null ? number_format((int)$application->desired_hourly_rate) . '円/時間' : '-' }}</div>
+                                            <div class="application-info-label">稼働曜日（目安）</div>
+                                            <div class="application-info-value">{{ $workDaysText }}</div>
+                                            <div class="application-info-label">稼働時間帯（目安）</div>
+                                            <div class="application-info-value">{{ ($application->work_time_from ?: '-') . ' 〜 ' . ($application->work_time_to ?: '-') }}</div>
+                                            <div class="application-info-label">合計週稼働時間</div>
+                                            <div class="application-info-value">{{ $weeklyHoursText }}</div>
+                                            <div class="application-info-label">開始可能日</div>
+                                            <div class="application-info-value">{{ $application->available_start ?: '-' }}</div>
+                                            <div class="application-info-label">備考</div>
+                                            <div class="application-info-value">{{ $application->note ?: '-' }}</div>
+                                            <div class="application-info-label">応募メッセージ</div>
+                                            <div class="application-info-value">{{ $application->message ?: '-' }}</div>
+                                        </div>
+                                    </div>
                                 @endforeach
                             </div>
                         @endforeach
                     </aside>
                 </div>
 
-                <div id="freelancerView" aria-label="フリーランス一覧">
+                <div id="freelancerView" aria-label="法人一覧">
                     <div class="list grid grid-cols-1 gap-5 lg:gap-6">
                         @foreach($freelancerRows as $application)
                             @php
                                 $job = $application->job;
-                                $freelancer = $application->freelancer;
+                                $corporate = $application->corporate;
                                 $jobGroupKey = 'job_' . (optional($job)->id ?? ('unknown-' . $application->id));
 
-                                $freelancerInitial = mb_substr($freelancer->display_name ?? '未', 0, 1);
+                                $corporateInitial = mb_substr($corporate->display_name ?? '未', 0, 1);
                                 $dt = $application->created_at ?? $application->updated_at ?? null;
                                 $timeText = $dt ? $dt->format('Y/m/d H:i') : '';
+                                $workDays = $application->work_days;
+                                if (is_string($workDays)) {
+                                    $decoded = json_decode($workDays, true);
+                                    $workDays = is_array($decoded) ? $decoded : [$workDays];
+                                } elseif (!is_array($workDays)) {
+                                    $workDays = [];
+                                }
+                                $workDaysText = count($workDays) ? implode(' / ', $workDays) : '-';
+                                $weeklyHoursMap = [
+                                    5 => '週5時間程度（20時間/月）',
+                                    10 => '週10時間程度（40時間/月）',
+                                    20 => '週20時間程度（80時間/月）',
+                                    30 => '週30時間程度（120時間/月）',
+                                    40 => '週40時間程度（160時間/月）',
+                                ];
+                                $weeklyHoursText = $application->weekly_hours !== null
+                                    ? ($weeklyHoursMap[(int)$application->weekly_hours] ?? ('週' . (int)$application->weekly_hours . '時間'))
+                                    : '-';
+                                $applicationInfoTarget = 'application-info-freelancer-' . $application->id;
                                 $chatUrl = $application->thread
                                     ? route('company.threads.show', ['thread' => $application->thread])
                                     : null;
@@ -925,10 +1111,10 @@
                                 @else
                                     <div class="freelancer-row" data-unread="{{ ($application->is_unread ?? false) ? '1' : '0' }}" data-job-key="{{ $jobGroupKey }}">
                                 @endif
-                                    <div class="avatar" aria-hidden="true">{{ $freelancerInitial }}</div>
+                                    <div class="avatar" aria-hidden="true">{{ $corporateInitial }}</div>
                                     <div class="freelancer-body">
                                         <div class="freelancer-name">
-                                            <span>{{ $freelancer->display_name ?? '名前不明' }}</span>
+                                            <span>{{ $corporate->display_name ?? '名前不明' }}</span>
                                             <span class="job-label">案件：{{ $job->title ?? '案件名不明' }}</span>
                                         </div>
                                         <div class="message">{{ Str::limit($application->message ?? ($job->description ?? ''), 44) }}</div>
@@ -938,6 +1124,7 @@
                                                 <span class="badge-pill">未読</span>
                                             @endif
                                             <span class="chat-btn {{ $chatUrl ? '' : 'is-disabled' }}">チャット</span>
+                                            <button type="button" class="application-info-btn" data-application-info-target="{{ $applicationInfoTarget }}">応募情報</button>
                                         </div>
                                     </div>
                                 @if($chatUrl)
@@ -945,6 +1132,26 @@
                                 @else
                                     </div>
                                 @endif
+                                <div class="application-info-template" id="{{ $applicationInfoTarget }}" aria-hidden="true">
+                                    <div class="application-info-grid">
+                                        <div class="application-info-label">法人名</div>
+                                        <div class="application-info-value">{{ $corporate->display_name ?? '名前不明' }}</div>
+                                        <div class="application-info-label">希望時間単価</div>
+                                        <div class="application-info-value">{{ $application->desired_hourly_rate !== null ? number_format((int)$application->desired_hourly_rate) . '円/時間' : '-' }}</div>
+                                        <div class="application-info-label">稼働曜日（目安）</div>
+                                        <div class="application-info-value">{{ $workDaysText }}</div>
+                                        <div class="application-info-label">稼働時間帯（目安）</div>
+                                        <div class="application-info-value">{{ ($application->work_time_from ?: '-') . ' 〜 ' . ($application->work_time_to ?: '-') }}</div>
+                                        <div class="application-info-label">合計週稼働時間</div>
+                                        <div class="application-info-value">{{ $weeklyHoursText }}</div>
+                                        <div class="application-info-label">開始可能日</div>
+                                        <div class="application-info-value">{{ $application->available_start ?: '-' }}</div>
+                                        <div class="application-info-label">備考</div>
+                                        <div class="application-info-value">{{ $application->note ?: '-' }}</div>
+                                        <div class="application-info-label">応募メッセージ</div>
+                                        <div class="application-info-value">{{ $application->message ?: '-' }}</div>
+                                    </div>
+                                </div>
                             </div>
                         @endforeach
                     </div>
@@ -958,6 +1165,20 @@
             @endif
         </div>
     </main>
+
+    <div class="application-modal" id="applicationInfoModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="applicationInfoModalTitle">
+        <div class="application-modal-backdrop" data-application-modal-close></div>
+        <div class="application-modal-dialog">
+            <div class="application-modal-header">
+                <div>
+                    <h2 class="application-modal-title" id="applicationInfoModalTitle">応募情報</h2>
+                    <p class="application-modal-subtitle">応募時に入力された内容を表示しています</p>
+                </div>
+                <button type="button" class="application-modal-close" data-application-modal-close aria-label="モーダルを閉じる">×</button>
+            </div>
+            <div class="application-modal-body" id="applicationInfoModalBody"></div>
+        </div>
+    </div>
 
     <script>
         (function () {
@@ -1122,7 +1343,7 @@
                 tabJobs.classList.remove('active');
                 tabFreelancers.setAttribute('aria-selected', 'true');
                 tabJobs.setAttribute('aria-selected', 'false');
-                // フリーランス一覧のみを表示（案件一覧・応募者パネルは非表示）
+                // 法人一覧のみを表示（案件一覧・応募者パネルは非表示）
                 jobView.classList.remove('active');
                 jobView.style.display = 'none';
                 freelancerView.style.display = 'block';
@@ -1169,6 +1390,61 @@
                         placeApplicantsPanel(currentJobKey);
                     }
                 }, 80);
+            });
+        })();
+    </script>
+    <script>
+        (function () {
+            const modal = document.getElementById('applicationInfoModal');
+            const body = document.getElementById('applicationInfoModalBody');
+            if (!modal || !body) return;
+
+            let previouslyFocused = null;
+
+            const closeSelectors = '[data-application-modal-close]';
+
+            const openModal = (targetId) => {
+                const template = document.getElementById(targetId);
+                if (!template) return;
+                previouslyFocused = document.activeElement;
+                body.innerHTML = template.innerHTML;
+                modal.classList.add('is-open');
+                modal.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+                const closeBtn = modal.querySelector('.application-modal-close');
+                if (closeBtn) closeBtn.focus();
+            };
+
+            const closeModal = () => {
+                modal.classList.remove('is-open');
+                modal.setAttribute('aria-hidden', 'true');
+                body.innerHTML = '';
+                document.body.style.overflow = '';
+                if (previouslyFocused && typeof previouslyFocused.focus === 'function') {
+                    previouslyFocused.focus();
+                }
+            };
+
+            document.addEventListener('click', (event) => {
+                const trigger = event.target.closest('[data-application-info-target]');
+                if (trigger) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const targetId = trigger.getAttribute('data-application-info-target');
+                    if (targetId) openModal(targetId);
+                    return;
+                }
+
+                if (event.target.closest(closeSelectors)) {
+                    event.preventDefault();
+                    closeModal();
+                }
+            });
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && modal.classList.contains('is-open')) {
+                    closeModal();
+                }
             });
         })();
     </script>

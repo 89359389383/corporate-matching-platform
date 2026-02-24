@@ -21,8 +21,9 @@ class ApplicationService
      * - 既応募の場合は「二重応募」を防ぎ、既存スレッドへ誘導する
      * - 途中失敗時に不整合を残さないため、トランザクションでまとめる
      */
-    public function apply(int $corporateId, Job $job, string $messageBody): Thread
+    public function apply(int $corporateId, Job $job, array $applicationData): Thread
     {
+        $messageBody = (string) ($applicationData['message'] ?? '');
         Log::info('[ApplicationService] applyメソッド開始', [
             'corporate_id' => $corporateId,
             'job_id' => $job->id,
@@ -71,7 +72,7 @@ class ApplicationService
 
         // 応募〜スレッド作成は複数テーブル更新なので、トランザクションで安全にまとめる
         Log::info('[ApplicationService] トランザクション開始');
-        return DB::transaction(function () use ($corporateId, $job, $messageBody): Thread {
+        return DB::transaction(function () use ($corporateId, $job, $messageBody, $applicationData): Thread {
             // 時刻を1回だけ作って、thread/messageの整合を取りやすくする
             $now = Carbon::now();
             Log::debug('[ApplicationService] トランザクション内: 基準時刻を設定', [
@@ -137,6 +138,14 @@ class ApplicationService
                 'corporate_id' => $corporateId,
                 // 応募時の本文（設計：applicationsにも保持）
                 'message' => $messageBody,
+                // 追加の応募情報
+                'desired_hourly_rate' => $applicationData['desired_hourly_rate'] ?? null,
+                'work_days' => $applicationData['work_days'] ?? null,
+                'work_time_from' => $applicationData['work_time_from'] ?? null,
+                'work_time_to' => $applicationData['work_time_to'] ?? null,
+                'note' => $applicationData['note'] ?? null,
+                'weekly_hours' => $applicationData['weekly_hours'] ?? null,
+                'available_start' => $applicationData['available_start'] ?? null,
                 // 初期状態は「未対応」
                 'status' => Application::STATUS_PENDING,
             ]);

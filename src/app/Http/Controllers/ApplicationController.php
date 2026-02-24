@@ -167,7 +167,7 @@ class ApplicationController extends Controller
         }
 
         // 応募（Application + Thread + 初回Message）を作成する
-        $thread = $applicationService->apply($corporate->id, $job, $validated['message']);
+        $thread = $applicationService->apply($corporate->id, $job, $validated);
 
         // 応募後はチャットへ遷移する
         return redirect()

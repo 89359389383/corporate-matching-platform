@@ -39,12 +39,33 @@ class CompanyApplicationController extends Controller
 
         // 自社案件への応募だけを取得する（company_idに紐づく応募のみ）
         $query = Application::query()
+            // 一覧/モーダル表示に必要なカラムを明示（selectされない事故を防ぐ）
+            ->select([
+                'applications.id',
+                'applications.job_id',
+                'applications.corporate_id',
+                'applications.message',
+                'applications.desired_hourly_rate',
+                'applications.work_days',
+                'applications.work_time_from',
+                'applications.work_time_to',
+                'applications.note',
+                'applications.weekly_hours',
+                'applications.available_start',
+                'applications.status',
+                'applications.created_at',
+                'applications.updated_at',
+            ])
             ->whereHas('job', function ($q) use ($company) {
                 // job.company_id が自社のものだけに絞る
                 $q->where('company_id', $company->id);
             })
             // 表示に必要なリレーションを先読みする
-            ->with(['job.company', 'corporate']);
+            ->with([
+                'job.company',
+                // 応募者（法人）名だけ使うので最小限ロード
+                'corporate:id,display_name',
+            ]);
 
         // status に応じて絞り込む
         if ($status === 'closed') {
