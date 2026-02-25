@@ -88,6 +88,43 @@ class CompanyCorporateController extends Controller
             }
         }
 
+        $corporateDataArray = $corporates->map(function ($corporate) use ($scoutThreadMap) {
+            $allSkills = $corporate->skills->pluck('name')->merge($corporate->customSkills->pluck('name'));
+            $workHours = $corporate->min_hours_per_week . '〜' . $corporate->max_hours_per_week . 'h';
+
+            $minRate = $corporate->min_rate ?: null; // 0は未設定扱い
+            $maxRate = $corporate->max_rate ?: null; // 0は未設定扱い
+            if ($minRate !== null && $maxRate !== null) {
+                $rateText = $minRate . '〜' . $maxRate . '万';
+            } elseif ($minRate !== null || $maxRate !== null) {
+                $rateText = ($minRate ?? $maxRate) . '万';
+            } else {
+                $rateText = '未設定';
+            }
+
+            return [
+                'id' => $corporate->id,
+                'avatar' => mb_substr($corporate->display_name, 0, 1),
+                'name' => $corporate->display_name,
+                'role' => $corporate->job_title ?? '',
+                'bio' => $corporate->bio ?? '',
+                'recipientType' => $corporate->recipient_type ?? 'individual',
+                'corporationName' => $corporate->corporation_name ?? '',
+                'corporationContactName' => $corporate->corporation_contact_name ?? '',
+                'companySiteUrl' => $corporate->company_site_url ?? '',
+                'skills' => $allSkills->toArray(),
+                'workHours' => $workHours,
+                'hoursPerDay' => $corporate->hours_per_day ?? null,
+                'daysPerWeek' => $corporate->days_per_week ?? null,
+                'workStyleText' => $corporate->work_style ?? $corporate->work_style_text ?? '',
+                'prefersFullRemote' => (bool)($corporate->prefers_full_remote ?? $corporate->full_remote ?? $corporate->wants_full_remote ?? false),
+                'rateText' => $rateText,
+                'portfolios' => $corporate->portfolios->pluck('url')->toArray(),
+                'experienceCompanies' => $corporate->experience_companies ?? '',
+                'threadId' => $scoutThreadMap[$corporate->id] ?? null,
+            ];
+        })->values()->toArray();
+
         $unreadApplicationCount = Thread::query()
             ->where('company_id', $companyId)
             ->whereNotNull('job_id')
@@ -113,6 +150,7 @@ class CompanyCorporateController extends Controller
             'rateMin' => $rateMinRaw,
             'rateMax' => $rateMaxRaw,
             'scoutThreadMap' => $scoutThreadMap,
+            'corporateDataArray' => $corporateDataArray,
             'unreadApplicationCount' => $unreadApplicationCount,
             'unreadScoutCount' => $unreadScoutCount,
             'userInitial' => $userInitial,

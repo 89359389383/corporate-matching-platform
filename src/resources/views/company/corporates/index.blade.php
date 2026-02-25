@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>フリーランス一覧（企業）- AITECH</title>
+    <title>法人一覧（企業）- AITECH</title>
     @include('partials.company-header-style')
     <style>
         :root {
@@ -542,6 +542,19 @@
             gap: 0.75rem;
             margin-top: 1rem;
         }
+        /* 追加した法人情報4項目は1行1項目で見せる */
+        #dCorporateInfo,
+        #dMeta {
+            grid-template-columns: 1fr;
+        }
+        @media (min-width: 768px) {
+            #dCorporateInfo {
+                grid-template-columns: 1fr;
+            }
+            #dMeta {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
         .meta-item {
             padding: 0.85rem;
             background-color: #f6f8fa;
@@ -667,8 +680,8 @@
         </aside>
 
         <section class="content-area flex-1 min-w-0">
-            <h1 class="page-title text-2xl md:text-3xl font-black tracking-tight">フリーランス一覧</h1>
-            <div class="list grid grid-cols-1 gap-5" id="corporateList" aria-label="フリーランス一覧">
+            <h1 class="page-title text-2xl md:text-3xl font-black tracking-tight">法人一覧</h1>
+            <div class="list grid grid-cols-1 gap-5" id="corporateList" aria-label="法人一覧">
                 @forelse($corporates as $index => $corporate)
                     @php
                         $avatarText = mb_substr($corporate->display_name, 0, 1);
@@ -735,7 +748,7 @@
                     </article>
                 @empty
                     <div class="rounded-2xl bg-white border border-slate-200 shadow-sm p-8 md:p-10 text-center text-slate-600">
-                        <p class="text-base md:text-lg font-semibold">フリーランスが見つかりませんでした。</p>
+                        <p class="text-base md:text-lg font-semibold">法人が見つかりませんでした。</p>
                     </div>
                 @endforelse
             </div>
@@ -749,7 +762,7 @@
         <aside class="sidebar right" id="detailSidebar">
             <div id="detailSidebarHost">
                 <div class="panel" id="detailPanel" aria-live="polite">
-                    <h3>選択中のフリーランス</h3>
+                    <h3>選択中の法人</h3>
                     <div id="detailContent" style="display: none;">
                         <div class="row">
                             <div class="avatar" id="dAvatar" aria-hidden="true"></div>
@@ -761,6 +774,9 @@
 
                         <div class="detail-title">自己紹介</div>
                         <div class="desc" id="dBio"></div>
+
+                        <div class="detail-title">法人情報</div>
+                        <div class="meta" id="dCorporateInfo"></div>
 
                         <div class="detail-title">スキル</div>
                         <div class="tags" id="dSkills"></div>
@@ -810,43 +826,7 @@
         })();
     </script>
 
-    @php
-        $corporateDataArray = $corporates->map(function($corporate) use ($scoutThreadMap) {
-            $allSkills = $corporate->skills->pluck('name')->merge($corporate->customSkills->pluck('name'));
-            $workHours = $corporate->min_hours_per_week . '〜' . $corporate->max_hours_per_week . 'h';
-
-            $minRate = $corporate->min_rate ?: null; // 0は未設定扱い
-            $maxRate = $corporate->max_rate ?: null; // 0は未設定扱い
-            if ($minRate !== null && $maxRate !== null) {
-                $rateText = $minRate . '〜' . $maxRate . '万';
-            } elseif ($minRate !== null || $maxRate !== null) {
-                $rateText = ($minRate ?? $maxRate) . '万';
-            } else {
-                $rateText = '未設定';
-            }
-
-            return [
-                'id' => $corporate->id,
-                'avatar' => mb_substr($corporate->display_name, 0, 1),
-                'name' => $corporate->display_name,
-                'role' => $corporate->job_title ?? '',
-                'bio' => $corporate->bio ?? '',
-                'skills' => $allSkills->toArray(),
-            'workHours' => $workHours,
-            'hoursPerDay' => $corporate->hours_per_day ?? null,
-            'daysPerWeek' => $corporate->days_per_week ?? null,
-            // フリー入力の働き方（プロフィールにある自由入力項目）を返す（存在すれば表示に使う）
-            'workStyleText' => $corporate->work_style ?? $corporate->work_style_text ?? '',
-            // フルリモート希望フラグ（モデル上の複数候補名に対応）
-            'prefersFullRemote' => (bool)($corporate->prefers_full_remote ?? $corporate->full_remote ?? $corporate->wants_full_remote ?? false),
-                'rateText' => $rateText,
-                'portfolios' => $corporate->portfolios->pluck('url')->toArray(),
-                'experienceCompanies' => $corporate->experience_companies ?? '',
-                'threadId' => $scoutThreadMap[$corporate->id] ?? null,
-            ];
-        })->values()->toArray();
-    @endphp
-    <script type="application/json" id="corporateDataJson">{!! json_encode($corporateDataArray, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
+    <script type="application/json" id="corporateDataJson">{!! json_encode(($corporateDataArray ?? []), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
     <script>
         (function () {
             const dataEl = document.getElementById('corporateDataJson');
@@ -861,13 +841,14 @@
             const dName = document.getElementById('dName');
             const dRole = document.getElementById('dRole');
             const dBio = document.getElementById('dBio');
+            const dCorporateInfo = document.getElementById('dCorporateInfo');
             const dSkills = document.getElementById('dSkills');
             const dMeta = document.getElementById('dMeta');
             const dPortfolio = document.getElementById('dPortfolio');
             const dExperienceCompanies = document.getElementById('dExperienceCompanies');
             const dScoutLink = document.getElementById('dScoutLink');
             
-            if (!list || !detailPanel || !detailContent || !detailEmpty || !dAvatar || !dName || !dRole || !dBio || !dSkills || !dMeta || !dPortfolio || !dExperienceCompanies || !dScoutLink) return;
+            if (!list || !detailPanel || !detailContent || !detailEmpty || !dAvatar || !dName || !dRole || !dBio || !dCorporateInfo || !dSkills || !dMeta || !dPortfolio || !dExperienceCompanies || !dScoutLink) return;
 
             // データをIDでマッピング
             const dataMap = {};
@@ -890,6 +871,52 @@
                 dName.textContent = x.name;
                 dRole.textContent = x.role;
                 dBio.textContent = x.bio || '（未設定）';
+
+                // 法人情報（受注者タイプ / 法人名 / 担当者名 / 会社サイトURL）
+                dCorporateInfo.innerHTML = '';
+                const addInfoRow = (label, valueNode) => {
+                    const item = document.createElement('div');
+                    item.className = 'meta-item';
+
+                    const l = document.createElement('div');
+                    l.className = 'meta-label';
+                    l.textContent = label;
+
+                    const v = document.createElement('div');
+                    v.className = 'meta-value';
+                    if (valueNode instanceof Node) v.appendChild(valueNode);
+                    else v.textContent = valueNode;
+
+                    item.appendChild(l);
+                    item.appendChild(v);
+                    dCorporateInfo.appendChild(item);
+                };
+
+                const recipientText = (x.recipientType === 'corporation') ? '法人' : '個人';
+                addInfoRow('受注者タイプ', recipientText);
+
+                const corpNameText = (x.recipientType === 'corporation')
+                    ? ((x.corporationName && String(x.corporationName).trim()) ? String(x.corporationName) : '（未設定）')
+                    : '（個人のため不要）';
+                addInfoRow('法人名', corpNameText);
+
+                const corpContactText = (x.recipientType === 'corporation')
+                    ? ((x.corporationContactName && String(x.corporationContactName).trim()) ? String(x.corporationContactName) : '（未設定）')
+                    : '（個人のため不要）';
+                addInfoRow('担当者名', corpContactText);
+
+                if (x.companySiteUrl && String(x.companySiteUrl).trim()) {
+                    const a = document.createElement('a');
+                    a.className = 'link';
+                    a.href = String(x.companySiteUrl);
+                    a.target = '_blank';
+                    a.rel = 'noopener noreferrer';
+                    a.textContent = String(x.companySiteUrl);
+                    addInfoRow('会社サイトURL', a);
+                } else {
+                    addInfoRow('会社サイトURL', '（未設定）');
+                }
+
                 dSkills.innerHTML = x.skills.length > 0 
                     ? x.skills.map(s => `<span class="tag">${s}</span>`).join('')
                     : '<span style="color: #586069;">（未設定）</span>';
@@ -905,21 +932,16 @@
                     parts.push(`<div class="detail-title">働き方</div><div class="desc" id="dWorkStyle">${String(x.workStyleText).replace(/\n/g,'<br>')}</div>`);
                 }
 
-                // 希望単価（上）
+                // 希望単価 / 稼働 は「見出し → 下にテキスト」でシンプルに表示
                 parts.push(`
-                    <div class="meta-item">
-                        <div class="meta-label">希望単価</div>
-                        <div class="meta-value" title="${String(x.rateText ?? '').replaceAll('"','&quot;')}">${x.rateText}</div>
-                    </div>
+                    <div class="detail-title">希望単価</div>
+                    <div class="desc" title="${String(x.rateText ?? '').replaceAll('"','&quot;')}">${x.rateText || '未設定'}</div>
                 `);
 
-                // 稼働（週行・その下に日別行）
                 parts.push(`
-                    <div class="meta-item">
-                        <div class="meta-label">稼働</div>
-                        <div class="meta-value" title="${(weekLine + (dailyLine ? ' ' + dailyLine : '')).replaceAll('"','&quot;')}">
-                            ${weekLine}${dailyLine ? '<br><span>' + dailyLine + '</span>' : ''}
-                        </div>
+                    <div class="detail-title">稼働</div>
+                    <div class="desc" title="${(weekLine + (dailyLine ? ' ' + dailyLine : '')).replaceAll('"','&quot;')}">
+                        ${weekLine}${dailyLine ? '<br><span>' + dailyLine + '</span>' : ''}
                     </div>
                 `);
 

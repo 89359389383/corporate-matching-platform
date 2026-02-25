@@ -29,6 +29,10 @@ class CorporateProfileService
 
                 $corporate = Corporate::create([
                     'user_id' => $user->id,
+                    'recipient_type' => $payload['recipient_type'],
+                    'corporation_name' => $payload['corporation_name'] ?? null,
+                    'corporation_contact_name' => $payload['corporation_contact_name'] ?? null,
+                    'company_site_url' => $payload['company_site_url'] ?? null,
                     'display_name' => $payload['display_name'],
                     'job_title' => $payload['job_title'],
                     'bio' => $payload['bio'],

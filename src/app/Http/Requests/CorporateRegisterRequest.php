@@ -14,6 +14,10 @@ class CorporateRegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'recipient_type' => ['required', 'string', 'in:individual,corporation'],
+            'corporation_name' => ['required_if:recipient_type,corporation', 'nullable', 'string', 'max:255'],
+            'corporation_contact_name' => ['required_if:recipient_type,corporation', 'nullable', 'string', 'max:255'],
+            'company_site_url' => ['nullable', 'url', 'max:2000'],
             'display_name' => ['required', 'string', 'max:255'],
             'job_title' => ['required', 'string', 'max:255'],
             'bio' => ['required', 'string', 'max:5000'],
@@ -38,6 +42,31 @@ class CorporateRegisterRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $merge = [];
+        $recipientType = $this->input('recipient_type');
+        if (is_string($recipientType)) {
+            $recipientType = trim($recipientType);
+        }
+        if ($recipientType === null || $recipientType === '') {
+            $recipientType = 'individual';
+        }
+        $merge['recipient_type'] = $recipientType;
+
+        foreach (['corporation_name', 'corporation_contact_name', 'company_site_url'] as $key) {
+            $value = $this->input($key);
+            if (is_string($value)) {
+                $value = trim($value);
+                if ($value === '') {
+                    $value = null;
+                }
+                $merge[$key] = $value;
+            }
+        }
+
+        if ($recipientType !== 'corporation') {
+            $merge['corporation_name'] = null;
+            $merge['corporation_contact_name'] = null;
+        }
+
         $min = $this->input('min_rate');
         $max = $this->input('max_rate');
         if ($min === null && $max === null) {
@@ -73,6 +102,14 @@ class CorporateRegisterRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'recipient_type.required' => '受注者タイプを選択してください。',
+            'recipient_type.in' => '受注者タイプの選択が不正です。',
+            'corporation_name.required_if' => '法人を選んだ場合、法人名は必須です。',
+            'corporation_name.max' => '法人名は255文字以内で入力してください。',
+            'corporation_contact_name.required_if' => '法人を選んだ場合、担当者名は必須です。',
+            'corporation_contact_name.max' => '担当者名は255文字以内で入力してください。',
+            'company_site_url.url' => '会社サイトURLは正しいURL形式で入力してください。',
+            'company_site_url.max' => '会社サイトURLは2000文字以内で入力してください。',
             'display_name.required' => '表示名を入力してください。',
             'job_title.required' => '職種を入力してください。',
             'bio.required' => '自己紹介文を入力してください。',

@@ -331,16 +331,65 @@
                 <div class="panel-title">基本情報</div>
                 <form class="form" action="{{ route('corporate.profile.store') }}" method="post" enctype="multipart/form-data">
                     @csrf
+                    <div class="row">
+                        <label class="label">受注者タイプ <span class="required">（必須）</span></label>
+                        @php
+                            $recipientType = old('recipient_type', 'individual');
+                        @endphp
+                        <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+                            <label style="display:inline-flex; align-items:center; gap:0.5rem; font-weight:800; color:#24292e;">
+                                <input type="radio" name="recipient_type" value="individual" {{ $recipientType === 'individual' ? 'checked' : '' }}>
+                                個人
+                            </label>
+                            <label style="display:inline-flex; align-items:center; gap:0.5rem; font-weight:800; color:#24292e;">
+                                <input type="radio" name="recipient_type" value="corporation" {{ $recipientType === 'corporation' ? 'checked' : '' }}>
+                                法人
+                            </label>
+                        </div>
+                        @error('recipient_type')
+                        <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div id="corporation-fields" class="row" style="display:none;">
+                        <div class="grid-2">
+                            <div class="row">
+                                <label class="label" for="corporation_name">法人名 <span class="required">（必須）</span></label>
+                                <input class="input @error('corporation_name') is-invalid @enderror" id="corporation_name" name="corporation_name" type="text" value="{{ old('corporation_name') }}" placeholder="例: 株式会社AITECH">
+                                @error('corporation_name')
+                                <span class="error-message">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="row">
+                                <label class="label" for="corporation_contact_name">担当者名 <span class="required">（必須）</span></label>
+                                <input class="input @error('corporation_contact_name') is-invalid @enderror" id="corporation_contact_name" name="corporation_contact_name" type="text" value="{{ old('corporation_contact_name') }}" placeholder="例: 山田 太郎">
+                                @error('corporation_contact_name')
+                                <span class="error-message">{{ $message }}</span>
+                                @enderror
+                                <div class="help">企業側がチャットで呼ぶ名前になります。</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <label class="label" for="company_site_url">会社サイトURL（任意）</label>
+                        <input class="input @error('company_site_url') is-invalid @enderror" id="company_site_url" name="company_site_url" type="url" value="{{ old('company_site_url') }}" placeholder="例: https://aitech.example.com">
+                        @error('company_site_url')
+                        <span class="error-message">{{ $message }}</span>
+                        @enderror
+                        <div class="help">信頼材料として掲載できます（ポートフォリオURLと同列の扱いでもOKです）。</div>
+                    </div>
+
                     <div class="grid-2">
                         <div class="row">
-                            <label class="label" for="display_name">表示名 <span class="required">必須</span></label>
+                            <label class="label" for="display_name">表示名 <span class="required">（必須）</span></label>
                             <input class="input @error('display_name') is-invalid @enderror" id="display_name" name="display_name" type="text" value="{{ old('display_name') }}" placeholder="例: 山田 太郎">
                             @error('display_name')
                             <span class="error-message">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="row">
-                            <label class="label" for="job_title">職種（自由入力） <span class="required">必須</span></label>
+                            <label class="label" for="job_title">職種（自由入力） <span class="required">（必須）</span></label>
                             <input class="input @error('job_title') is-invalid @enderror" id="job_title" name="job_title" type="text" value="{{ old('job_title') }}" placeholder="例: Laravelエンジニア">
                             @error('job_title')
                             <span class="error-message">{{ $message }}</span>
@@ -349,7 +398,7 @@
                     </div>
 
                     <div class="row">
-                        <label class="label" for="bio">自己紹介文 <span class="required">必須</span></label>
+                        <label class="label" for="bio">自己紹介文 <span class="required">（必須）</span></label>
                         <textarea class="textarea @error('bio') is-invalid @enderror" id="bio" name="bio" placeholder="例) Laravelを中心にWeb開発を5年経験。EC/在庫管理などの業務ドメインに強みがあります。">{{ old('bio') }}</textarea>
                         @error('bio')
                         <span class="error-message">{{ $message }}</span>
@@ -434,7 +483,7 @@
                                 @enderror
                             </div>
                             <div class="row" style="align-self: start;">
-                                <label class="label">稼働可能時間 <span class="required">必須</span></label>
+                                <label class="label">稼働可能時間 <span class="required">（必須）</span></label>
                                 <div class="help" style="margin-bottom:0.75rem;">1週間あたりの稼働可能時間の範囲と、1日あたりの稼働時間・稼働日数を入力してください。</div>
                                 <div style="margin-bottom:0.75rem;">
                                     <div style="font-weight: 700; color: #586069; font-size: 0.85rem; margin-bottom:0.5rem;">週間稼働時間</div>
@@ -713,6 +762,25 @@
 
             // 初期プレビュー更新
             updatePreview();
+        })();
+
+        // 受注者タイプ（個人/法人）で法人項目を出し分け
+        (function () {
+            const radios = document.querySelectorAll('input[name="recipient_type"]');
+            const corpFields = document.getElementById('corporation-fields');
+            const corpName = document.getElementById('corporation_name');
+            const corpContact = document.getElementById('corporation_contact_name');
+
+            function sync() {
+                const checked = document.querySelector('input[name="recipient_type"]:checked');
+                const isCorp = checked && checked.value === 'corporation';
+                if (corpFields) corpFields.style.display = isCorp ? '' : 'none';
+                if (corpName) corpName.disabled = !isCorp;
+                if (corpContact) corpContact.disabled = !isCorp;
+            }
+
+            radios.forEach(r => r.addEventListener('change', sync));
+            sync();
         })();
     </script>
 </body>

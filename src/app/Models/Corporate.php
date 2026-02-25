@@ -14,6 +14,10 @@ class Corporate extends Model
 
     protected $fillable = [
         'user_id',
+        'recipient_type',
+        'corporation_name',
+        'corporation_contact_name',
+        'company_site_url',
         'display_name',
         'job_title',
         'bio',

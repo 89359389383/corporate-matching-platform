@@ -4,8 +4,564 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>設定 - AITECH</title>
+    {{-- ヘッダーに必要なスタイルのみをここに記載 --}}
     <style>
-        /* ヘッダー共通スタイル（省略） */
+        /* Header (企業側と同じレスポンシブ構造: 640 / 768 / 1024 / 1280) */
+        .header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e1e4e8;
+            padding: 0 var(--header-padding-x, 1rem);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            min-height: var(--header-height-current, 91px);
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr auto; /* mobile: ロゴ / 右側 */
+            align-items: center;
+            gap: 0.5rem;
+            height: var(--header-height-current, 91px);
+            position: relative;
+            min-width: 0;
+            padding: 0.25rem 0; /* 縦余白 */
+        }
+
+        /* md以上: ロゴ / 中央ナビ / 右側 */
+        @media (min-width: 768px) {
+            .header-content { grid-template-columns: auto 1fr auto; gap: 1rem; }
+        }
+
+        /* lg: 間隔を広げる */
+        @media (min-width: 1024px) {
+            .header-content { gap: 1.5rem; padding: 0.5rem 0; }
+        }
+
+        .header-left { display: flex; align-items: center; gap: 0.75rem; min-width: 0; }
+        .header-right { display: flex; align-items: center; justify-content: flex-end; min-width: 0; gap: 0.75rem; }
+
+        /* ロゴ */
+        .logo { display: flex; align-items: center; gap: 8px; min-width: 0; }
+        .logo-text {
+            font-weight: 900;
+            font-size: 18px;
+            margin-left: 0;
+            color: #111827;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+        @media (min-width: 640px) { .logo-text { font-size: 20px; } }
+        @media (min-width: 768px) { .logo-text { font-size: 22px; } }
+        @media (min-width: 1024px) { .logo-text { font-size: 24px; } }
+        @media (min-width: 1280px) { .logo-text { font-size: 26px; } }
+
+        /* Mobile nav toggle (<=768pxで表示) */
+        .nav-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid #e1e4e8;
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            flex: 0 0 auto;
+        }
+        .nav-toggle:hover { background: #f6f8fa; }
+        .nav-toggle:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.15); }
+        .nav-toggle svg { width: 22px; height: 22px; color: #24292e; }
+        @media (min-width: 768px) { .nav-toggle { display: none; } }
+
+        /* Desktop nav (>=768pxで表示) */
+        .nav-links {
+            display: none; /* mobile: hidden (use hamburger) */
+            align-items: center;
+            justify-content: center;
+            flex-wrap: nowrap;
+            min-width: 0;
+            overflow: hidden;
+            gap: 1.25rem;
+        }
+        @media (min-width: 640px) { .nav-links { display: none; } }
+        @media (min-width: 768px) { .nav-links { display: flex; gap: 1.25rem; } }
+        @media (min-width: 1024px) { .nav-links { gap: 2rem; } }
+        @media (min-width: 1280px) { .nav-links { gap: 3rem; } }
+
+        .nav-link {
+            text-decoration: none;
+            color: #586069;
+            font-weight: 500;
+            font-size: 1.05rem;
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            transition: all 0.15s ease;
+            position: relative;
+            letter-spacing: -0.01em;
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+        @media (min-width: 768px) { .nav-link { font-size: 1.1rem; padding: 0.75rem 1.25rem; } }
+        @media (min-width: 1280px) { .nav-link { font-size: 1.15rem; } }
+        .nav-link.has-badge { padding-right: 3rem; }
+        .nav-link:hover { background-color: #f6f8fa; color: #24292e; }
+        .nav-link.active {
+            background-color: #0366d6;
+            color: white;
+            box-shadow: 0 2px 8px rgba(3, 102, 214, 0.3);
+        }
+
+        .badge {
+            background-color: #d73a49;
+            color: white;
+            border-radius: 50%;
+            padding: 0.15rem 0.45rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            min-width: 18px;
+            height: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px rgba(209, 58, 73, 0.3);
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        /* Mobile nav menu */
+        .mobile-nav {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border-bottom: 1px solid #e1e4e8;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.10);
+            padding: 0.75rem var(--header-padding-x, 1rem);
+            display: none;
+            z-index: 110;
+        }
+        .header.is-mobile-nav-open .mobile-nav { display: block; }
+        @media (min-width: 768px) { .mobile-nav { display: none !important; } }
+        .mobile-nav-inner {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            gap: 0.5rem;
+        }
+        .mobile-nav .nav-link {
+            width: 100%;
+            justify-content: flex-start;
+            background: #fafbfc;
+            border: 1px solid #e1e4e8;
+            padding: 0.875rem 1rem;
+        }
+        .mobile-nav .nav-link:hover { background: #f6f8fa; }
+        .mobile-nav .nav-link.active {
+            background-color: #0366d6;
+            color: #fff;
+            border-color: #0366d6;
+        }
+        .mobile-nav .nav-link.has-badge { padding-right: 1rem; }
+        .mobile-nav .badge {
+            position: static;
+            transform: none;
+            margin-left: auto;
+            margin-right: 0;
+        }
+
+        /* User menu / Dropdown */
+        .user-menu { display: flex; align-items: center; position: static; transform: none; }
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: none;
+            padding: 0;
+            appearance: none;
+        }
+        .dropdown { position: relative; }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background-color: white;
+            min-width: 240px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08);
+            border-radius: 12px;
+            z-index: 1000;
+            border: 1px solid #e1e4e8;
+            margin-top: 0.5rem;
+        }
+        .dropdown.is-open .dropdown-content { display: block; }
+        .dropdown-item {
+            display: block;
+            padding: 0.875rem 1.25rem;
+            text-decoration: none;
+            color: #586069;
+            transition: all 0.15s ease;
+            border-radius: 6px;
+            margin: 0.25rem;
+            white-space: nowrap;
+        }
+        .dropdown-item:hover { background-color: #f6f8fa; color: #24292e; }
+        .dropdown-divider { height: 1px; background-color: #e1e4e8; margin: 0.5rem 0; }
+    </style>
+    <style>
+        /* 元の settings.css をそのまま保持します（ヘッダーは共通レイアウトに移動） */
+        :root {
+            --header-height: 72px;
+            --header-height-mobile: 72px;
+            --header-height-sm: 72px;         /* sm */
+            --header-height-md: 72px;        /* md */
+            --header-height-lg: 72px;        /* lg */
+            --header-height-xl: 72px;        /* xl */
+            --header-height-current: var(--header-height-mobile);
+            --header-padding-x: 1rem;
+        }
+
+        /* Breakpoint: sm (>=640px) */
+        @media (min-width: 640px) {
+            :root {
+                --header-padding-x: 1.5rem;
+                --header-height-current: var(--header-height-sm);
+            }
+        }
+
+        /* Breakpoint: md (>=768px) */
+        @media (min-width: 768px) {
+            :root {
+                --header-padding-x: 2rem;
+                --header-height-current: var(--header-height-md);
+            }
+        }
+
+        /* Breakpoint: lg (>=1024px) */
+        @media (min-width: 1024px) {
+            :root {
+                --header-padding-x: 2.5rem;
+                --header-height-current: var(--header-height-lg);
+            }
+        }
+
+        /* Breakpoint: xl (>=1280px) */
+        @media (min-width: 1280px) {
+            :root {
+                --header-padding-x: 3rem;
+                --header-height-current: var(--header-height-xl);
+            }
+        }
+
+        :root {
+            --header-height: 72px;
+            --header-height-mobile: 72px;
+            --container-max-width: 1600px;
+            --main-padding: 3rem;
+            --sidebar-width: 320px;
+            --sidebar-gap: 3rem;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { font-size: 97.5%; }
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #fafbfc;
+            color: #24292e;
+            line-height: 1.5;
+        }
+
+        .main-content {
+            display: flex;
+            max-width: 1150px;
+            margin: 0 auto;
+            padding: var(--main-padding);
+            gap: var(--sidebar-gap);
+        }
+        .sidebar {
+            width: var(--sidebar-width);
+            flex-shrink: 0;
+            /* デフォルトでは固定しない（モバイル/タブレットで通常フローにする） */
+            position: static;
+            top: auto;
+            align-self: flex-start;
+        }
+
+        /* 大きい画面（lg相当）でのみ固定する */
+        @media (min-width: 1024px) {
+            .sidebar {
+                position: sticky;
+                top: calc(var(--header-height) + 1.5rem);
+            }
+        }
+        .content-area { flex: 1; min-width: 0; }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            color: #24292e;
+            letter-spacing: -0.025em;
+        }
+        .page-subtitle {
+            color: #6a737d;
+            font-size: 1rem;
+            margin-bottom: 2.25rem;
+        }
+
+        .panel {
+            background-color: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            border: 1px solid #e1e4e8;
+            margin-bottom: 2rem;
+        }
+        .panel-title {
+            font-size: 1.1rem;
+            font-weight: 900;
+            margin-bottom: 1.25rem;
+            color: #24292e;
+            letter-spacing: -0.01em;
+        }
+
+        .profile-card {
+            background-color: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            border: 1px solid #e1e4e8;
+        }
+        .profile-head {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .big-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        .big-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        .name {
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: #24292e;
+            margin-bottom: 0.25rem;
+        }
+        .headline {
+            color: #6a737d;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .skill-tag {
+            background-color: #f1f8ff;
+            color: #0366d6;
+            padding: 0.375rem 0.875rem;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid #c8e1ff;
+        }
+        .divider {
+            height: 1px;
+            background-color: #e1e4e8;
+            margin: 1rem 0;
+        }
+        .kv {
+            display: grid;
+            gap: 0.75rem;
+        }
+        .k {
+            font-weight: 800;
+            color: #586069;
+            font-size: 0.9rem;
+        }
+        .v {
+            color: #24292e;
+            font-weight: 600;
+        }
+        .help {
+            color: #6a737d;
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        .form {
+            display: grid;
+            gap: 1.5rem;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            /* 左カラム(表示名)のエラーメッセージで行の高さが増えても、
+               右カラム(職種)が同じ高さに引き伸ばされないようにする */
+            align-items: start;
+        }
+        .row {
+            display: grid;
+            gap: 0.5rem;
+        }
+        .label {
+            font-weight: 900;
+            color: #586069;
+            font-size: 0.9rem;
+        }
+        .required {
+            font-size: 0.75rem;
+            font-weight: 900;
+            color: white;
+            background: #d73a49;
+            border-radius: 999px;
+            padding: 0.15rem 0.55rem;
+            letter-spacing: 0.02em;
+            margin-left: 0.5rem;
+            display: inline-block;
+            line-height: 1.2;
+        }
+        .input, .textarea, .select {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #e1e4e8;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: all 0.15s ease;
+            background-color: #fafbfc;
+        }
+        .input:focus, .textarea:focus, .select:focus {
+            outline: none;
+            border-color: #0366d6;
+            box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.1);
+            background-color: white;
+        }
+        .input.is-invalid, .textarea.is-invalid {
+            border-color: #d73a49;
+        }
+        .textarea {
+            min-height: 120px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+        .file-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px dashed #e1e4e8;
+            border-radius: 10px;
+            background-color: #fafbfc;
+            transition: all 0.15s ease;
+            cursor: pointer;
+        }
+        .file-input:hover {
+            border-color: #0366d6;
+            background-color: #f6f8fa;
+        }
+        .file-input:focus {
+            outline: none;
+            border-color: #0366d6;
+            box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.1);
+        }
+        .error-message {
+            display: block;
+            margin-top: 6px;
+            font-size: 13px;
+            font-weight: 800;
+            color: #dc2626;
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            padding-top: 1rem;
+            border-top: 1px solid #e1e4e8;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 15px 60px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+            cursor: pointer;
+            border: none;
+            font-size: 20px;
+            letter-spacing: -0.01em;
+            white-space: nowrap;
+        }
+        .btn-primary { background-color: #0366d6; color: white; }
+        .btn-primary:hover { background-color: #0256cc; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(3, 102, 214, 0.3); }
+        .btn-secondary { background-color: #586069; color: white; }
+        .btn-secondary:hover { background-color: #4c5561; transform: translateY(-1px); }
+
+        .btn-outline {
+            background-color: transparent;
+            color: #0366d6;
+            border: 2px solid #0366d6;
+            padding: 8px 14px;
+            font-size: 16px;
+        }
+        .btn-outline:hover {
+            background-color: #f1f8ff;
+            color: #0256cc;
+            border-color: #0256cc;
+        }
+
+        .skills-container {
+            display: grid;
+            gap: 0.75rem;
+        }
+        .skill-input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+        }
+        @media (max-width: 768px) {
+            .skill-input-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
     </style>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -37,6 +593,21 @@
                 </a>
             </nav>
             <div class="header-right" role="region" aria-label="ユーザー">
+                <button
+                    class="nav-toggle"
+                    id="mobileNavToggle"
+                    type="button"
+                    aria-label="メニューを開く"
+                    aria-haspopup="menu"
+                    aria-expanded="false"
+                    aria-controls="mobileNav"
+                >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 6h18"></path>
+                        <path d="M3 12h18"></path>
+                        <path d="M3 18h18"></path>
+                    </svg>
+                </button>
                 <div class="user-menu">
                     <div class="dropdown" id="userDropdown">
                         <button class="user-avatar" id="userDropdownToggle" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="userDropdownMenu">
@@ -51,11 +622,29 @@
                             <div class="dropdown-divider"></div>
                             <form method="POST" action="{{ route('auth.logout') }}" style="display: inline;">
                                 @csrf
-                                <button type="submit" class="dropdown-item" role="menuitem">ログアウト</button>
+                                <button type="submit" class="dropdown-item" role="menuitem" style="width: 100%; text-align: left; background: none; border: none; padding: 0.875rem 1.25rem; color: #586069; cursor: pointer; font-size: inherit; font-family: inherit;">ログアウト</button>
                             </form>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div class="mobile-nav" id="mobileNav" role="menu" aria-label="モバイルナビゲーション">
+            <div class="mobile-nav-inner">
+                <a href="{{ route('corporate.jobs.index') }}" class="nav-link">案件一覧</a>
+                <a href="{{ route('corporate.applications.index') }}" class="nav-link {{ Request::routeIs('corporate.applications.*') ? 'active' : '' }} {{ $appUnread > 0 ? 'has-badge' : '' }}">
+                    応募した案件
+                    @if($appUnread > 0)
+                        <span class="badge" aria-live="polite">{{ $appUnread }}</span>
+                    @endif
+                </a>
+                <a href="{{ route('corporate.scouts.index') }}" class="nav-link {{ Request::routeIs('corporate.scouts.*') ? 'active' : '' }} {{ $scoutUnread > 0 ? 'has-badge' : '' }}">
+                    スカウト
+                    @if($scoutUnread > 0)
+                        <span class="badge" aria-hidden="false">{{ $scoutUnread }}</span>
+                    @endif
+                </a>
             </div>
         </div>
     </header>
@@ -147,6 +736,56 @@
                 <form class="form" action="{{ route('corporate.profile.settings.update') }}" method="post" enctype="multipart/form-data">
                     @csrf
 
+                    @php
+                        $recipientType = old('recipient_type', $corporate->recipient_type ?? 'individual');
+                    @endphp
+
+                    <div class="row">
+                        <div class="label">受注者タイプ <span class="required">（必須）</span></div>
+                        <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+                            <label style="display:inline-flex; align-items:center; gap:0.5rem; font-weight:800; color:#24292e;">
+                                <input type="radio" name="recipient_type" value="individual" {{ $recipientType === 'individual' ? 'checked' : '' }}>
+                                個人
+                            </label>
+                            <label style="display:inline-flex; align-items:center; gap:0.5rem; font-weight:800; color:#24292e;">
+                                <input type="radio" name="recipient_type" value="corporation" {{ $recipientType === 'corporation' ? 'checked' : '' }}>
+                                法人
+                            </label>
+                        </div>
+                        @error('recipient_type')
+                        <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div id="corporation-fields" class="row" style="display:none;">
+                        <div class="grid-2">
+                            <div class="row">
+                                <div class="label">法人名 <span class="required">（必須）</span></div>
+                                <input class="input @error('corporation_name') is-invalid @enderror" id="corporation_name" name="corporation_name" type="text" value="{{ old('corporation_name', $corporate->corporation_name ?? '') }}" placeholder="例: 株式会社AITECH">
+                                @error('corporation_name')
+                                <span class="error-message">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="row">
+                                <div class="label">担当者名 <span class="required">（必須）</span></div>
+                                <input class="input @error('corporation_contact_name') is-invalid @enderror" id="corporation_contact_name" name="corporation_contact_name" type="text" value="{{ old('corporation_contact_name', $corporate->corporation_contact_name ?? '') }}" placeholder="例: 山田 太郎">
+                                @error('corporation_contact_name')
+                                <span class="error-message">{{ $message }}</span>
+                                @enderror
+                                <div class="help">企業側がチャットで呼ぶ名前になります。</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="label">会社サイトURL（任意）</div>
+                        <input class="input @error('company_site_url') is-invalid @enderror" id="company_site_url" name="company_site_url" type="url" value="{{ old('company_site_url', $corporate->company_site_url ?? '') }}" placeholder="例: https://aitech.example.com">
+                        @error('company_site_url')
+                        <span class="error-message">{{ $message }}</span>
+                        @enderror
+                        <div class="help">信頼材料として掲載できます（ポートフォリオURLと同列の扱いでもOKです）。</div>
+                    </div>
+
                     <div class="grid-2 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                         <div class="row">
                             <div class="label">表示名</div>
@@ -173,21 +812,36 @@
                     </div>
 
                     <div class="row">
-                        <div class="label">スキル（カンマ区切りで複数入力）</div>
+                        <div class="label">スキル（1つ以上推奨・複数入力）</div>
+                        <div class="help">複数入力できます。</div>
                         @php
-                            $skillNames = [];
-                            if (isset($corporate) && $corporate) {
-                                if ($corporate->skills) {
-                                    $skillNames = array_merge($skillNames, $corporate->skills->pluck('name')->toArray());
-                                }
-                                if ($corporate->customSkills) {
-                                    $skillNames = array_merge($skillNames, $corporate->customSkills->pluck('name')->toArray());
+                            $skillsInvalid = $errors->has('custom_skills');
+                            $customSkillValues = old('custom_skills');
+                            if (!is_array($customSkillValues)) {
+                                $customSkillValues = [];
+                                if (isset($corporate) && $corporate && $corporate->customSkills) {
+                                    $customSkillValues = $corporate->customSkills->pluck('name')->toArray();
                                 }
                             }
-                            $skillInputValue = old('skills', implode(', ', $skillNames));
+                            $minSlots = 4;
+                            if (count($customSkillValues) < $minSlots) {
+                                $customSkillValues = array_pad($customSkillValues, $minSlots, null);
+                            }
                         @endphp
-                        <input class="input @error('skills') is-invalid @enderror" id="skills" name="skills" type="text" value="{{ $skillInputValue }}" placeholder="例: PHP, Laravel, JavaScript">
-                        @error('skills')
+
+                        <div class="skills-container" id="skills-container">
+                            @for($i = 0; $i < count($customSkillValues); $i += 2)
+                                <div class="skill-input-row">
+                                    <input class="input skill-input {{ $skillsInvalid ? 'is-invalid' : '' }}" name="custom_skills[]" type="text" value="{{ $customSkillValues[$i] ?? '' }}" placeholder="例: Laravel">
+                                    <input class="input skill-input" name="custom_skills[]" type="text" value="{{ $customSkillValues[$i + 1] ?? '' }}" placeholder="例: Vue.js">
+                                </div>
+                            @endfor
+                        </div>
+                        <button type="button" class="btn btn-outline" id="add-skill-btn" style="margin-top:0.75rem;">追加する</button>
+                        @error('custom_skills')
+                        <span class="error-message">{{ $message }}</span>
+                        @enderror
+                        @error('custom_skills.*')
                         <span class="error-message">{{ $message }}</span>
                         @enderror
                     </div>
@@ -264,17 +918,90 @@
     </main>
 
     <script>
-        // プレビュー用スクリプト（freelancer→corporateに合わせて変数名を変えています）
+        (function () {
+            const header = document.querySelector('header.header');
+            const toggle = document.getElementById('mobileNavToggle');
+            const mobileNav = document.getElementById('mobileNav');
+            if (!header || !toggle || !mobileNav) return;
+
+            const OPEN_CLASS = 'is-mobile-nav-open';
+            const isOpen = () => header.classList.contains(OPEN_CLASS);
+
+            const open = () => {
+                header.classList.add(OPEN_CLASS);
+                toggle.setAttribute('aria-expanded', 'true');
+            };
+
+            const close = () => {
+                header.classList.remove(OPEN_CLASS);
+                toggle.setAttribute('aria-expanded', 'false');
+            };
+
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (isOpen()) close();
+                else open();
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!header.contains(e.target)) close();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') close();
+            });
+
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 768) close();
+            });
+        })();
+    </script>
+    <script>
+        (function () {
+            const dropdown = document.getElementById('userDropdown');
+            const toggle = document.getElementById('userDropdownToggle');
+            const menu = document.getElementById('userDropdownMenu');
+            if (!dropdown || !toggle || !menu) return;
+
+            const open = () => {
+                dropdown.classList.add('is-open');
+                toggle.setAttribute('aria-expanded', 'true');
+            };
+
+            const close = () => {
+                dropdown.classList.remove('is-open');
+                toggle.setAttribute('aria-expanded', 'false');
+            };
+
+            const isOpen = () => dropdown.classList.contains('is-open');
+
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (isOpen()) close();
+                else open();
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!dropdown.contains(e.target)) close();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') close();
+            });
+        })();
+
+        // リアルタイムプレビュー機能
         (function () {
             const displayName = document.getElementById('display_name');
             const jobTitle = document.getElementById('job_title');
-            const skills = document.getElementById('skills');
             const minRate = document.getElementById('min_rate');
             const maxRate = document.getElementById('max_rate');
             const minHours = document.getElementById('min_hours_per_week');
             const maxHours = document.getElementById('max_hours_per_week');
             const hoursPerDay = document.getElementById('hours_per_day');
             const daysPerWeek = document.getElementById('days_per_week');
+            const addSkillBtn = document.getElementById('add-skill-btn');
+            const skillsContainer = document.getElementById('skills-container');
 
             const previewName = document.getElementById('preview-name');
             const previewHeadline = document.getElementById('preview-headline');
@@ -284,43 +1011,125 @@
             const previewDays = document.getElementById('preview-days');
 
             function updatePreview() {
-                if (displayName && previewName) { previewName.textContent = displayName.value || '未入力'; }
-                if (jobTitle && previewHeadline) { previewHeadline.textContent = jobTitle.value || '未入力'; }
-                if (skills && previewSkills) {
-                    const skillText = skills.value;
+                if (displayName && previewName) {
+                    previewName.textContent = displayName.value || '未入力';
+                }
+                if (jobTitle && previewHeadline) {
+                    previewHeadline.textContent = jobTitle.value || '未入力';
+                }
+                if (previewSkills) {
                     previewSkills.innerHTML = '';
-                    if (skillText.trim()) {
-                        const skillArray = skillText.split(',').map(s => s.trim()).filter(s => s);
-                        skillArray.forEach(skill => {
-                            const tag = document.createElement('span');
-                            tag.className = 'skill-tag';
-                            tag.textContent = skill;
-                            previewSkills.appendChild(tag);
-                        });
-                    }
+                    const skillInputs = document.querySelectorAll('input[name="custom_skills[]"]');
+                    skillInputs.forEach(input => {
+                        const value = (input.value || '').trim();
+                        if (!value) return;
+                        const tag = document.createElement('span');
+                        tag.className = 'skill-tag';
+                        tag.textContent = value;
+                        previewSkills.appendChild(tag);
+                    });
                 }
                 if (minRate && maxRate && previewRate) {
-                    const min = minRate.value; const max = maxRate.value;
-                    if (min && max) previewRate.textContent = min + '〜' + max + '万円';
-                    else if (min || max) previewRate.textContent = (min || max) + '万円';
-                    else previewRate.textContent = '未設定';
+                    const min = minRate.value;
+                    const max = maxRate.value;
+                    if (min && max) {
+                        previewRate.textContent = min + '〜' + max + '万円';
+                    } else if (min || max) {
+                        previewRate.textContent = (min || max) + '万円';
+                    } else {
+                        previewRate.textContent = '未設定';
+                    }
                 }
                 if (minHours && maxHours && previewHours) {
-                    const min = minHours.value; const max = maxHours.value;
-                    if (min && max) previewHours.textContent = '週' + min + '〜' + max + 'h';
-                    else if (min || max) previewHours.textContent = '週' + (min || max) + 'h';
-                    else previewHours.textContent = '未設定';
+                    const min = minHours.value;
+                    const max = maxHours.value;
+                    if (min && max) {
+                        previewHours.textContent = '週' + min + '〜' + max + 'h';
+                    } else if (min || max) {
+                        previewHours.textContent = '週' + (min || max) + 'h';
+                    } else {
+                        previewHours.textContent = '未設定';
+                    }
                 }
                 if (hoursPerDay && daysPerWeek && previewDays) {
-                    const hours = hoursPerDay.value; const days = daysPerWeek.value;
-                    if (hours && days) previewDays.textContent = hours + 'h/day・' + days + '日/week';
-                    else if (hours || days) previewDays.textContent = (hours ? hours + 'h/day' : '') + (days ? days + '日/week' : '');
-                    else previewDays.textContent = '未設定';
+                    const hours = hoursPerDay.value;
+                    const days = daysPerWeek.value;
+                    if (hours && days) {
+                        previewDays.textContent = hours + 'h/day・' + days + '日/week';
+                    } else if (hours || days) {
+                        previewDays.textContent = (hours ? hours + 'h/day' : '') + (days ? days + '日/week' : '');
+                    } else {
+                        previewDays.textContent = '未設定';
+                    }
                 }
             }
 
-            [displayName, jobTitle, skills, minRate, maxRate, minHours, maxHours, hoursPerDay, daysPerWeek].forEach(el => { if (el) el.addEventListener('input', updatePreview); });
+            // イベントリスナーを追加
+            [displayName, jobTitle, minRate, maxRate, minHours, maxHours, hoursPerDay, daysPerWeek].forEach(el => {
+                if (el) el.addEventListener('input', updatePreview);
+            });
+
+            // スキル入力欄追加機能（createと同様）
+            if (addSkillBtn && skillsContainer) {
+                addSkillBtn.addEventListener('click', function() {
+                    const lastRow = skillsContainer.lastElementChild;
+                    const inputsInLastRow = lastRow ? lastRow.querySelectorAll('.skill-input') : [];
+
+                    if (lastRow && inputsInLastRow.length < 2) {
+                        const newInput = document.createElement('input');
+                        newInput.className = 'input skill-input';
+                        newInput.name = 'custom_skills[]';
+                        newInput.type = 'text';
+                        newInput.placeholder = '例: スキル名';
+                        lastRow.appendChild(newInput);
+                        newInput.addEventListener('input', updatePreview);
+                        newInput.addEventListener('change', updatePreview);
+                    } else {
+                        const newRow = document.createElement('div');
+                        newRow.className = 'skill-input-row';
+
+                        const newInput = document.createElement('input');
+                        newInput.className = 'input skill-input';
+                        newInput.name = 'custom_skills[]';
+                        newInput.type = 'text';
+                        newInput.placeholder = '例: スキル名';
+                        newRow.appendChild(newInput);
+                        skillsContainer.appendChild(newRow);
+
+                        newInput.addEventListener('input', updatePreview);
+                        newInput.addEventListener('change', updatePreview);
+                    }
+                });
+            }
+
+            // 既存スキル入力にもプレビュー更新を紐づけ
+            const skillInputs = document.querySelectorAll('input[name="custom_skills[]"]');
+            skillInputs.forEach(input => {
+                input.addEventListener('input', updatePreview);
+                input.addEventListener('change', updatePreview);
+            });
+
+            // 初期表示
             updatePreview();
+        })();
+
+        // 受注者タイプ（個人/法人）で法人項目を出し分け
+        (function () {
+            const radios = document.querySelectorAll('input[name="recipient_type"]');
+            const corpFields = document.getElementById('corporation-fields');
+            const corpName = document.getElementById('corporation_name');
+            const corpContact = document.getElementById('corporation_contact_name');
+
+            function sync() {
+                const checked = document.querySelector('input[name="recipient_type"]:checked');
+                const isCorp = checked && checked.value === 'corporation';
+                if (corpFields) corpFields.style.display = isCorp ? '' : 'none';
+                if (corpName) corpName.disabled = !isCorp;
+                if (corpContact) corpContact.disabled = !isCorp;
+            }
+
+            radios.forEach(r => r.addEventListener('change', sync));
+            sync();
         })();
     </script>
 </body>

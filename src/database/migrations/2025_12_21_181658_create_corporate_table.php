@@ -22,6 +22,18 @@ return new class extends Migration
                 ->constrained('users')
                 ->cascadeOnDelete();
 
+            // 受注者タイプ（個人 / 法人）
+            $table->string('recipient_type', 20)->default('individual');
+
+            // 法人名（法人の場合）
+            $table->string('corporation_name')->nullable();
+
+            // 担当者名（法人の場合）
+            $table->string('corporation_contact_name')->nullable();
+
+            // 会社サイトURL（任意）
+            $table->string('company_site_url', 2000)->nullable();
+
             // 表示名
             $table->string('display_name');
 
