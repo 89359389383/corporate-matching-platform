@@ -84,13 +84,15 @@ class Thread extends Model
      */
     public function scout(): HasOne
     {
-        $relation = $this->hasOne(Scout::class, 'company_id', 'company_id')
-            ->where('corporate_id', $this->corporate_id);
-
-        if ($this->job_id === null) {
-            return $relation->whereNull('job_id');
-        }
-
-        return $relation->where('job_id', $this->job_id);
+        // Eager load / whereHas でも正しく動くよう、インスタンス値ではなく whereColumn で結合条件を表現する
+        return $this->hasOne(Scout::class, 'corporate_id', 'corporate_id')
+            ->whereColumn('scouts.company_id', 'threads.company_id')
+            ->where(function ($q) {
+                $q->whereColumn('scouts.job_id', 'threads.job_id')
+                    ->orWhere(function ($q) {
+                        $q->whereNull('scouts.job_id')
+                            ->whereNull('threads.job_id');
+                    });
+            });
     }
 }

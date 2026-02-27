@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Application;
 use App\Models\Thread;
 use App\Models\Scout;
 
@@ -20,11 +21,15 @@ class CorporateScoutController extends Controller
 
         $threads = Thread::query()
             ->where('corporate_id', $corporate->id)
+            // スカウト一覧には「スカウト由来のスレッド」だけを表示する
+            // 応募スレッド（job_idあり）が混ざると、応募案件がスカウト一覧にも表示されてしまう
+            ->whereNull('job_id')
+            ->whereHas('scout')
             ->with(['company', 'messages', 'scout'])
             ->orderByDesc('id')
             ->paginate(20);
 
-        $applicationCount = 0;
+        $applicationCount = Application::query()->where('corporate_id', $corporate->id)->count();
         $scoutCount = Scout::query()->where('corporate_id', $corporate->id)->count();
 
         $unreadScoutCount = Thread::query()
