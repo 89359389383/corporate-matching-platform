@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Thread extends Model
 {
@@ -60,5 +61,36 @@ class Thread extends Model
     public function messages(): HasMany
     {
         return $this->hasMany(Message::class)->orderBy('sent_at');
+    }
+
+    public function contracts(): HasMany
+    {
+        return $this->hasMany(Contract::class)->orderByDesc('version');
+    }
+
+    public function currentContract(): HasOne
+    {
+        return $this->hasOne(Contract::class)
+            ->whereNull('superseded_by_contract_id')
+            ->orderByDesc('version');
+    }
+
+    /**
+     * Scout (inverse of Scout::thread)
+     *
+     * Note: Scout stores company_id, corporate_id and optional job_id.
+     * We mirror Scout::thread() logic here so Thread->scout returns
+     * the matching scout (if any) for this thread.
+     */
+    public function scout(): HasOne
+    {
+        $relation = $this->hasOne(Scout::class, 'company_id', 'company_id')
+            ->where('corporate_id', $this->corporate_id);
+
+        if ($this->job_id === null) {
+            return $relation->whereNull('job_id');
+        }
+
+        return $relation->where('job_id', $this->job_id);
     }
 }

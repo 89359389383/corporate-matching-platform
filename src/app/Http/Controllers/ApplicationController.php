@@ -111,6 +111,8 @@ class ApplicationController extends Controller
             'userInitial' => $userInitial,
             // 法人情報（アイコン表示用）
             'corporate' => $corporate,
+            // 応募フローなので応募した案件をアクティブに
+            'activeNav' => 'applications',
         ]);
     }
 

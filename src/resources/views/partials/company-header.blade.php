@@ -16,6 +16,7 @@
         <nav class="nav-links" id="desktopNav" aria-label="グローバルナビゲーション">
             <a href="{{ route('company.corporates.index') }}" class="nav-link {{ request()->routeIs('company.corporates.*') ? 'active' : '' }}">法人一覧</a>
             <a href="{{ route('company.jobs.index') }}" class="nav-link {{ request()->routeIs('company.jobs.*') ? 'active' : '' }}">案件一覧</a>
+            <a href="{{ route('company.contracts.index') }}" class="nav-link {{ request()->routeIs('company.contracts.*') ? 'active' : '' }}">契約</a>
             @php
                 $appUnread = ($unreadApplicationCount ?? 0);
                 $scoutUnread = ($unreadScoutCount ?? 0);
@@ -91,6 +92,20 @@
             const onChange = () => { if (mq.matches) close(); };
             if (mq.addEventListener) mq.addEventListener('change', onChange);
             else mq.addListener(onChange);
+        })();
+    </script>
+    <script>
+        (function () {
+            const dropdown = document.getElementById('userDropdown');
+            const toggle = document.getElementById('userDropdownToggle');
+            const menu = document.getElementById('userDropdownMenu');
+            if (!dropdown || !toggle || !menu) return;
+            const open = () => { dropdown.classList.add('is-open'); toggle.setAttribute('aria-expanded', 'true'); menu.style.display = 'block'; };
+            const close = () => { dropdown.classList.remove('is-open'); toggle.setAttribute('aria-expanded', 'false'); menu.style.display = 'none'; };
+            const isOpen = () => dropdown.classList.contains('is-open');
+            toggle.addEventListener('click', (e) => { e.stopPropagation(); if (isOpen()) close(); else open(); });
+            document.addEventListener('click', (e) => { if (!dropdown.contains(e.target)) close(); });
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
         })();
     </script>
 </header>

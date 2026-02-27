@@ -521,6 +521,7 @@
                 <div class="chat-title">
                     <span>{{ $thread->freelancer->display_name ?? '不明' }}とのチャット</span>
                 </div>
+                <a class="btn" href="{{ route('company.threads.contracts.index', ['thread' => $thread->id]) }}">契約</a>
                 <a class="btn" href="{{ route('company.scouts.index') }}">一覧へ</a>
             </div>
 

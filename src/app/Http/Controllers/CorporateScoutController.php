@@ -53,6 +53,7 @@ class CorporateScoutController extends Controller
             'unreadApplicationCount' => $unreadApplicationCount,
             'unreadScoutCount' => $unreadScoutCount,
             'userInitial' => $userInitial,
+            'corporate' => $corporate,
         ]);
     }
 }

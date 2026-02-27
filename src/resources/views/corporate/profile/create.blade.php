@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>プロフィール作成 - AITECH</title>
+    @include('partials.corporate-header-style')
     <style>
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { font-size: 97.5%; }
         body {
@@ -295,6 +295,8 @@
     </style>
 </head>
 <body>
+    @include('partials.corporate-header')
+
     <main class="main-content">
         <!-- Sidebar preview -->
         <aside class="sidebar">

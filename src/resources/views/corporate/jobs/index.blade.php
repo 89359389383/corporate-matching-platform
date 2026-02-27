@@ -696,6 +696,7 @@
                         <span class="badge" aria-hidden="false">{{ $scoutUnread }}</span>
                     @endif
                 </a>
+                <a href="{{ route('corporate.contracts.index') }}" class="nav-link {{ Request::routeIs('corporate.contracts.*') ? 'active' : '' }}">契約</a>
             </nav>
 
             <div class="header-right" role="region" aria-label="ユーザー">
@@ -752,6 +753,7 @@
                         <span class="badge" aria-hidden="false">{{ $scoutUnread }}</span>
                     @endif
                 </a>
+                <a href="{{ route('corporate.contracts.index') }}" class="nav-link {{ Request::routeIs('corporate.contracts.*') ? 'active' : '' }}">契約</a>
             </div>
         </div>
     </header>

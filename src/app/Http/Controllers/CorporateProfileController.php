@@ -26,8 +26,13 @@ class CorporateProfileController extends Controller
             return redirect('/corporate/jobs');
         }
 
+        $userInitial = !empty($user->email) ? mb_substr($user->email, 0, 1) : 'U';
         return view('corporate.profile.create', [
             'user' => $user,
+            'unreadApplicationCount' => 0,
+            'unreadScoutCount' => 0,
+            'userInitial' => $userInitial,
+            'corporate' => null,
         ]);
     }
 

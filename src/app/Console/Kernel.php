@@ -15,7 +15,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        // 契約の自動有効化（signed -> active）
+        $schedule->command('contracts:activate')->dailyAt('02:00');
     }
 
     /**

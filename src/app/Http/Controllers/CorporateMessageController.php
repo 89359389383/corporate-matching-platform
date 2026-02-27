@@ -89,6 +89,7 @@ class CorporateMessageController extends Controller
                 'unreadScoutCount' => $unreadScoutCount,
                 'userInitial' => $userInitial,
                 'corporate' => $corporate,
+                'activeNav' => 'scouts',
             ]);
         }
 
@@ -102,6 +103,7 @@ class CorporateMessageController extends Controller
             'unreadScoutCount' => $unreadScoutCount,
             'userInitial' => $userInitial,
             'corporate' => $corporate,
+            'activeNav' => 'applications',
         ]);
     }
 

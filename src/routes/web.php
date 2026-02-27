@@ -14,6 +14,8 @@ use App\Http\Controllers\CompanyJobController;
 use App\Http\Controllers\ScoutController;
 use App\Http\Controllers\CompanyApplicationController;
 use App\Http\Controllers\CompanyMessageController;
+use App\Http\Controllers\CompanyContractController;
+use App\Http\Controllers\CorporateContractController;
 
 /*
 |--------------------------------------------------------------------------
@@ -112,6 +114,14 @@ Route::middleware(['auth:corporate', 'corporate'])->group(function () {
 
     // スカウト一覧
     Route::get('/corporate/scouts', [CorporateScoutController::class, 'index'])->name('corporate.scouts.index');
+
+    // 契約（法人）
+    Route::get('/corporate/contracts', [CorporateContractController::class, 'index'])->name('corporate.contracts.index');
+    Route::get('/corporate/threads/{thread}/contracts', [CorporateContractController::class, 'threadIndex'])->name('corporate.threads.contracts.index');
+    Route::get('/corporate/contracts/{contract}', [CorporateContractController::class, 'show'])->name('corporate.contracts.show');
+    Route::post('/corporate/contracts/{contract}/return', [CorporateContractController::class, 'return'])->name('corporate.contracts.return');
+    Route::post('/corporate/contracts/{contract}/agree', [CorporateContractController::class, 'agree'])->name('corporate.contracts.agree');
+    Route::get('/corporate/contracts/{contract}/pdf', [CorporateContractController::class, 'pdf'])->name('corporate.contracts.pdf');
 });
 
 Route::middleware(['auth:company', 'company'])->group(function () {
@@ -180,4 +190,20 @@ Route::middleware(['auth:company', 'company'])->group(function () {
 
     // 応募ステータス更新
     Route::patch('/company/threads/{thread}/application-status', [CompanyMessageController::class, 'updateApplicationStatus'])->name('company.threads.application-status.update');
+
+    // 契約（企業）
+    Route::get('/company/contracts', [CompanyContractController::class, 'index'])->name('company.contracts.index');
+    Route::get('/company/threads/{thread}/contracts', [CompanyContractController::class, 'threadIndex'])->name('company.threads.contracts.index');
+    Route::get('/company/threads/{thread}/contracts/create', [CompanyContractController::class, 'create'])->name('company.threads.contracts.create');
+    Route::post('/company/threads/{thread}/contracts', [CompanyContractController::class, 'store'])->name('company.threads.contracts.store');
+    Route::get('/company/contracts/{contract}', [CompanyContractController::class, 'show'])->name('company.contracts.show');
+    Route::get('/company/contracts/{contract}/edit', [CompanyContractController::class, 'edit'])->name('company.contracts.edit');
+    Route::patch('/company/contracts/{contract}', [CompanyContractController::class, 'update'])->name('company.contracts.update');
+    Route::post('/company/contracts/{contract}/propose', [CompanyContractController::class, 'propose'])->name('company.contracts.propose');
+    Route::get('/company/contracts/{contract}/versions/create', [CompanyContractController::class, 'createVersion'])->name('company.contracts.versions.create');
+    Route::post('/company/contracts/{contract}/versions', [CompanyContractController::class, 'storeVersion'])->name('company.contracts.versions.store');
+    Route::post('/company/contracts/{contract}/agree', [CompanyContractController::class, 'agree'])->name('company.contracts.agree');
+    Route::post('/company/contracts/{contract}/complete', [CompanyContractController::class, 'complete'])->name('company.contracts.complete');
+    Route::get('/company/contracts/{contract}/pdf', [CompanyContractController::class, 'pdf'])->name('company.contracts.pdf');
+    Route::post('/company/contracts/{contract}/terminate', [CompanyContractController::class, 'terminate'])->name('company.contracts.terminate');
 });
