@@ -510,7 +510,7 @@
             padding: 0.9rem 1rem;
         }
         .persona-title {
-            font-size: 0.8rem;
+            font-size: 1rem;
             color: #6a737d;
             font-weight: 900;
             text-transform: uppercase;

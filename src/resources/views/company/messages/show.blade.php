@@ -511,7 +511,11 @@
                             </select>
                         </form>
                     @endif
-                    <a class="btn" href="{{ route('company.threads.contracts.index', ['thread' => $thread->id]) }}">契約</a>
+                    @if(optional($thread->currentContract)->id)
+                        <a class="btn" href="{{ route('company.contracts.show', ['contract' => $thread->currentContract->id]) }}">契約</a>
+                    @else
+                        <a class="btn" href="{{ route('company.threads.contracts.create', ['thread' => $thread->id]) }}">契約</a>
+                    @endif
                     <a class="btn" href="{{ route('company.applications.index') }}">一覧へ</a>
                 </div>
             </div>

@@ -277,6 +277,10 @@
             background: rgba(15, 23, 42, 0.12);
             transform: translateY(-1px);
         }
+        /* 代表者生年月日クリアボタンの最小幅を指定（create ページで縦表示になってしまう問題の対策） */
+        #representativeBirthClearBtn {
+            min-width: 80px;
+        }
 
     </style>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -571,14 +575,40 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="label" for="representative_birthdate">代表者の生年月日（任意）</label>
-                    <input
-                        id="representative_birthdate"
-                        type="date"
-                        name="representative_birthdate"
-                        value="{{ old('representative_birthdate') }}"
-                        class="form-input @error('representative_birthdate') is-invalid @enderror"
->
+                    <label class="label">代表者の生年月日（任意）</label>
+                    <div class="birthday-widget" aria-label="代表者の生年月日入力">
+                        <div class="birthday-row birthday-row--single" style="display:flex;gap:8px;align-items:center;">
+                            <select id="representativeBirthYear" class="form-input birthday-select" aria-label="年" style="width:34%;">
+                                <option value="">年</option>
+                            </select>
+                            <select id="representativeBirthMonth" class="form-input birthday-select" aria-label="月" style="width:20%;">
+                                <option value="">月</option>
+                            </select>
+                            <select id="representativeBirthDay" class="form-input birthday-select" aria-label="日" style="width:20%;">
+                                <option value="">日</option>
+                            </select>
+
+                            <input
+                                type="text"
+                                id="representativeBirthText"
+                                class="form-input birthday-text"
+                                inputmode="numeric"
+                                autocomplete="bday"
+                                placeholder="YYYY/MM/DD（例: 1990/01/23）"
+                                style="width:40%;">
+                            <button type="button" class="btn btn-secondary" id="representativeBirthClearBtn" style="padding:8px 10px; font-weight:700; min: width 80%;">クリア</button>
+                        </div>
+
+                        <input
+                            type="date"
+                            name="representative_birthdate"
+                            id="representativeBirthHidden"
+                            class="form-input birthday-hidden @error('representative_birthdate') is-invalid @enderror"
+                            value="{{ old('representative_birthdate') }}"
+                            style="display:none;">
+
+                        <div style="margin-top:6px; font-size:13px; font-weight:800; color:#64748b;">プルダウンまたは手入力（YYYY/MM/DD）で入力できます。</div>
+                    </div>
                     @error('representative_birthdate')
                     <span class="error-message">{{ $message }}</span>
                     @enderror
@@ -594,199 +624,156 @@
 </body>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const hiddenInput = document.getElementById('representative_birthdate');
-    if (!hiddenInput) return;
+    (function () {
+        const hiddenInput = document.getElementById('representativeBirthHidden');
+        const yearSelect = document.getElementById('representativeBirthYear');
+        const monthSelect = document.getElementById('representativeBirthMonth');
+        const daySelect = document.getElementById('representativeBirthDay');
+        const textInput = document.getElementById('representativeBirthText');
+        const clearBtn = document.getElementById('representativeBirthClearBtn');
+        if (!hiddenInput || !yearSelect || !monthSelect || !daySelect || !textInput || !clearBtn) return;
 
-    const widget = document.createElement('div');
-    widget.className = 'birthday-widget';
-    widget.setAttribute('aria-label', '代表者の生年月日入力');
-    widget.style.marginTop = '6px';
+        const pad2 = (n) => String(n).padStart(2, '0');
+        const isValidDate = (y, m, d) => {
+            const dt = new Date(y, m - 1, d);
+            return dt.getFullYear() === y && (dt.getMonth() + 1) === m && dt.getDate() === d;
+        };
+        const lastDayOfMonth = (y, m) => new Date(y, m, 0).getDate();
 
-    const row = document.createElement('div');
-    row.style.display = 'flex';
-    row.style.gap = '8px';
-    row.style.alignItems = 'center';
+        const fillYears = () => {
+            const currentYear = new Date().getFullYear();
+            const maxYear = currentYear - 10;
+            const minYear = currentYear - 100;
+            for (let y = maxYear; y >= minYear; y--) {
+                const opt = document.createElement('option');
+                opt.value = String(y);
+                opt.textContent = String(y);
+                yearSelect.appendChild(opt);
+            }
+        };
 
-    const year = document.createElement('select');
-    year.id = 'rep_birth_year';
-    year.className = 'form-input birthday-select';
-    year.style.width = '34%';
-    year.innerHTML = '<option value=\"\">年</option>';
+        const fillMonths = () => {
+            for (let m = 1; m <= 12; m++) {
+                const opt = document.createElement('option');
+                opt.value = String(m);
+                opt.textContent = String(m);
+                monthSelect.appendChild(opt);
+            }
+        };
 
-    const month = document.createElement('select');
-    month.id = 'rep_birth_month';
-    month.className = 'form-input birthday-select';
-    month.style.width = '20%';
-    month.innerHTML = '<option value=\"\">月</option>';
+        const fillDays = (y, m, selectedDay = '') => {
+            const placeholder = daySelect.querySelector('option[value=""]');
+            daySelect.innerHTML = '';
+            if (placeholder) daySelect.appendChild(placeholder);
+            if (!y || !m) return;
 
-    const day = document.createElement('select');
-    day.id = 'rep_birth_day';
-    day.className = 'form-input birthday-select';
-    day.style.width = '20%';
-    day.innerHTML = '<option value=\"\">日</option>';
+            const max = lastDayOfMonth(y, m);
+            for (let d = 1; d <= max; d++) {
+                const opt = document.createElement('option');
+                opt.value = String(d);
+                opt.textContent = String(d);
+                daySelect.appendChild(opt);
+            }
+            if (selectedDay) daySelect.value = selectedDay;
+        };
 
-    const text = document.createElement('input');
-    text.type = 'text';
-    text.id = 'rep_birth_text';
-    text.className = 'form-input birthday-text';
-    text.placeholder = 'YYYY/MM/DD（例: 1990/01/23）';
-    text.style.width = '40%';
+        const syncToHidden = () => {
+            const y = parseInt(yearSelect.value, 10);
+            const m = parseInt(monthSelect.value, 10);
+            const d = parseInt(daySelect.value, 10);
+            if (!y || !m || !d || !isValidDate(y, m, d)) {
+                hiddenInput.value = '';
+                return;
+            }
+            hiddenInput.value = `${y}-${pad2(m)}-${pad2(d)}`;
+        };
 
-    const clearBtn = document.createElement('button');
-    clearBtn.type = 'button';
-    clearBtn.id = 'rep_birth_clear';
-    clearBtn.className = 'btn btn-secondary';
-    clearBtn.style.padding = '8px 10px';
-    clearBtn.style.fontWeight = '700';
-    clearBtn.textContent = 'クリア';
+        const syncText = () => {
+            const y = parseInt(yearSelect.value, 10);
+            const m = parseInt(monthSelect.value, 10);
+            const d = parseInt(daySelect.value, 10);
+            if (!y || !m || !d || !isValidDate(y, m, d)) {
+                textInput.value = '';
+                return;
+            }
+            textInput.value = `${y}/${pad2(m)}/${pad2(d)}`;
+        };
 
-    row.appendChild(year);
-    row.appendChild(month);
-    row.appendChild(day);
-    row.appendChild(text);
-    row.appendChild(clearBtn);
-    widget.appendChild(row);
-
-    const help = document.createElement('div');
-    help.className = 'help';
-    help.style.marginTop = '6px';
-    help.textContent = 'プルダウンまたは手入力（YYYY/MM/DD）で入力できます。';
-    widget.appendChild(help);
-
-    hiddenInput.parentNode.insertBefore(widget, hiddenInput);
-    hiddenInput.style.display = 'none';
-
-    const pad2 = (n) => String(n).padStart(2, '0');
-    const isValidDate = (y, m, d) => {
-        const dt = new Date(y, m - 1, d);
-        return dt.getFullYear() === y && (dt.getMonth() + 1) === m && dt.getDate() === d;
-    };
-    const lastDayOfMonth = (y, m) => new Date(y, m, 0).getDate();
-
-    const fillYears = () => {
-        const currentYear = new Date().getFullYear();
-        const maxYear = currentYear - 10;
-        const minYear = currentYear - 100;
-        for (let y = maxYear; y >= minYear; y--) {
-            const opt = document.createElement('option');
-            opt.value = String(y);
-            opt.textContent = String(y);
-            year.appendChild(opt);
-        }
-    };
-    const fillMonths = () => {
-        for (let m = 1; m <= 12; m++) {
-            const opt = document.createElement('option');
-            opt.value = String(m);
-            opt.textContent = String(m);
-            month.appendChild(opt);
-        }
-    };
-    const fillDays = (y, m, selectedDay = '') => {
-        const placeholder = day.querySelector('option[value=\"\"]');
-        day.innerHTML = '';
-        if (placeholder) day.appendChild(placeholder);
-        if (!y || !m) return;
-        const max = lastDayOfMonth(y, m);
-        for (let d = 1; d <= max; d++) {
-            const opt = document.createElement('option');
-            opt.value = String(d);
-            opt.textContent = String(d);
-            day.appendChild(opt);
-        }
-        if (selectedDay) day.value = selectedDay;
-    };
-
-    const syncToHidden = () => {
-        const y = parseInt(year.value, 10);
-        const m = parseInt(month.value, 10);
-        const d = parseInt(day.value, 10);
-        if (!y || !m || !d || !isValidDate(y, m, d)) {
-            hiddenInput.value = '';
-            return;
-        }
-        hiddenInput.value = `${y}-${pad2(m)}-${pad2(d)}`;
-    };
-    const syncText = () => {
-        const y = parseInt(year.value, 10);
-        const m = parseInt(month.value, 10);
-        const d = parseInt(day.value, 10);
-        if (!y || !m || !d || !isValidDate(y, m, d)) {
-            text.value = '';
-            return;
-        }
-        text.value = `${y}/${pad2(m)}/${pad2(d)}`;
-    };
-
-    const parseTextToISO = (txt) => {
-        const raw = (txt || '').trim();
-        if (!raw) return '';
-        const m = raw.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
-        if (!m) return '';
-        const y = parseInt(m[1], 10);
-        const mo = parseInt(m[2], 10);
-        const d = parseInt(m[3], 10);
-        if (!isValidDate(y, mo, d)) return '';
-        return `${y}-${pad2(mo)}-${pad2(d)}`;
-    };
-
-    fillYears();
-    fillMonths();
-    if (hiddenInput.value) {
-        const iso = hiddenInput.value.match(/^\d{4}-\d{2}-\d{2}$/) ? hiddenInput.value : parseTextToISO(hiddenInput.value);
-        if (iso) {
-            hiddenInput.value = iso;
-            const parts = iso.split('-');
-            year.value = parts[0];
-            month.value = String(parseInt(parts[1],10));
-            fillDays(parseInt(parts[0],10), parseInt(parts[1],10), String(parseInt(parts[2],10)));
-            day.value = String(parseInt(parts[2],10));
+        const setFromISO = (iso) => {
+            const match = (iso || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            if (!match) return;
+            const y = parseInt(match[1], 10);
+            const m = parseInt(match[2], 10);
+            const d = parseInt(match[3], 10);
+            if (!isValidDate(y, m, d)) return;
+            yearSelect.value = String(y);
+            monthSelect.value = String(m);
+            fillDays(y, m, String(d));
+            daySelect.value = String(d);
             syncText();
+        };
+
+        const parseTextToISO = (txt) => {
+            const raw = (txt || '').trim();
+            if (!raw) return '';
+            const match = raw.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+            if (!match) return '';
+            const y = parseInt(match[1], 10);
+            const m = parseInt(match[2], 10);
+            const d = parseInt(match[3], 10);
+            if (!isValidDate(y, m, d)) return '';
+            return `${y}-${pad2(m)}-${pad2(d)}`;
+        };
+
+        fillYears();
+        fillMonths();
+        if (hiddenInput.value) {
+            const normalized = hiddenInput.value.match(/^\d{4}-\d{2}-\d{2}$/)
+                ? hiddenInput.value
+                : parseTextToISO(hiddenInput.value);
+            if (normalized) {
+                hiddenInput.value = normalized;
+                setFromISO(normalized);
+            }
         }
-    }
 
-    year.addEventListener('change', () => {
-        const y = parseInt(year.value, 10);
-        const m = parseInt(month.value, 10);
-        const currentDay = day.value;
-        fillDays(y || 0, m || 0, currentDay);
-        syncToHidden();
-        syncText();
-    });
-    month.addEventListener('change', () => {
-        const y = parseInt(year.value, 10);
-        const m = parseInt(month.value, 10);
-        const currentDay = day.value;
-        fillDays(y || 0, m || 0, currentDay);
-        syncToHidden();
-        syncText();
-    });
-    day.addEventListener('change', () => {
-        syncToHidden();
-        syncText();
-    });
+        yearSelect.addEventListener('change', () => {
+            const y = parseInt(yearSelect.value, 10);
+            const m = parseInt(monthSelect.value, 10);
+            const currentDay = daySelect.value;
+            fillDays(y || 0, m || 0, currentDay);
+            syncToHidden();
+            syncText();
+        });
+        monthSelect.addEventListener('change', () => {
+            const y = parseInt(yearSelect.value, 10);
+            const m = parseInt(monthSelect.value, 10);
+            const currentDay = daySelect.value;
+            fillDays(y || 0, m || 0, currentDay);
+            syncToHidden();
+            syncText();
+        });
+        daySelect.addEventListener('change', () => {
+            syncToHidden();
+            syncText();
+        });
 
-    text.addEventListener('blur', () => {
-        const iso = parseTextToISO(text.value);
-        if (!iso) return;
-        hiddenInput.value = iso;
-        const parts = iso.split('-');
-        year.value = parts[0];
-        month.value = String(parseInt(parts[1],10));
-        fillDays(parseInt(parts[0],10), parseInt(parts[1],10), String(parseInt(parts[2],10)));
-        day.value = String(parseInt(parts[2],10));
-    });
+        textInput.addEventListener('blur', () => {
+            const iso = parseTextToISO(textInput.value);
+            if (!iso) return;
+            hiddenInput.value = iso;
+            setFromISO(iso);
+        });
 
-    clearBtn.addEventListener('click', () => {
-        year.value = '';
-        month.value = '';
-        day.value = '';
-        text.value = '';
-        hiddenInput.value = '';
-        fillDays(0,0);
-    });
-});
+        clearBtn.addEventListener('click', () => {
+            yearSelect.value = '';
+            monthSelect.value = '';
+            daySelect.value = '';
+            textInput.value = '';
+            hiddenInput.value = '';
+            fillDays(0, 0);
+        });
+    })();
 </script>
 
 </html>

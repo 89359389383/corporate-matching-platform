@@ -455,7 +455,7 @@ class CompanyContractController extends Controller
             ->with('success', '契約を完了にしました');
     }
 
-    public function pdf(Contract $contract)
+    public function pdf(Request $request, Contract $contract, ContractService $contractService)
     {
         $user = Auth::user();
         if ($user->role !== 'company') {
@@ -469,16 +469,21 @@ class CompanyContractController extends Controller
             abort(403);
         }
 
-        if ($contract->pdf_path === null) {
-            return redirect()
-                ->route('company.contracts.show', ['contract' => $contract])
-                ->with('error', 'PDFは締結後に生成されます');
+        $contract->loadMissing(['company', 'corporate', 'job', 'thread', 'signatures']);
+
+        // PDFが未生成 or 実体が無い場合はオンデマンド生成してからダウンロードする
+        if ($contract->pdf_path === null || !Storage::disk('local')->exists($contract->pdf_path)) {
+            if ($contract->pdf_path !== null && !Storage::disk('local')->exists($contract->pdf_path)) {
+                $contract->forceFill(['pdf_path' => null])->save();
+            }
+            $docHash = $contractService->computeDocumentHash($contract);
+            $contractService->generateSignedPdf($contract, $docHash);
         }
 
-        if (!Storage::disk('local')->exists($contract->pdf_path)) {
+        if ($contract->pdf_path === null || !Storage::disk('local')->exists($contract->pdf_path)) {
             return redirect()
                 ->route('company.contracts.show', ['contract' => $contract])
-                ->with('error', 'PDFファイルが見つかりません');
+                ->with('error', 'PDFの生成に失敗しました');
         }
 
         return Storage::disk('local')->download($contract->pdf_path, 'contract_' . $contract->id . '_v' . $contract->version . '.pdf');

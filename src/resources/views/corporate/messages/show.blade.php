@@ -170,7 +170,11 @@
         @if($thread->job)
             <a class="btn" href="{{ route('corporate.jobs.show',['job'=>$thread->job->id]) }}">案件詳細</a>
         @endif
-        <a class="btn" href="{{ route('corporate.threads.contracts.index',['thread'=>$thread->id]) }}">契約</a>
+        @if(optional($thread->currentContract)->id)
+            <a class="btn" href="{{ route('corporate.contracts.show', ['contract' => $thread->currentContract->id]) }}">契約</a>
+        @else
+            <button class="btn is-disabled" type="button" disabled>契約</button>
+        @endif
     </div>
 </div>
 

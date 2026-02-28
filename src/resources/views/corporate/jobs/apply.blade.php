@@ -205,6 +205,7 @@
         .inline-input .input {
             flex: 1 1 220px;
             min-width: 160px;
+            max-width: 220px;
         }
         .input-unit {
             color: #24292e;
@@ -283,19 +284,33 @@
         }
 
         .time-range {
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 0.75rem;
-            flex-wrap: wrap;
+            gap: 0.35rem;
+            flex-wrap: nowrap;
         }
-        .time-range .input {
-            flex: 1 1 180px;
-            min-width: 160px;
+        .time-input {
+            width: 112px;
+            min-width: 112px;
+            padding: 0.55rem 0.7rem;
+            border: 1px solid #a9b4c1;
+            border-radius: 2px;
+            background: #f8fafc;
+            color: #475569;
+            font-size: 1.05rem;
+            line-height: 1.2;
+        }
+        .time-input:focus {
+            border-color: #6b7280;
+            box-shadow: 0 0 0 2px rgba(107, 114, 128, 0.12);
+            background: #ffffff;
         }
         .time-sep {
-            font-weight: 900;
-            color: #586069;
+            font-weight: 700;
+            color: #475569;
             white-space: nowrap;
+            font-size: 1.05rem;
+            padding: 0 0.05rem;
         }
 
         .actions {
@@ -436,8 +451,13 @@
                     <div class="form-row">
                         <span class="label">稼働曜日（目安） <span class="required">必須</span></span>
                         @php
-                            $oldDays = old('work_days', []);
-                            if (!is_array($oldDays)) $oldDays = [];
+                            // 初期状態は月〜金を選択済みにする（フォーム送信後は old() を優先）
+                            $oldDays = old('work_days', null);
+                            if ($oldDays === null) {
+                                $oldDays = ['月','火','水','木','金'];
+                            } else {
+                                if (!is_array($oldDays)) $oldDays = [];
+                            }
                             $days = ['月','火','水','木','金','土','日'];
                         @endphp
                         <div class="weekday-grid" role="group" aria-label="稼働曜日（目安）">
@@ -461,7 +481,7 @@
                         <div class="time-range" aria-label="稼働時間帯（目安）">
                             <input
                                 id="work_time_from"
-                                class="input @error('work_time_from') is-invalid @enderror"
+                                class="input time-input @error('work_time_from') is-invalid @enderror"
                                 type="time"
                                 name="work_time_from"
                                 value="{{ old('work_time_from') }}"
@@ -470,7 +490,7 @@
                             <span class="time-sep">〜</span>
                             <input
                                 id="work_time_to"
-                                class="input @error('work_time_to') is-invalid @enderror"
+                                class="input time-input @error('work_time_to') is-invalid @enderror"
                                 type="time"
                                 name="work_time_to"
                                 value="{{ old('work_time_to') }}"

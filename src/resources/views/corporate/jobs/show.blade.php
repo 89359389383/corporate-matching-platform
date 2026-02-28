@@ -169,7 +169,7 @@
             padding: 1rem 1.1rem;
         }
         .persona-title {
-            font-size: 0.8rem;
+            font-size: 24px;
             color: #6a737d;
             font-weight: 900;
             text-transform: uppercase;
@@ -177,7 +177,7 @@
             margin-bottom: 0.5rem;
         }
         .overview-title {
-            font-size: 0.8rem;
+            font-size: 24px;
             color: #4b5563;
             font-weight: 900;
             text-transform: uppercase;
@@ -231,6 +231,7 @@
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 1rem;
             margin-top: 1rem;
+            max-width: 600px;
         }
         .detail-item {
             display: flex;
@@ -243,7 +244,7 @@
             border-radius: 10px;
         }
         .detail-label {
-            font-size: 0.75rem;
+            font-size: 24px;
             color: #6a737d;
             font-weight: 800;
             text-transform: uppercase;
@@ -255,10 +256,6 @@
             color: #24292e;
             font-size: 1.05rem;
             white-space: nowrap;
-        }
-
-        .job-details {
-            max-width: 600px;
         }
 
         .skills {
@@ -276,25 +273,6 @@
             font-weight: 700;
             border: 1px solid #c8e1ff;
         }
-
-        /* Sidebar cards */
-        .side-card {
-            background-color: white;
-            border-radius: 16px;
-            padding: 2rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
-            border: 1px solid #e1e4e8;
-            margin-bottom: 2rem;
-        }
-        .side-title { font-size: 1.1rem; font-weight: 900; margin-bottom: 1.25rem; }
-        .kv {
-            display: grid;
-            grid-template-columns: 120px 1fr;
-            gap: 0.75rem 1rem;
-        }
-        .k { color: #6a737d; font-weight: 800; font-size: 0.9rem; }
-        .v { color: #24292e; font-weight: 900; font-size: 0.95rem; }
-        .help { color: #6a737d; font-size: 0.85rem; line-height: 1.5; }
 
         .btn-row {
             display: flex;
@@ -344,28 +322,20 @@
             background-color: #4c5561;
             transform: translateY(-1px);
         }
-        .btn-ghost {
-            background: #fafbfc;
-            color: #24292e;
-            border: 1px solid #e1e4e8;
-        }
-        .btn-ghost:hover { background: #f6f8fa; transform: translateY(-1px); }
-
     </style>
-    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
     @include('partials.corporate-header')
 
-    <main class="main-content max-w-5xl mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-10">
+    <main class="main-content">
         <div class="content-area">
-            <div class="page-breadcrumbs" aria-label="パンくず">
+            <div class="page-breadcrumbs">
                 <a href="{{ route('corporate.jobs.index') }}">案件一覧</a>
-                <span aria-hidden="true">/</span>
+                <span>/</span>
                 <span>案件詳細</span>
             </div>
 
-            <section class="hero" aria-label="案件概要">
+            <section class="hero">
                 @php
                     $rewardText = '';
                     if ($job->reward_type === 'monthly') {
@@ -374,7 +344,6 @@
                         $rewardText = number_format($job->min_rate) . '〜' . number_format($job->max_rate) . '円/時';
                     }
 
-                    // ステータス pill（index と同じ）
                     $statusClass = '';
                     $statusText = '';
                     switch($job->status) {
@@ -392,7 +361,6 @@
                             break;
                     }
 
-                    // 掲載終了までの日数 / 稼働開始日（index と同じ見え方）
                     $today = \Illuminate\Support\Carbon::today();
                     $daysUntilPublishEnd = null;
                     if (!empty($job->publish_end_date)) {
@@ -411,7 +379,7 @@
                     }
                 @endphp
 
-                <div class="job-meta-line" aria-label="掲載終了までの日数と稼働開始日">
+                <div class="job-meta-line">
                     @if($daysUntilPublishEnd !== null)
                         @if($daysUntilPublishEnd >= 0)
                             <span class="meta-bold">あと <span class="meta-days">{{ $daysUntilPublishEnd }}日</span>で掲載終了</span>
@@ -435,22 +403,22 @@
                         <div class="hero-company-label">会社名</div>
                         <div class="hero-company">{{ $job->company->name ?? '' }}</div>
 
-                        <div class="overview-section" aria-label="案件概要">
+                        <div class="overview-section">
                             <div class="overview-title">案件概要</div>
                             <div class="overview-text">{{ $job->description ?: '未設定' }}</div>
                         </div>
 
-                        <div class="persona-section" aria-label="求めている人物像">
+                        <div class="persona-section">
                             <div class="persona-title">求めている人物像</div>
                             <div class="persona-text">{{ $job->desired_persona ?: '未設定' }}</div>
                         </div>
                     </div>
-                    <div class="inline" aria-label="ステータス">
+                    <div class="inline">
                         <span class="pill {{ $statusClass }}">{{ $statusText }}</span>
                     </div>
                 </div>
 
-                <div class="job-details grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4" aria-label="主要条件">
+                <div class="job-details">
                     <div class="detail-item">
                         <div class="detail-label">報酬</div>
                         <div class="detail-value">{{ $rewardText }}</div>
@@ -462,10 +430,8 @@
                 </div>
 
                 @if($job->required_skills_text)
-                    @php
-                        $skills = explode(',', $job->required_skills_text);
-                    @endphp
-                    <div class="skills-block" aria-label="必要スキル">
+                    @php $skills = explode(',', $job->required_skills_text); @endphp
+                    <div class="skills-block">
                         <div class="skills-label">必要スキル</div>
                         <div class="skills">
                             @foreach($skills as $skill)
@@ -473,103 +439,24 @@
                             @endforeach
                         </div>
                     </div>
-                @else
-                    <div class="skills-block" aria-label="必要スキル">
-                        <div class="skills-label">必要スキル</div>
-                        <div class="help">未設定</div>
-                    </div>
                 @endif
             </section>
 
-            <section class="section" aria-label="応募">
-                <div class="btn-row horizontal flex flex-col md:flex-row gap-3 md:gap-4">
+            <section class="section">
+                <div class="btn-row horizontal">
                     @if($alreadyApplied)
                         @if($thread)
-                            <a href="{{ route('corporate.threads.show', $thread->id) }}" class="btn btn-primary w-full md:flex-1">応募済み（チャットを開く）</a>
+                            <a href="{{ route('corporate.threads.show', $thread->id) }}" class="btn btn-primary">応募済み（チャットを開く）</a>
                         @else
-                            <button class="btn btn-primary w-full md:flex-1" disabled>応募済み</button>
+                            <button class="btn btn-primary" disabled>応募済み</button>
                         @endif
                     @else
-                        <a href="{{ route('corporate.jobs.apply.create', $job->id) }}" class="btn btn-primary w-full md:flex-1">応募する</a>
+                        <a href="{{ route('corporate.jobs.apply.create', $job->id) }}" class="btn btn-primary">応募する</a>
                     @endif
-                    <a href="{{ route('corporate.jobs.index') }}" class="btn btn-secondary w-full md:flex-1">一覧に戻る</a>
+                    <a href="{{ route('corporate.jobs.index') }}" class="btn btn-secondary">一覧に戻る</a>
                 </div>
             </section>
         </div>
     </main>
-
-    <script>
-        (function () {
-            const header = document.querySelector('header.header');
-            const toggle = document.getElementById('mobileNavToggle');
-            const mobileNav = document.getElementById('mobileNav');
-            if (!header || !toggle || !mobileNav) return;
-
-            const OPEN_CLASS = 'is-mobile-nav-open';
-            const isOpen = () => header.classList.contains(OPEN_CLASS);
-
-            const open = () => {
-                header.classList.add(OPEN_CLASS);
-                toggle.setAttribute('aria-expanded', 'true');
-            };
-
-            const close = () => {
-                header.classList.remove(OPEN_CLASS);
-                toggle.setAttribute('aria-expanded', 'false');
-            };
-
-            toggle.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (isOpen()) close();
-                else open();
-            });
-
-            document.addEventListener('click', (e) => {
-                if (!header.contains(e.target)) close();
-            });
-
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') close();
-            });
-
-            window.addEventListener('resize', () => {
-                if (window.innerWidth >= 768) close();
-            });
-        })();
-    </script>
-    <script>
-        (function () {
-            const dropdown = document.getElementById('userDropdown');
-            const toggle = document.getElementById('userDropdownToggle');
-            const menu = document.getElementById('userDropdownMenu');
-            if (!dropdown || !toggle || !menu) return;
-
-            const open = () => {
-                dropdown.classList.add('is-open');
-                toggle.setAttribute('aria-expanded', 'true');
-            };
-
-            const close = () => {
-                dropdown.classList.remove('is-open');
-                toggle.setAttribute('aria-expanded', 'false');
-            };
-
-            const isOpen = () => dropdown.classList.contains('is-open');
-
-            toggle.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (isOpen()) close();
-                else open();
-            });
-
-            document.addEventListener('click', (e) => {
-                if (!dropdown.contains(e.target)) close();
-            });
-
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') close();
-            });
-        })();
-    </script>
 </body>
 </html>

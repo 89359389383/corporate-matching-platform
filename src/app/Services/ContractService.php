@@ -326,8 +326,8 @@ class ContractService
         if ((int)$contract->corporate_id !== (int)$corporateId) {
             throw ValidationException::withMessages(['contract' => '当事者ではありません。']);
         }
-        if ($contract->status !== Contract::STATUS_PROPOSED) {
-            throw ValidationException::withMessages(['contract' => '同意できるのは提示中（proposed）のみです。']);
+        if (!in_array($contract->status, [Contract::STATUS_PROPOSED, Contract::STATUS_NEGOTIATING, Contract::STATUS_DRAFT], true)) {
+            throw ValidationException::withMessages(['contract' => '同意できるのは draft / proposed / negotiating のみです。']);
         }
         if (!$contract->isCurrent()) {
             throw ValidationException::withMessages(['contract' => '旧版は同意できません。']);

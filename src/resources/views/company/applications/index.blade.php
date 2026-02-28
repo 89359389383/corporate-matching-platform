@@ -539,6 +539,38 @@
             outline: none;
             box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.15);
         }
+        .contract-info-btn {
+            background: #fff;
+            color: #24292e;
+            padding: 0.28rem 0.65rem;
+            border-radius: 10px;
+            font-size: 1.04rem;
+            font-weight: 900;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            min-width: 90px;
+            text-decoration: none;
+            border: 1px solid #d0d7de;
+            cursor: pointer;
+            transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+        }
+        .contract-info-btn:hover {
+            background: #f6f8fa;
+            border-color: #b6bec8;
+            color: #111827;
+        }
+        .contract-info-btn:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.18);
+        }
+        .contract-info-btn.is-disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
         .application-info-template { display: none; }
 
         .application-modal {
@@ -610,7 +642,7 @@
         .application-info-grid {
             display: grid;
             grid-template-columns: minmax(130px, 170px) 1fr;
-            gap: 0.5rem 0.85rem;
+            gap: 1rem 0.85rem;
             align-items: start;
             border: 1px solid #e5e7eb;
             border-radius: 12px;
@@ -997,6 +1029,10 @@
                                         $chatUrl = $application->thread
                                             ? route('company.threads.show', ['thread' => $application->thread])
                                             : null;
+                                        $contractId = optional(optional($application->thread)->currentContract)->id;
+                                        $contractUrl = $contractId
+                                            ? route('company.contracts.show', ['contract' => $contractId])
+                                            : null;
                                     @endphp
 
                                     @if($chatUrl)
@@ -1038,6 +1074,11 @@
                                                 @endif
                                                 <span class="chat-btn {{ $chatUrl ? '' : 'is-disabled' }}">チャット</span>
                                                 <button type="button" class="application-info-btn" data-application-info-target="{{ $applicationInfoTarget }}">応募情報</button>
+                                                <button
+                                                    type="button"
+                                                    class="contract-info-btn {{ $contractUrl ? '' : 'is-disabled' }}"
+                                                    @if($contractUrl) data-contract-url="{{ $contractUrl }}" @endif
+                                                >契約情報</button>
                                             </div>
                                         </div>
                                     @if($chatUrl)
@@ -1104,6 +1145,10 @@
                                 $chatUrl = $application->thread
                                     ? route('company.threads.show', ['thread' => $application->thread])
                                     : null;
+                                $contractId = optional(optional($application->thread)->currentContract)->id;
+                                $contractUrl = $contractId
+                                    ? route('company.contracts.show', ['contract' => $contractId])
+                                    : null;
                             @endphp
                             <div class="card rounded-2xl bg-white border border-slate-200 shadow-sm p-5 md:p-6 relative overflow-hidden">
                                 @if($chatUrl)
@@ -1125,6 +1170,11 @@
                                             @endif
                                             <span class="chat-btn {{ $chatUrl ? '' : 'is-disabled' }}">チャット</span>
                                             <button type="button" class="application-info-btn" data-application-info-target="{{ $applicationInfoTarget }}">応募情報</button>
+                                            <button
+                                                type="button"
+                                                class="contract-info-btn {{ $contractUrl ? '' : 'is-disabled' }}"
+                                                @if($contractUrl) data-contract-url="{{ $contractUrl }}" @endif
+                                            >契約情報</button>
                                         </div>
                                     </div>
                                 @if($chatUrl)
@@ -1432,6 +1482,15 @@
                     event.stopPropagation();
                     const targetId = trigger.getAttribute('data-application-info-target');
                     if (targetId) openModal(targetId);
+                    return;
+                }
+
+                const contractTrigger = event.target.closest('[data-contract-url]');
+                if (contractTrigger) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const contractUrl = contractTrigger.getAttribute('data-contract-url');
+                    if (contractUrl) window.location.href = contractUrl;
                     return;
                 }
 
