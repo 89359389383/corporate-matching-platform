@@ -13,8 +13,50 @@
     <style>
         /* Base */
         :root {
-            --header-height-current: 72px;
+            --header-height: 72px;           /* md 基本高さ */
+            --header-height-mobile: 72px;     /* xs / mobile */
+            --header-height-sm: 72px;         /* sm */
+            --header-height-md: 72px;        /* md */
+            --header-height-lg: 72px;        /* lg */
+            --header-height-xl: 72px;        /* xl */
+            --header-height-current: var(--header-height-mobile);
             --header-padding-x: 1rem;
+            --container-max-width: 1600px;
+            --main-padding: 0.5rem;
+            --sidebar-width: 320px;
+            --sidebar-gap: 3rem;
+        }
+
+        /* Breakpoint: sm (>=640px) */
+        @media (min-width: 640px) {
+            :root {
+                --header-padding-x: 1.5rem;
+                --header-height-current: var(--header-height-sm);
+            }
+        }
+
+        /* Breakpoint: md (>=768px) */
+        @media (min-width: 768px) {
+            :root {
+                --header-padding-x: 2rem;
+                --header-height-current: var(--header-height-md);
+            }
+        }
+
+        /* Breakpoint: lg (>=1024px) */
+        @media (min-width: 1024px) {
+            :root {
+                --header-padding-x: 2.5rem;
+                --header-height-current: var(--header-height-lg);
+            }
+        }
+
+        /* Breakpoint: xl (>=1280px) */
+        @media (min-width: 1280px) {
+            :root {
+                --header-padding-x: 3rem;
+                --header-height-current: var(--header-height-xl);
+            }
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -253,6 +295,20 @@
             font-size: 1.05rem;
             font-weight: 700;
         }
+
+        /* ロゴサイズを company/corporates/index と同じにする（全ブレイクポイント） */
+        .logo-text {
+            font-weight: 900;
+            font-size: 18px;
+            margin-left: 0;
+            color: #111827;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+        @media (min-width: 640px) { .logo-text { font-size: 20px; } }
+        @media (min-width: 768px) { .logo-text { font-size: 22px; } }
+        @media (min-width: 1024px) { .logo-text { font-size: 24px; } }
+        @media (min-width: 1280px) { .logo-text { font-size: 26px; } }
     </style>
 </head>
 <body>

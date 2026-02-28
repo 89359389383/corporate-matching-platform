@@ -8,27 +8,48 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
-            --header-height: 72px;
-            --header-height-mobile: 72px;
-            --header-height-sm: 72px;
-            --header-height-md: 72px;
-            --header-height-lg: 72px;
-            --header-height-xl: 72px;
+            --header-height: 72px;           /* md 基本高さ */
+            --header-height-mobile: 72px;     /* xs / mobile */
+            --header-height-sm: 72px;         /* sm */
+            --header-height-md: 72px;        /* md */
+            --header-height-lg: 72px;        /* lg */
+            --header-height-xl: 72px;        /* xl */
             --header-height-current: var(--header-height-mobile);
             --header-padding-x: 1rem;
         }
+
+        /* Breakpoint: sm (>=640px) */
         @media (min-width: 640px) {
-            :root { --header-padding-x: 1.5rem; --header-height-current: var(--header-height-sm); }
+            :root {
+                --header-padding-x: 1.5rem;
+                --header-height-current: var(--header-height-sm);
+            }
         }
+
+        /* Breakpoint: md (>=768px) -- デスクトップの基本 */
         @media (min-width: 768px) {
-            :root { --header-padding-x: 2rem; --header-height-current: var(--header-height-md); }
+            :root {
+                --header-padding-x: 2rem;
+                --header-height-current: var(--header-height-md);
+            }
         }
+
+        /* Breakpoint: lg (>=1024px) */
         @media (min-width: 1024px) {
-            :root { --header-padding-x: 2.5rem; --header-height-current: var(--header-height-lg); }
+            :root {
+                --header-padding-x: 2.5rem;
+                --header-height-current: var(--header-height-lg);
+            }
         }
+
+        /* Breakpoint: xl (>=1280px) */
         @media (min-width: 1280px) {
-            :root { --header-padding-x: 3rem; --header-height-current: var(--header-height-xl); }
+            :root {
+                --header-padding-x: 3rem;
+                --header-height-current: var(--header-height-xl);
+            }
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { font-size: 97.5%; }
         body {
@@ -37,6 +58,8 @@
             color: #24292e;
             line-height: 1.5;
         }
+
+        /* Header (4 breakpoints: sm/md/lg/xl) */
         .header {
             background-color: #ffffff;
             border-bottom: 1px solid #e1e4e8;
@@ -52,22 +75,29 @@
             max-width: 1600px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: 1fr auto;
+            grid-template-columns: 1fr auto; /* mobile: ロゴ / 右側 */
             align-items: center;
             gap: 0.5rem;
             height: var(--header-height-current);
             position: relative;
             min-width: 0;
-            padding: 0.25rem 0;
+            padding: 0.25rem 0; /* 縦余白を確保 */
         }
+
+        /* md以上: ロゴ / 中央ナビ / 右側 (ユーザー) */
         @media (min-width: 768px) {
             .header-content { grid-template-columns: auto 1fr auto; gap: 1rem; }
         }
+
+        /* lg: より広く間隔を取る */
         @media (min-width: 1024px) {
             .header-content { gap: 1.5rem; padding: 0.5rem 0; }
         }
+
         .header-left { display: flex; align-items: center; gap: 0.75rem; min-width: 0; }
         .header-right { display: flex; align-items: center; justify-content: flex-end; min-width: 0; gap: 0.75rem; }
+
+        /* ロゴ（左） */
         .logo { display: flex; align-items: center; gap: 8px; min-width: 0; }
         .logo-text {
             font-weight: 900;
@@ -90,6 +120,8 @@
             font-weight: 700;
             white-space: nowrap;
         }
+
+        /* Mobile nav toggle */
         .nav-toggle {
             display: inline-flex;
             align-items: center;
@@ -107,8 +139,9 @@
         .nav-toggle:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.15); }
         .nav-toggle svg { width: 22px; height: 22px; color: #24292e; }
         @media (min-width: 768px) { .nav-toggle { display: none; } }
+
         .nav-links {
-            display: none;
+            display: none; /* mobile: hidden (use hamburger) */
             align-items: center;
             justify-content: center;
             flex-wrap: nowrap;
@@ -116,10 +149,11 @@
             overflow: hidden;
             gap: 1.25rem;
         }
-        @media (min-width: 640px) { .nav-links { display: none; } }
+        @media (min-width: 640px) { .nav-links { display: none; } } /* smではまだ省スペースにすることが多い */
         @media (min-width: 768px) { .nav-links { display: flex; gap: 1.25rem; } }
         @media (min-width: 1024px) { .nav-links { gap: 2rem; } }
         @media (min-width: 1280px) { .nav-links { gap: 3rem; } }
+
         .nav-link {
             text-decoration: none;
             color: #586069;
@@ -143,7 +177,7 @@
             color: white;
             box-shadow: 0 2px 8px rgba(3, 102, 214, 0.3);
         }
-        .header .badge {
+        .badge {
             background-color: #d73a49;
             color: white;
             border-radius: 50%;
@@ -162,6 +196,8 @@
             transform: translateY(-50%);
         }
         .user-menu { display: flex; align-items: center; position: static; transform: none; }
+
+        /* Mobile nav menu */
         .mobile-nav {
             position: absolute;
             top: 100%;
@@ -202,6 +238,34 @@
             margin-left: auto;
             margin-right: 0;
         }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: none;
+            padding: 0;
+            appearance: none;
+            flex: 0 0 auto;
+        }
+        /* avatar size responsive */
+        @media (min-width: 640px) { .user-avatar { width: 40px; height: 40px; } }
+        @media (min-width: 768px) { .user-avatar { width: 44px; height: 44px; } }
+        @media (min-width: 1024px) { .user-avatar { width: 48px; height: 48px; } }
+        @media (min-width: 1280px) { .user-avatar { width: 52px; height: 52px; } }
+        .user-avatar:hover { transform: scale(1.08); box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+        .user-avatar:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.25), 0 2px 8px rgba(0,0,0,0.1); }
+
+        /* Dropdown */
         .dropdown { position: relative; }
         .dropdown-content {
             display: none;
