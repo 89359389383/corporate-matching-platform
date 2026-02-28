@@ -51,6 +51,48 @@
             margin-bottom: 1.5rem;
         }
 
+        .status-filter {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 0.6rem;
+            margin-bottom: 1.1rem;
+        }
+        .filter-btn {
+            appearance: none;
+            border: 1px solid #d1d5db;
+            background: #ffffff;
+            color: #334155;
+            border-radius: 10px;
+            padding: 0.58rem 0.7rem;
+            font-size: 0.9rem;
+            font-weight: 800;
+            line-height: 1.2;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .filter-btn:hover {
+            border-color: #93c5fd;
+            background: #f8fbff;
+            color: #1d4ed8;
+        }
+        .filter-btn.is-active {
+            border-color: #2563eb;
+            background: #2563eb;
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+        }
+        .filter-empty {
+            border-radius: 12px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+            font-weight: 700;
+            text-align: center;
+            padding: 1rem;
+            margin-top: 0.8rem;
+        }
+
         .jobs-grid {
             display: grid;
             gap: 1rem;
@@ -196,6 +238,7 @@
             .job-title { font-size: 1.3rem; }
             .company-name { font-size: 1rem; }
             .job-details { grid-template-columns: 1fr; }
+            .status-filter { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
 
         /* Empty */
@@ -222,6 +265,12 @@
         <div class="content-area">
             <h1 class="page-title">契約</h1>
             <p class="page-subtitle">自分が当事者の契約一覧です（作成はできません）。</p>
+            <div class="status-filter" id="contract-status-filter" role="group" aria-label="契約ステータス絞り込み">
+                <button type="button" class="filter-btn is-active" data-status-filter="all">全て</button>
+                <button type="button" class="filter-btn" data-status-filter="draft">下書き</button>
+                <button type="button" class="filter-btn" data-status-filter="signed">締結</button>
+                <button type="button" class="filter-btn" data-status-filter="completed">完了</button>
+            </div>
 
             <div class="jobs-grid grid grid-cols-1 gap-5 lg:gap-6" id="jobs-grid">
                 @forelse($contracts as $contract)
@@ -267,10 +316,19 @@
                             $statusClass = 'draft';
                         }
 
+                        $normalizedStatus = 'other';
+                        if ($contractStatus === 'completed') {
+                            $normalizedStatus = 'completed';
+                        } elseif (in_array($contractStatus, ['signed', 'active'], true)) {
+                            $normalizedStatus = 'signed';
+                        } elseif ($contractStatus === 'draft') {
+                            $normalizedStatus = 'draft';
+                        }
+
                         $typeClass = str_contains((string)$contractType, '機密') ? 'purple' : 'blue';
                     @endphp
 
-                    <a href="{{ route('corporate.contracts.show', ['contract' => $contract]) }}" class="job-card">
+                    <a href="{{ route('corporate.contracts.show', ['contract' => $contract]) }}" class="job-card contract-card" data-contract-status="{{ $normalizedStatus }}">
                         <div class="job-header">
                             <div>
                                 <div class="title-row">
@@ -322,11 +380,49 @@
                     </div>
                 @endforelse
             </div>
+            <div id="filter-empty-message" class="filter-empty" style="display:none;">該当する契約はありません。</div>
 
             <div style="margin-top:2rem;">
                 {{ $contracts->links() }}
             </div>
         </div>
     </main>
+    <script>
+        (function () {
+            const filterRoot = document.getElementById('contract-status-filter');
+            const grid = document.getElementById('jobs-grid');
+            if (!filterRoot || !grid) return;
+
+            const buttons = Array.from(filterRoot.querySelectorAll('[data-status-filter]'));
+            const cards = Array.from(grid.querySelectorAll('.contract-card'));
+            const emptyMessage = document.getElementById('filter-empty-message');
+
+            const applyFilter = (targetStatus) => {
+                let visibleCount = 0;
+
+                cards.forEach((card) => {
+                    const status = card.getAttribute('data-contract-status') || '';
+                    const shouldShow = targetStatus === 'all' || status === targetStatus;
+                    card.style.display = shouldShow ? '' : 'none';
+                    if (shouldShow) visibleCount += 1;
+                });
+
+                if (emptyMessage) {
+                    emptyMessage.style.display = cards.length > 0 && visibleCount === 0 ? 'block' : 'none';
+                }
+            };
+
+            buttons.forEach((button) => {
+                button.addEventListener('click', () => {
+                    const selected = button.getAttribute('data-status-filter') || 'all';
+                    buttons.forEach((btn) => btn.classList.remove('is-active'));
+                    button.classList.add('is-active');
+                    applyFilter(selected);
+                });
+            });
+
+            applyFilter('all');
+        })();
+    </script>
 </body>
 </html>

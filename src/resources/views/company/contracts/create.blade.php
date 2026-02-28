@@ -266,7 +266,7 @@
         @endif
     </div>
 
-    <form method="POST" action="{{ route('company.threads.contracts.store', ['thread' => $thread]) }}" class="card">
+    <form method="POST" action="{{ route('company.threads.contracts.store', ['thread' => $thread]) }}" class="card" novalidate>
         @csrf
         @include('company.contracts._form_fields', [
             'contractType' => 'nda',

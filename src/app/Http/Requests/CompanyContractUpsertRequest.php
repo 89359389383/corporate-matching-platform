@@ -14,28 +14,21 @@ class CompanyContractUpsertRequest extends FormRequest
 
     public function rules(): array
     {
-        $contractType = (string)$this->input('contract_type', '');
-        $isNda = $contractType === 'nda';
-        $isIndividual = $contractType === 'individual';
-
-        $deliverables = trim((string)$this->input('deliverables', ''));
-        $hasDeliverables = $deliverables !== '';
-
         return [
             'contract_type' => ['required', 'string', Rule::in(['nda', 'basic', 'individual'])],
 
             'start_date' => ['required', 'date'],
-            'end_date' => ['nullable', 'date', 'after_or_equal:start_date', Rule::requiredIf($isIndividual)],
+            'end_date' => ['required', 'date', 'after_or_equal:start_date'],
 
-            'scope' => ['nullable', 'string', 'max:5000', Rule::requiredIf(!$isNda)],
-            'amount' => ['nullable', 'string', 'max:1000', Rule::requiredIf(!$isNda)],
-            'payment_terms' => ['nullable', 'string', 'max:5000', Rule::requiredIf(!$isNda)],
+            'scope' => ['required', 'string', 'max:5000'],
+            'amount' => ['required', 'string', 'max:1000'],
+            'payment_terms' => ['required', 'string', 'max:5000'],
 
-            'deliverables' => ['nullable', 'string', 'max:5000', Rule::requiredIf($isIndividual)],
-            'due_date' => ['nullable', 'string', 'max:2000', Rule::requiredIf($isIndividual || $hasDeliverables)],
+            'deliverables' => ['required', 'string', 'max:5000'],
+            'due_date' => ['required', 'string', 'max:2000'],
 
-            'contract_period' => ['nullable', 'string', 'max:2000'],
-            'trade_terms' => ['nullable', 'string', 'max:5000'],
+            'contract_period' => ['required', 'string', 'max:2000'],
+            'trade_terms' => ['required', 'string', 'max:5000'],
             'special_terms' => ['nullable', 'string', 'max:5000'],
             'free_text' => ['nullable', 'string', 'max:10000'],
         ];
@@ -74,9 +67,11 @@ class CompanyContractUpsertRequest extends FormRequest
             'due_date.string' => '納期は文字列で入力してください。',
             'due_date.max' => '納期は2000文字以内で入力してください。',
 
+            'contract_period.required' => '契約期間を入力してください。',
             'contract_period.string' => '契約期間は文字列で入力してください。',
             'contract_period.max' => '契約期間は2000文字以内で入力してください。',
 
+            'trade_terms.required' => '取引条件を入力してください。',
             'trade_terms.string' => '取引条件は文字列で入力してください。',
             'trade_terms.max' => '取引条件は5000文字以内で入力してください。',
 
