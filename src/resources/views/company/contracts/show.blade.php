@@ -372,7 +372,7 @@
         .subv{ font-weight:800; color:#374151; white-space: pre-wrap; }
         .amount-value {
             font-size: 16px !important;
-            margin-left: -10px;
+            margin-left: -5px;
             display: inline-block;
         }
         .check-item{
