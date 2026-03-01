@@ -88,12 +88,14 @@
             <span class="error-message">{{ $message }}</span>
         @enderror
     </div>
-    <div>
-        <label style="font-weight:900; display:block; margin-bottom:0.35rem;">自由記述（任意）</label>
-        <textarea name="free_text" rows="6" class="@error('free_text') is-invalid @enderror" style="width:100%; padding:0.7rem; border:1px solid #e1e4e8; border-radius:10px;">{{ old('free_text', $terms['free_text'] ?? '') }}</textarea>
-        @error('free_text')
-            <span class="error-message">{{ $message }}</span>
-        @enderror
-    </div>
+    @if($show_free_text ?? true)
+        <div>
+            <label style="font-weight:900; display:block; margin-bottom:0.35rem;">自由記述（任意）</label>
+            <textarea name="free_text" rows="6" class="@error('free_text') is-invalid @enderror" style="width:100%; padding:0.7rem; border:1px solid #e1e4e8; border-radius:10px;">{{ old('free_text', $terms['free_text'] ?? '') }}</textarea>
+            @error('free_text')
+                <span class="error-message">{{ $message }}</span>
+            @enderror
+        </div>
+    @endif
 </div>
 

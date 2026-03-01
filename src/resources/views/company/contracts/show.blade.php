@@ -613,6 +613,10 @@
                                 <div class="k">稼働時間</div>
                                 <div class="subv">{{ $t['trade_terms'] ?? '' }}</div>
                             </div>
+                            <div class="kv">
+                                <div class="k">納期</div>
+                                <div class="subv">{{ $t['due_date'] ?? '' }}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -686,7 +690,7 @@
                 </div>
             </section>
 
-            {{-- 秘密保持 --}}
+            {{-- 業務範囲 --}}
             <section class="card p-5">
                 <div class="flex items-start gap-3">
                     <div class="mt-0.5 w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center">
@@ -696,22 +700,17 @@
                         </svg>
                     </div>
                     <div class="w-full">
-                        <h2 class="text-lg font-black">秘密保持</h2>
+                        <h2 class="text-lg font-black">業務範囲</h2>
                         <div class="mt-3">
                             <div class="kv">
-                                <div class="k">保持期間</div>
-                                <div class="v">{{ $t['confidentiality_period'] ?? '' }}</div>
-                            </div>
-                            <div class="kv">
-                                <div class="k">対象範囲</div>
-                                <div class="subv">{{ $t['confidentiality_scope'] ?? '' }}</div>
+                                <div class="v whitespace-pre-wrap">{{ $t['scope'] ?? '' }}</div>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {{-- その他条項 --}}
+            {{-- 特約 --}}
             <section class="card p-5">
                 <div class="flex items-start gap-3">
                     <div class="mt-0.5 w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center">
@@ -723,7 +722,7 @@
                         </svg>
                     </div>
                     <div class="w-full">
-                        <h2 class="text-lg font-black">その他条項</h2>
+                        <h2 class="text-lg font-black">特約</h2>
                         <div class="mt-3 text-gray-700 font-bold leading-relaxed">
                             {{ $t['special_terms'] ?? '' }}
                             @if(!empty($t['free_text']))
@@ -768,7 +767,7 @@
                             </svg>
                         </div>
                         <div class="min-w-0">
-                            <div class="text-xs font-black text-gray-500">フリーランス</div>
+                            <div class="text-xs font-black text-gray-500">法人</div>
                             <div class="mt-1 font-black text-gray-900 break-words">
                                 {{ $t['freelancer_name'] ?? '山田太郎' }}
                             </div>
@@ -790,41 +789,6 @@
                     <div>
                         <div class="text-xs font-black text-gray-500">作成日時</div>
                         <div class="mt-1 font-black text-gray-900">{{ $createdAt }}</div>
-                    </div>
-                </div>
-            </section>
-
-            {{-- 基本情報（画面の項目は維持） --}}
-            <section class="card p-5">
-                <h3 class="text-lg font-black">基本情報</h3>
-                <div class="mt-3">
-                    <div class="kv">
-                        <div class="k">案件</div>
-                        <div class="subv">{{ $jobTitle }}</div>
-                    </div>
-                    <div class="kv">
-                        <div class="k">開始日</div>
-                        <div class="subv">{{ $contract->start_date ? $contract->start_date->format('Y-m-d') : '' }}</div>
-                    </div>
-                    <div class="kv">
-                        <div class="k">終了日</div>
-                        <div class="subv">{{ $contract->end_date ? $contract->end_date->format('Y-m-d') : '' }}</div>
-                    </div>
-                    <div class="kv">
-                        <div class="k">提示日時</div>
-                        <div class="subv">{{ $contract->proposed_at ? $contract->proposed_at->format('Y-m-d H:i') : '' }}</div>
-                    </div>
-                    <div class="kv">
-                        <div class="k">締結日時</div>
-                        <div class="subv">{{ $contract->signed_at ? $contract->signed_at->format('Y-m-d H:i') : '' }}</div>
-                    </div>
-                    <div class="kv">
-                        <div class="k">文面ハッシュ</div>
-                        <div class="subv break-all">{{ $contract->document_hash ?? '' }}</div>
-                    </div>
-                    <div class="kv">
-                        <div class="k">PDFハッシュ</div>
-                        <div class="subv break-all">{{ $contract->pdf_hash ?? '' }}</div>
                     </div>
                 </div>
             </section>

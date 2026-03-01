@@ -342,6 +342,7 @@
             'startDate' => $contract->start_date ? $contract->start_date->format('Y-m-d') : '',
             'endDate' => $contract->end_date ? $contract->end_date->format('Y-m-d') : '',
             'terms' => $terms,
+            'show_free_text' => false,
         ])
 
         <div style="display:flex; gap:0.75rem; margin-top:1.25rem; width:100%;">

@@ -345,6 +345,7 @@
             'startDate' => '',
             'endDate' => '',
             'terms' => [],
+            'show_free_text' => false,
         ])
 
         <div style="display:flex; gap:0.75rem; margin-top:1.25rem; width:100%;">

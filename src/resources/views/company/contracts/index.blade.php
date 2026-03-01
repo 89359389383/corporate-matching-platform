@@ -90,7 +90,7 @@
 
         .status-filter {
             display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-template-columns: repeat(5, minmax(0, 1fr));
             gap: 0.6rem;
             margin-bottom: 1.1rem;
         }
@@ -107,6 +107,10 @@
             text-align: center;
             cursor: pointer;
             transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
         }
         .filter-btn:hover {
             border-color: #93c5fd;
@@ -118,6 +122,28 @@
             background: #2563eb;
             color: #ffffff;
             box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+        }
+        .filter-badge{
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            min-width: 1.6rem;
+            height: 1.3rem;
+            padding: 0 0.45rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 900;
+            border: 1px solid #d1d5db;
+            background: rgba(15, 23, 42, 0.06);
+            color: #334155;
+        }
+        .filter-btn:hover .filter-badge{
+            border-color: #93c5fd;
+        }
+        .filter-btn.is-active .filter-badge{
+            border-color: rgba(255,255,255,0.35);
+            background: rgba(255,255,255,0.20);
+            color: #ffffff;
         }
         .filter-empty {
             border-radius: 12px;
@@ -316,11 +342,50 @@
         <div class="content-area">
             <h1 class="page-title">契約</h1>
             <p class="page-subtitle">自社が当事者の契約一覧です（スレッドに紐づきます）。</p>
+            @php
+                $contractsCollection = $contracts instanceof \Illuminate\Pagination\AbstractPaginator
+                    ? $contracts->getCollection()
+                    : collect($contracts);
+
+                $allCount = $contractsCollection->count();
+                $draftCount = 0;
+                $companyWaitingCount = 0;
+                $signedCountForFilter = 0;
+                $completedCount = 0;
+
+                foreach ($contractsCollection as $c) {
+                    $st = $c->status ?? null;
+                    $companySigCount = $c->signatures->where('signer_type', 'company')->count();
+                    $corporateSigCount = $c->signatures->where('signer_type', 'corporate')->count();
+                    $isCompanyWaiting = ($st === 'ready_to_sign' && $corporateSigCount > 0 && $companySigCount === 0);
+
+                    if ($st === 'completed') {
+                        $completedCount += 1;
+                    } elseif ($isCompanyWaiting) {
+                        $companyWaitingCount += 1;
+                    } elseif (in_array($st, ['signed', 'active'], true)) {
+                        $signedCountForFilter += 1;
+                    } elseif ($st === 'draft') {
+                        $draftCount += 1;
+                    }
+                }
+            @endphp
             <div class="status-filter" id="contract-status-filter" role="group" aria-label="契約ステータス絞り込み">
-                <button type="button" class="filter-btn is-active" data-status-filter="all">全て</button>
-                <button type="button" class="filter-btn" data-status-filter="draft">下書き</button>
-                <button type="button" class="filter-btn" data-status-filter="signed">締結</button>
-                <button type="button" class="filter-btn" data-status-filter="completed">完了</button>
+                <button type="button" class="filter-btn is-active" data-status-filter="all">
+                    全て <span class="filter-badge">{{ $allCount }}</span>
+                </button>
+                <button type="button" class="filter-btn" data-status-filter="draft">
+                    下書き <span class="filter-badge">{{ $draftCount }}</span>
+                </button>
+                <button type="button" class="filter-btn" data-status-filter="company_waiting">
+                    企業署名待ち <span class="filter-badge">{{ $companyWaitingCount }}</span>
+                </button>
+                <button type="button" class="filter-btn" data-status-filter="signed">
+                    締結 <span class="filter-badge">{{ $signedCountForFilter }}</span>
+                </button>
+                <button type="button" class="filter-btn" data-status-filter="completed">
+                    完了 <span class="filter-badge">{{ $completedCount }}</span>
+                </button>
             </div>
 
             <div class="jobs-grid grid grid-cols-1 gap-5 lg:gap-6" id="jobs-grid">
@@ -334,6 +399,8 @@
                         $contractType = $contract->contract_type ?? '不明';
                         $version = $contract->version ?? '';
                         $signedCount = $contract->signatures->count() ?? 0;
+                        $companySigCount = $contract->signatures->where('signer_type', 'company')->count() ?? 0;
+                        $corporateSigCount = $contract->signatures->where('signer_type', 'corporate')->count() ?? 0;
 
                         $title = $corporate->display_name ?? ($corporate->corporation_name ?? '法人');
                         $subTitle = $job ? $job->title : '案件情報なし';
@@ -357,6 +424,8 @@
                             $statusLabel = '完了';
                         } elseif (in_array($contractStatus, ['signed', 'active'], true)) {
                             $statusLabel = '締結済み';
+                        } elseif ($contractStatus === 'ready_to_sign' && $corporateSigCount > 0 && $companySigCount === 0) {
+                            $statusLabel = '企業署名待ち';
                         } elseif ($contractStatus === 'draft') {
                             $statusLabel = '下書き';
                         }
@@ -373,6 +442,8 @@
                             $normalizedStatus = 'completed';
                         } elseif (in_array($contractStatus, ['signed', 'active'], true)) {
                             $normalizedStatus = 'signed';
+                        } elseif ($contractStatus === 'ready_to_sign' && $corporateSigCount > 0 && $companySigCount === 0) {
+                            $normalizedStatus = 'company_waiting';
                         } elseif ($contractStatus === 'draft') {
                             $normalizedStatus = 'draft';
                         }

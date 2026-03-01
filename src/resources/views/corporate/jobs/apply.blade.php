@@ -251,6 +251,10 @@
             cursor: pointer;
             transition: all 0.15s ease;
         }
+        .weekday-box.is-invalid {
+            border-color: rgba(239, 68, 68, 0.8);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.10);
+        }
         .weekday-box::before {
             content: "";
             width: 18px;
@@ -424,7 +428,7 @@
             <!-- 応募内容 -->
             <div class="panel">
                 <div class="panel-title">応募内容</div>
-                <form class="form" action="{{ route('corporate.jobs.apply.store', $job) }}" method="post">
+                <form class="form" action="{{ route('corporate.jobs.apply.store', $job) }}" method="post" novalidate>
                     @csrf
                     <div class="form-row">
                         <label class="label" for="desired_hourly_rate">希望時間単価 <span class="required">必須</span></label>
@@ -439,7 +443,6 @@
                                 step="100"
                                 inputmode="numeric"
                                 placeholder="2,000"
-                                required
                             >
                             <span class="input-unit">円/時間</span>
                         </div>
@@ -464,7 +467,7 @@
                             @foreach($days as $day)
                                 <label class="weekday-item">
                                     <input type="checkbox" name="work_days[]" value="{{ $day }}" {{ in_array($day, $oldDays, true) ? 'checked' : '' }}>
-                                    <span class="weekday-box">{{ $day }}</span>
+                                    <span class="weekday-box @error('work_days') is-invalid @enderror @error('work_days.*') is-invalid @enderror">{{ $day }}</span>
                                 </label>
                             @endforeach
                         </div>
@@ -485,7 +488,6 @@
                                 type="time"
                                 name="work_time_from"
                                 value="{{ old('work_time_from') }}"
-                                required
                             >
                             <span class="time-sep">〜</span>
                             <input
@@ -494,7 +496,6 @@
                                 type="time"
                                 name="work_time_to"
                                 value="{{ old('work_time_to') }}"
-                                required
                             >
                         </div>
                         @error('work_time_from')
@@ -520,7 +521,7 @@
 
                     <div class="form-row">
                         <label class="label" for="weekly_hours">合計週稼働時間（目安） <span class="required">必須</span></label>
-                        <select id="weekly_hours" class="select @error('weekly_hours') is-invalid @enderror" name="weekly_hours" required>
+                        <select id="weekly_hours" class="select @error('weekly_hours') is-invalid @enderror" name="weekly_hours">
                             <option value="" disabled {{ old('weekly_hours') === null ? 'selected' : '' }}>稼働時間を選択してください</option>
                             <option value="5" {{ old('weekly_hours') == 5 ? 'selected' : '' }}>週5時間程度（20時間／月）</option>
                             <option value="10" {{ old('weekly_hours') == 10 ? 'selected' : '' }}>週10時間程度（40時間／月）</option>
@@ -535,7 +536,7 @@
 
                     <div class="form-row">
                         <label class="label" for="available_start">開始可能日 <span class="required">必須</span></label>
-                        <select id="available_start" class="select @error('available_start') is-invalid @enderror" name="available_start" required>
+                        <select id="available_start" class="select @error('available_start') is-invalid @enderror" name="available_start">
                             <option value="" disabled {{ old('available_start') === null ? 'selected' : '' }}>稼働可能開始日を選択してください</option>
                             @foreach(['即日','2週間後','1ヶ月後','3ヶ月後以降'] as $opt)
                                 <option value="{{ $opt }}" {{ old('available_start') === $opt ? 'selected' : '' }}>{{ $opt }}</option>

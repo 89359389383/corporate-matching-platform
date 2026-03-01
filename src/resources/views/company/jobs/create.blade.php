@@ -547,7 +547,7 @@
                                 </select>
                             </div>
                         </div>
-                        <input id="work_start_date" name="work_start_date" class="date-hidden" type="date" value="{{ old('work_start_date') }}">
+                        <input id="work_start_date" name="work_start_date" class="date-hidden" type="date" value="{{ old('work_start_date', date('Y-m-d')) }}">
                         @error('work_start_date')
                             <span class="error-message">{{ $message }}</span>
                         @enderror
@@ -567,7 +567,7 @@
                                 </select>
                             </div>
                         </div>
-                        <input id="publish_end_date" name="publish_end_date" class="date-hidden" type="date" value="{{ old('publish_end_date') }}">
+                        <input id="publish_end_date" name="publish_end_date" class="date-hidden" type="date" value="{{ old('publish_end_date', date('Y-m-d')) }}">
                         @error('publish_end_date')
                             <span class="error-message">{{ $message }}</span>
                         @enderror
