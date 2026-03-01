@@ -468,7 +468,6 @@
         }
         .detail-item {
             display: flex;
-            max-width: 250px;
             flex-direction: row;
             align-items: center;
             justify-content: space-between;
@@ -772,12 +771,23 @@
                                 break;
                         }
                         
-                        // 報酬の表示フォーマット
-                        $rewardDisplay = '';
+                        // 報酬の表示フォーマット（万表記にしない）
+                        $rewardLabel = '報酬';
                         if ($job->reward_type === 'monthly') {
-                            $rewardDisplay = ($job->min_rate / 10000) . '〜' . ($job->max_rate / 10000) . '万円';
-                        } else {
-                            $rewardDisplay = number_format($job->min_rate) . '〜' . number_format($job->max_rate) . '円/時';
+                            $rewardLabel = '固定報酬';
+                        } elseif ($job->reward_type === 'hourly') {
+                            $rewardLabel = '時間単価';
+                        }
+
+                        $rewardDisplay = '';
+                        $minRate = $job->min_rate;
+                        $maxRate = $job->max_rate;
+                        if (!is_null($minRate) && !is_null($maxRate) && $minRate !== '' && $maxRate !== '') {
+                            $rewardDisplay = number_format((float)$minRate) . '円 〜 ' . number_format((float)$maxRate) . '円';
+                        } elseif (!is_null($minRate) && $minRate !== '') {
+                            $rewardDisplay = number_format((float)$minRate) . '円〜';
+                        } elseif (!is_null($maxRate) && $maxRate !== '') {
+                            $rewardDisplay = '〜' . number_format((float)$maxRate) . '円';
                         }
 
                         // 掲載終了までの日数 / 稼働開始日（表示用）
@@ -842,7 +852,7 @@
                                 <div class="detail-value">{{ $job->work_time_text }}</div>
                             </div>
                             <div class="detail-item">
-                                <div class="detail-label">報酬</div>
+                                <div class="detail-label">{{ $rewardLabel }}</div>
                                 <div class="detail-value">{{ $rewardDisplay }}</div>
                             </div>
                         </div>

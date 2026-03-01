@@ -366,6 +366,33 @@
         .error-panel li:last-child {
             margin-bottom: 0;
         }
+
+        /* Required skills (multi inputs) */
+        .skills-container { display: grid; gap: 0.75rem; }
+        .skills-row-4 {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+        @media (min-width: 768px) {
+            .skills-row-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        }
+        .skills-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .skills-actions .btn {
+            padding: 0.75rem 1rem;
+            font-size: 14px;
+            border-radius: 10px;
+            border: 1px solid #e1e4e8;
+            background: #fff;
+            color: #111827;
+        }
+        .skills-actions .btn:hover { opacity: 0.92; }
+        .skills-actions .btn:disabled { opacity: 0.55; cursor: not-allowed; }
     </style>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -429,11 +456,41 @@
 
                 <div class="field">
                     <label for="required_skills_text">必要スキル（自由入力）</label>
-                    <input id="required_skills_text" name="required_skills_text" class="input @error('required_skills_text') is-invalid @enderror" type="text" placeholder="例: PHP, Laravel, Vue.js, MySQL" value="{{ old('required_skills_text') }}">
-                    <div class="help">カンマ区切りで入力してください</div>
+                    @php
+                        $requiredSkillsInvalid = $errors->has('required_skills_text');
+                    @endphp
+                    {{-- 互換性のため hidden にカンマ結合して送信 --}}
+                    <input
+                        id="required_skills_text"
+                        name="required_skills_text"
+                        type="hidden"
+                        value="{{ old('required_skills_text') }}"
+                    >
+                    <div class="skills-container" id="required-skills-container" aria-label="必要スキル入力欄">
+                        <div class="skills-row-4">
+                            <input class="input skill-input {{ $requiredSkillsInvalid ? 'is-invalid' : '' }}" type="text" placeholder="例: PHP">
+                            <input class="input skill-input {{ $requiredSkillsInvalid ? 'is-invalid' : '' }}" type="text" placeholder="例: Laravel">
+                            <input class="input skill-input {{ $requiredSkillsInvalid ? 'is-invalid' : '' }}" type="text" placeholder="例: Vue.js">
+                            <input class="input skill-input {{ $requiredSkillsInvalid ? 'is-invalid' : '' }}" type="text" placeholder="例: MySQL">
+                        </div>
+                        <div class="skills-row-4">
+                            <input class="input skill-input {{ $requiredSkillsInvalid ? 'is-invalid' : '' }}" type="text" placeholder="例: Docker">
+                            <input class="input skill-input {{ $requiredSkillsInvalid ? 'is-invalid' : '' }}" type="text" placeholder="例: AWS">
+                            <input class="input skill-input {{ $requiredSkillsInvalid ? 'is-invalid' : '' }}" type="text" placeholder="例: TypeScript">
+                            <input class="input skill-input {{ $requiredSkillsInvalid ? 'is-invalid' : '' }}" type="text" placeholder="例: Git">
+                        </div>
                     @error('required_skills_text')
                         <span class="error-message">{{ $message }}</span>
                     @enderror
+                        @error('required_skills_text.*')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div class="skills-actions">
+                        <button type="button" class="btn" id="required-skills-add-row">フォーム追加</button>
+                        <button type="button" class="btn" id="required-skills-remove-row">削除</button>
+                    </div>
+                    <div class="help">各フォームに1つずつ入力できます。</div>
                 </div>
 
                 <div class="grid-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
@@ -652,6 +709,103 @@
 
             initYmdWidget('work_start_date_widget');
             initYmdWidget('publish_end_date_widget');
+        })();
+
+        // 必要スキル（複数フォーム入力 → hidden にカンマ結合）
+        (function () {
+            const container = document.getElementById('required-skills-container');
+            const hidden = document.getElementById('required_skills_text');
+            const addBtn = document.getElementById('required-skills-add-row');
+            const removeBtn = document.getElementById('required-skills-remove-row');
+            if (!container || !hidden || !addBtn || !removeBtn) return;
+
+            const MIN_ROWS = 2;
+            const COLS = 4;
+
+            const splitSkills = (text) => {
+                return String(text || '')
+                    .split(/[\n,、]+/)
+                    .map((s) => s.trim())
+                    .filter(Boolean);
+            };
+
+            const getRows = () => Array.from(container.querySelectorAll('.skills-row-4'));
+            const getInputs = () => Array.from(container.querySelectorAll('input.skill-input'));
+
+            const syncHidden = () => {
+                const values = getInputs()
+                    .map((i) => (i.value || '').trim())
+                    .filter(Boolean);
+                hidden.value = values.join(', ');
+            };
+
+            const bindInputs = (root) => {
+                const inputs = Array.from((root || container).querySelectorAll('input.skill-input'));
+                inputs.forEach((input) => {
+                    if (input.hasAttribute('data-listener-added')) return;
+                    input.addEventListener('input', syncHidden);
+                    input.addEventListener('change', syncHidden);
+                    input.setAttribute('data-listener-added', 'true');
+                });
+            };
+
+            const updateRemoveState = () => {
+                removeBtn.disabled = getRows().length <= MIN_ROWS;
+            };
+
+            const createRow = () => {
+                const row = document.createElement('div');
+                row.className = 'skills-row-4';
+                for (let i = 0; i < COLS; i++) {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.className = 'input skill-input';
+                    input.placeholder = '例: スキル名';
+                    row.appendChild(input);
+                }
+                return row;
+            };
+
+            const ensureCapacity = (needed) => {
+                while (getInputs().length < needed) {
+                    const row = createRow();
+                    container.appendChild(row);
+                    bindInputs(row);
+                }
+                updateRemoveState();
+            };
+
+            addBtn.addEventListener('click', () => {
+                const row = createRow();
+                container.appendChild(row);
+                bindInputs(row);
+                updateRemoveState();
+            });
+
+            removeBtn.addEventListener('click', () => {
+                const rows = getRows();
+                if (rows.length <= MIN_ROWS) return;
+                rows[rows.length - 1].remove();
+                syncHidden();
+                updateRemoveState();
+            });
+
+            // 初期値反映
+            const initialSkills = splitSkills(hidden.value);
+            ensureCapacity(Math.max(MIN_ROWS * COLS, initialSkills.length));
+            const inputs = getInputs();
+            initialSkills.forEach((skill, idx) => {
+                if (inputs[idx]) inputs[idx].value = skill;
+            });
+            bindInputs(container);
+            syncHidden();
+            updateRemoveState();
+
+            // submit 時も同期（念のため）
+            const form = hidden.closest('form');
+            if (form) {
+                form.addEventListener('submit', syncHidden);
+            }
         })();
     </script>
 </body>

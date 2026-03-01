@@ -338,9 +338,9 @@
             'terms' => $terms,
         ])
 
-        <div style="display:flex; gap:0.75rem; margin-top:1.25rem;">
-            <a class="btn" href="{{ route('company.contracts.show', ['contract' => $contract]) }}">戻る</a>
-            <button class="btn primary" type="submit">更新</button>
+        <div style="display:flex; gap:0.75rem; margin-top:1.25rem; width:100%;">
+            <a class="btn" style="flex:1; justify-content:center;" href="{{ route('company.contracts.show', ['contract' => $contract]) }}">戻る</a>
+            <button class="btn primary" type="submit" style="flex:1; justify-content:center;">更新</button>
         </div>
     </form>
 </main>

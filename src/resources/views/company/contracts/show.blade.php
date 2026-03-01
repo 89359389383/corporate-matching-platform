@@ -524,6 +524,15 @@
                         <button type="submit" class="btn primary">署名する</button>
                     </form>
                 @endif
+                {{-- 編集ボタン：コピーの左に配置（クリックで編集画面へ遷移） --}}
+                <a href="{{ route('company.contracts.edit', ['contract' => $contract]) }}" class="btn" aria-label="編集">
+                    {{-- edit icon --}}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="mr-1">
+                        <path d="M3 21v-3.75L17.81 2.44a2 2 0 0 1 2.83 0l0 0a2 2 0 0 1 0 2.83L5.83 20.08 3 21z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M14 4l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    編集
+                </a>
                 {{-- ✅ 1回のボタンで全部コピー --}}
                 <button type="button" id="copyAllBtn" class="btn">
                     {{-- copy icon --}}
