@@ -294,10 +294,18 @@
         .dropdown-item:hover { background-color: #f6f8fa; color: #24292e; }
         .dropdown-divider { height: 1px; background-color: #e1e4e8; margin: 0.5rem 0; }
 
-        .main { max-width: 900px; margin: 0 auto; padding: 2rem; }
+        .main { max-width: 600px; margin: 0 auto; padding: 2rem; }
         .title { font-size: 26px; font-weight: 900; margin-bottom: 0.5rem; }
         .sub { color:#6a737d; font-weight:700; margin-bottom: 1.25rem; }
-        .card { background:#fff; border:1px solid #e1e4e8; border-radius:14px; padding: 1.25rem; }
+        .card {
+            background:#fff;
+            border:1px solid #e1e4e8;
+            border-radius:14px;
+            padding: 1.25rem;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+        }
         .btn { display:inline-flex; padding: 0.7rem 1rem; border-radius: 10px; font-weight: 900; border:1px solid #e1e4e8; background:#fff; text-decoration:none; color:#111827; cursor:pointer; }
         .btn.primary { background:#0366d6; color:#fff; border-color:#0366d6; }
         .btn:hover { opacity:0.92; }
