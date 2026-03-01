@@ -77,7 +77,11 @@
             padding: 3rem;
         }
 
-        .content-area { width: 100%; }
+        .content-area {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
 
         .page-title {
             font-size: 28px;
@@ -368,6 +372,21 @@
                         }
 
                         $typeClass = str_contains((string)$contractType, '機密') ? 'purple' : 'blue';
+
+                        // 契約種別の表示ラベル（英語 → 日本語）
+                        $displayContractType = $contractType;
+                        $typeMap = [
+                            'basic' => 'ベーシック',
+                            'basic individual' => 'ベーシック（個人）',
+                            'basic corporate' => 'ベーシック（法人）',
+                            'individual' => '個人向け',
+                            'corporate' => '法人向け',
+                            'nda' => '機密保持契約（NDA）',
+                        ];
+                        $normalizedTypeKey = strtolower(trim((string)$contractType));
+                        if (isset($typeMap[$normalizedTypeKey])) {
+                            $displayContractType = $typeMap[$normalizedTypeKey];
+                        }
                     @endphp
 
                     <a href="{{ route('corporate.contracts.show', ['contract' => $contract]) }}" class="job-card contract-card" data-contract-status="{{ $normalizedStatus }}">
@@ -375,10 +394,9 @@
                             <div>
                                 <div class="title-row">
                                     <h2 class="job-title">{{ $company->name ?? '企業' }}</h2>
-                                    <span class="type-chip {{ $typeClass }}">{{ $contractType }}</span>
                                 </div>
                                 <div class="company-name">{{ $job ? $job->title : '案件情報なし' }}</div>
-                                <div class="meta-inline">版: v{{ $version }} / 署名: {{ $signedCount }}/2</div>
+                                <div class="meta-inline">署名: {{ $signedCount }}/2</div>
                             </div>
                             <span class="status-badge {{ $statusClass }}">{{ $statusLabel }}</span>
                         </div>

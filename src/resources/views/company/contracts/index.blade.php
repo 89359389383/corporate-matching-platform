@@ -68,14 +68,11 @@
             line-height: 1.5;
         }
 
-        /* Main Layout */
-        .main-content {
-            max-width: 1000px;
+        .content-area {
+            width: 100%;
+            max-width: 800px;
             margin: 0 auto;
-            padding: 3rem;
         }
-
-        .content-area { width: 100%; }
 
         .page-title {
             font-size: 28px;
@@ -388,10 +385,9 @@
                             <div>
                                 <div class="title-row">
                                     <h2 class="job-title">{{ $title }}</h2>
-                                    <span class="type-chip {{ $typeClass }}">{{ $contractType }}</span>
                                 </div>
                                 <div class="company-name">{{ $subTitle }}</div>
-                                <div class="meta-inline">版: v{{ $version }} / 署名: {{ $signedCount }}/2</div>
+                                <div class="meta-inline">署名: {{ $signedCount }}/2</div>
                             </div>
                             <span class="status-badge {{ $statusClass }}">{{ $statusLabel }}</span>
                         </div>
