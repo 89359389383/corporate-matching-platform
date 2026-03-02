@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ログイン - AITECH</title>
+    <title>ログイン - AIプロマッチ</title>
     <style>
         /* リセット & ベース */
         * {
@@ -295,7 +295,7 @@
 
     <div class="container px-4 md:px-6 lg:px-8 py-10">
         <div class="login-card p-6 md:p-10 lg:p-12">
-            <div class="page-title">複業AI</div>
+            <div class="page-title">AIプロマッチ</div>
             @include('partials.error-panel')
 
             @if (session('success'))

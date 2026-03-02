@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>企業登録（ログイン情報登録） - AITECH</title>
+    <title>企業登録（ログイン情報登録） - AIプロマッチ</title>
     <style>
         /* リセット & ベース */
         * {

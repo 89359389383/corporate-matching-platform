@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>自社案件一覧（企業）- AITECH</title>
+    <title>自社案件一覧（企業）- AIプロマッチ</title>
     @include('partials.company-header-style')
     <style>
         :root {

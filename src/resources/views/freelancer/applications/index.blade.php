@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>応募した案件 - AITECH</title>
+    <title>応募した案件 - AIプロマッチ</title>
     {{-- ヘッダーに必要なスタイルのみをここに記載 --}}
     <style>
         /* Header (企業側と同じレスポンシブ構造: 640 / 768 / 1024 / 1280) */
@@ -578,7 +578,7 @@
         <div class="header-content">
             <div class="header-left">
                 <div class="logo" aria-hidden="true">
-                    <div class="logo-text">複業AI</div>
+                    <div class="logo-text">AIプロマッチ</div>
                 </div>
             </div>
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>スカウト一覧 - AITECH</title>
+    <title>スカウト一覧 - AIプロマッチ</title>
     @include('partials.corporate-header-style')
     <script src="https://cdn.tailwindcss.com"></script>
 </head>

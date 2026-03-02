@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'AITECH')</title>
+    <title>@yield('title', 'AIプロマッチ')</title>
     {{-- ヘッダーに必要なスタイルのみをここに記載 --}}
     <style>
         :root {
@@ -139,7 +139,7 @@
     <header class="header" role="banner">
         <div class="header-content">
             <div class="logo" aria-hidden="true">
-                <div class="logo-text">複業AI</div>
+                <div class="logo-text">AIプロマッチ</div>
             </div>
             <nav class="nav-links" role="navigation" aria-label="フリーランスナビゲーション">
                 <a href="{{ route('freelancer.jobs.index') }}" class="nav-link {{ Request::routeIs('freelancer.jobs.*') ? 'active' : '' }}">案件一覧</a>

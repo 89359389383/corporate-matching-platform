@@ -2,7 +2,7 @@
     <div class="header-content">
         <div class="header-left">
             <div class="logo" aria-hidden="true">
-                <div class="logo-text">複業AI</div>
+                <div class="logo-text">AIプロマッチ</div>
             </div>
         </div>
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>メッセージ - AITECH</title>
+    <title>メッセージ - AIプロマッチ</title>
 
     @include('partials.corporate-header-style')
 

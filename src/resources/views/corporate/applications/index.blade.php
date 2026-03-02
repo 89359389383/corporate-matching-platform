@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>応募一覧 - AITECH</title>
+    <title>応募一覧 - AIプロマッチ</title>
 
     {{-- 上部ヘッダーは既存のものをそのまま使用 --}}
     @include('partials.corporate-header-style')

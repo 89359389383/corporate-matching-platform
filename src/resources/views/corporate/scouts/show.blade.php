@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>スカウト詳細 - AITECH</title>
+    <title>スカウト詳細 - AIプロマッチ</title>
     @include('partials.corporate-header-style')
     @include('partials.corporate-chat-style')
     <script src="https://cdn.tailwindcss.com"></script>

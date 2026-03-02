@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>応募する - AITECH</title>
+    <title>応募する - AIプロマッチ</title>
     <style>
         :root {
             --header-height: 72px;       /* 80px * 1.3 */
@@ -477,7 +477,7 @@
         <div class="header-content">
             <div class="header-left">
                 <div class="logo" aria-hidden="true">
-                    <div class="logo-text">複業AI</div>
+                    <div class="logo-text">AIプロマッチ</div>
                 </div>
             </div>
 

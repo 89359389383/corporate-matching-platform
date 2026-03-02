@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>契約表示（企業）- AITECH</title>
+    <title>契約表示（企業）- AIプロマッチ</title>
 
     {{-- ✅ 上部ヘッダーは変更しない --}}
     @include('partials.company-header-style')
