@@ -716,7 +716,6 @@
                 daySelect.addEventListener('change', syncHiddenInput);
             };
 
-</snippet>
             initYmdWidget('work_start_date_widget');
             initYmdWidget('publish_end_date_widget');
         })();

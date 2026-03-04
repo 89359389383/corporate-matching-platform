@@ -130,8 +130,34 @@ return [
     */
 
     'custom' => [
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
+        // スキル関連（custom_skills が未指定または配列内要素が未指定の場合）
+        'custom_skills' => [
+            'required_without' => '1つ以上のスキルを入力してください。',
+        ],
+        'custom_skills.*' => [
+            'required' => '1つ以上のスキルを入力してください。',
+        ],
+
+        // 稼働時間関連（必須メッセージをよりわかりやすく）
+        'min_hours_per_week' => [
+            'required' => '最小稼働時間は必須です。',
+        ],
+        'max_hours_per_week' => [
+            'required' => '最大稼働時間は必須です。',
+        ],
+        'hours_per_day' => [
+            'required' => '1日あたりの稼働時間は必須です。',
+        ],
+        'days_per_week' => [
+            'required' => '1週間あたりの稼働日数は必須です。',
+        ],
+
+        // 法人選択時の必須項目（required_if のメッセージを短く）
+        'corporation_name' => [
+            'required_if' => '法人名は必須です。',
+        ],
+        'corporation_contact_name' => [
+            'required_if' => '担当者名は必須です。',
         ],
     ],
 
@@ -146,5 +172,16 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'display_name' => '表示名',
+        'job_title' => '職種',
+        'bio' => '自己紹介文',
+        'min_hours_per_week' => '最小稼働時間',
+        'max_hours_per_week' => '最大稼働時間',
+        'hours_per_day' => '1日あたりの稼働時間',
+        'days_per_week' => '1週間あたりの稼働日数',
+        'custom_skills' => 'スキル',
+        'corporation_name' => '法人名',
+        'corporation_contact_name' => '担当者名',
+    ],
 ];

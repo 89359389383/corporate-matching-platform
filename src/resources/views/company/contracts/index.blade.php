@@ -332,6 +332,20 @@
         @media (min-width: 768px) { .logo-text { font-size: 22px; } }
         @media (min-width: 1024px) { .logo-text { font-size: 24px; } }
         @media (min-width: 1280px) { .logo-text { font-size: 26px; } }
+
+        /* Dropdown（company/jobs/index と同一の見栄えに統一） */
+        .dropdown-item {
+            display: block;
+            padding: 0.875rem 1.25rem;
+            text-decoration: none;
+            color: #586069;
+            transition: all 0.15s ease;
+            border-radius: 6px;
+            margin: 0.25rem;
+            white-space: nowrap;
+        }
+        .dropdown-item:hover { background-color: #f6f8fa; color: #24292e; }
+        .dropdown-divider { height: 1px; background-color: #e1e4e8; margin: 0.5rem 0; }
     </style>
 </head>
 <body>

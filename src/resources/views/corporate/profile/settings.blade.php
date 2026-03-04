@@ -341,6 +341,30 @@
             }
         }
 
+        /* 6項目を1行で揃える（希望単価/稼働条件） */
+        .work-conditions-grid {
+            display: grid;
+            gap: 1rem;
+            align-items: start;
+            grid-template-columns: 1fr;
+        }
+        @media (min-width: 768px) {
+            .work-conditions-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+        @media (min-width: 1024px) {
+            .work-conditions-grid {
+                grid-template-columns: repeat(6, minmax(0, 1fr));
+            }
+        }
+        .work-conditions-label {
+            font-weight: 900;
+            color: #586069;
+            font-size: 0.82rem;
+            line-height: 1.2;
+        }
+
     </style>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -400,10 +424,10 @@
                     <div class="k">日</div>
                     <div class="v" id="preview-days">
                         @if($corporate && ($corporate->hours_per_day || $corporate->days_per_week))
-                            @if($corporate->hours_per_day && $corporate->days_per_week)
-                                {{ $corporate->hours_per_day }}h/day・{{ $corporate->days_per_week }}日/week
+                                @if($corporate->hours_per_day && $corporate->days_per_week)
+                                {{ $corporate->hours_per_day }}時間/日・{{ $corporate->days_per_week }}日/週
                             @else
-                                {{ $corporate->hours_per_day ?? '' }}{{ $corporate->hours_per_day ? 'h/day' : '' }}{{ $corporate->days_per_week ?? '' }}{{ $corporate->days_per_week ? '日/week' : '' }}
+                                {{ $corporate->hours_per_day ?? '' }}{{ $corporate->hours_per_day ? '時間/日' : '' }}{{ $corporate->days_per_week ?? '' }}{{ $corporate->days_per_week ? '日/週' : '' }}
                             @endif
                         @else
                             未設定
@@ -545,55 +569,51 @@
                     </div>
 
                     <div class="row">
-                        <div class="label">希望単価（万円/月）</div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
+                        <div class="label">希望単価・稼働条件</div>
+                        <div class="work-conditions-grid">
+                            <div class="row" style="gap:0.4rem;">
+                                <div class="work-conditions-label">希望単価 下限（万円）</div>
                                 <input class="input @error('min_rate') is-invalid @enderror" id="min_rate" name="min_rate" type="number" placeholder="下限" value="{{ old('min_rate', $corporate->min_rate ?? '') }}" min="0">
                                 @error('min_rate')
                                 <span class="error-message">{{ $message }}</span>
                                 @enderror
                             </div>
-                            <div>
+                            <div class="row" style="gap:0.4rem;">
+                                <div class="work-conditions-label">希望単価 上限（万円）</div>
                                 <input class="input @error('max_rate') is-invalid @enderror" id="max_rate" name="max_rate" type="number" placeholder="上限" value="{{ old('max_rate', $corporate->max_rate ?? '') }}" min="0">
                                 @error('max_rate')
                                 <span class="error-message">{{ $message }}</span>
                                 @enderror
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="label">稼働時間（時間/週）</div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <input class="input @error('min_hours_per_week') is-invalid @enderror" id="min_hours_per_week" name="min_hours_per_week" type="number" placeholder="下限" value="{{ old('min_hours_per_week', $corporate->min_hours_per_week ?? '') }}" min="0">
+                            <div class="row" style="gap:0.4rem;">
+                                <div class="work-conditions-label">最小稼働時間（時間/週）</div>
+                                <input class="input @error('min_hours_per_week') is-invalid @enderror" id="min_hours_per_week" name="min_hours_per_week" type="number" placeholder="最小" value="{{ old('min_hours_per_week', $corporate->min_hours_per_week ?? '') }}" min="0">
                                 @error('min_hours_per_week')
                                 <span class="error-message">{{ $message }}</span>
                                 @enderror
                             </div>
-                            <div>
-                                <input class="input @error('max_hours_per_week') is-invalid @enderror" id="max_hours_per_week" name="max_hours_per_week" type="number" placeholder="上限" value="{{ old('max_hours_per_week', $corporate->max_hours_per_week ?? '') }}" min="0">
+                            <div class="row" style="gap:0.4rem;">
+                                <div class="work-conditions-label">最大稼働時間（時間/週）</div>
+                                <input class="input @error('max_hours_per_week') is-invalid @enderror" id="max_hours_per_week" name="max_hours_per_week" type="number" placeholder="最大" value="{{ old('max_hours_per_week', $corporate->max_hours_per_week ?? '') }}" min="0">
                                 @error('max_hours_per_week')
                                 <span class="error-message">{{ $message }}</span>
                                 @enderror
                             </div>
+                            <div class="row" style="gap:0.4rem;">
+                                <div class="work-conditions-label">1日あたりの稼働時間（時間）</div>
+                                <input class="input @error('hours_per_day') is-invalid @enderror" id="hours_per_day" name="hours_per_day" type="number" value="{{ old('hours_per_day', $corporate->hours_per_day ?? '') }}" min="0" placeholder="例: 8">
+                                @error('hours_per_day')
+                                <span class="error-message">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="row" style="gap:0.4rem;">
+                                <div class="work-conditions-label">1週間あたりの稼働日数（日）</div>
+                                <input class="input @error('days_per_week') is-invalid @enderror" id="days_per_week" name="days_per_week" type="number" value="{{ old('days_per_week', $corporate->days_per_week ?? '') }}" min="0" max="7" placeholder="例: 5">
+                                @error('days_per_week')
+                                <span class="error-message">{{ $message }}</span>
+                                @enderror
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="label">1日の稼働時間</div>
-                        <input class="input @error('hours_per_day') is-invalid @enderror" id="hours_per_day" name="hours_per_day" type="number" value="{{ old('hours_per_day', $corporate->hours_per_day ?? '') }}" min="0" placeholder="例: 8">
-                        @error('hours_per_day')
-                        <span class="error-message">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    <div class="row">
-                        <div class="label">週の稼働日数</div>
-                        <input class="input @error('days_per_week') is-invalid @enderror" id="days_per_week" name="days_per_week" type="number" value="{{ old('days_per_week', $corporate->days_per_week ?? '') }}" min="0" max="7" placeholder="例: 5">
-                        @error('days_per_week')
-                        <span class="error-message">{{ $message }}</span>
-                        @enderror
                     </div>
 
                     <div class="row">
@@ -742,9 +762,9 @@
                     const min = minHours.value;
                     const max = maxHours.value;
                     if (min && max) {
-                        previewHours.textContent = '週' + min + '〜' + max + 'h';
+                        previewHours.textContent = '週' + min + '〜' + max + '時間';
                     } else if (min || max) {
-                        previewHours.textContent = '週' + (min || max) + 'h';
+                        previewHours.textContent = '週' + (min || max) + '時間';
                     } else {
                         previewHours.textContent = '未設定';
                     }
@@ -753,9 +773,9 @@
                     const hours = hoursPerDay.value;
                     const days = daysPerWeek.value;
                     if (hours && days) {
-                        previewDays.textContent = hours + 'h/day・' + days + '日/week';
+                        previewDays.textContent = hours + '時間/日・' + days + '日/週';
                     } else if (hours || days) {
-                        previewDays.textContent = (hours ? hours + 'h/day' : '') + (days ? days + '日/week' : '');
+                        previewDays.textContent = (hours ? hours + '時間/日' : '') + (days ? days + '日/週' : '');
                     } else {
                         previewDays.textContent = '未設定';
                     }

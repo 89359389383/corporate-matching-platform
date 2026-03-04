@@ -16,7 +16,8 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
             min-height: 100vh;
-            overflow: hidden;
+            /* コンテンツが長い場合は縦スクロールを許可する */
+            overflow-y: auto;
             position: relative;
             color: #0f172a;
         }

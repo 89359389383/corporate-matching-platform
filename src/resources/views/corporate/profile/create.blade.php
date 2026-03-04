@@ -295,7 +295,7 @@
     </style>
 </head>
 <body>
-    @include('partials.corporate-header')
+    
 
     <main class="main-content">
         <!-- Sidebar preview -->

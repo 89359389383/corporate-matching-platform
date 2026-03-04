@@ -261,11 +261,7 @@
             appearance: none;
             flex: 0 0 auto;
         }
-        /* avatar size responsive */
-        @media (min-width: 640px) { .user-avatar { width: 40px; height: 40px; } }
-        @media (min-width: 768px) { .user-avatar { width: 44px; height: 44px; } }
-        @media (min-width: 1024px) { .user-avatar { width: 48px; height: 48px; } }
-        @media (min-width: 1280px) { .user-avatar { width: 52px; height: 52px; } }
+        /* avatar size fixed (all breakpoints) */
         .user-avatar:hover { transform: scale(1.08); box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
         .user-avatar:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.25), 0 2px 8px rgba(0,0,0,0.1); }
 
@@ -404,7 +400,9 @@
 @php
     $t = $contract->terms_json ?? [];
 
-    $corpName = $contract->corporate->display_name ?? ($contract->corporate->corporation_name ?? '');
+    $companyName = $contract->company->name ?? '';
+    // 法人名は terms_json 優先（無い場合はリレーションからフォールバック）
+    $corpName = $t['corporate_name'] ?? ($contract->corporate->display_name ?? ($contract->corporate->corporation_name ?? ''));
     $jobTitle  = $contract->job ? $contract->job->title : '（スカウト）';
 
     $start = $contract->start_date ? $contract->start_date->format('Y/m/d') : '';
@@ -427,8 +425,8 @@
     $copyLines[] = ($t['scope'] ?? ''); // 画面の概要に合わせて scope を概要扱い（必要なら別キーに差し替えOK）
     $copyLines[] = "";
     $copyLines[] = "【当事者】";
-    $copyLines[] = "企業: {$corpName}";
-    $copyLines[] = "フリーランス: " . ($t['freelancer_name'] ?? ''); // 無ければ空
+    $copyLines[] = "企業: {$companyName}";
+    $copyLines[] = "法人: {$corpName}";
     $copyLines[] = "";
     $copyLines[] = "【契約期間】";
     $copyLines[] = "開始日: {$start}";
@@ -524,15 +522,17 @@
                         <button type="submit" class="btn primary">署名する</button>
                     </form>
                 @endif
-                {{-- 編集ボタン：コピーの左に配置（クリックで編集画面へ遷移） --}}
-                <a href="{{ route('company.contracts.edit', ['contract' => $contract]) }}" class="btn" aria-label="編集">
-                    {{-- edit icon --}}
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="mr-1">
-                        <path d="M3 21v-3.75L17.81 2.44a2 2 0 0 1 2.83 0l0 0a2 2 0 0 1 0 2.83L5.83 20.08 3 21z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M14 4l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    編集
-                </a>
+                {{-- 編集ボタン：下書き（draft）のときのみ表示 --}}
+                @if(($contract->status ?? null) === \App\Models\Contract::STATUS_DRAFT)
+                    <a href="{{ route('company.contracts.edit', ['contract' => $contract]) }}" class="btn" aria-label="編集">
+                        {{-- edit icon --}}
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="mr-1">
+                            <path d="M3 21v-3.75L17.81 2.44a2 2 0 0 1 2.83 0l0 0a2 2 0 0 1 0 2.83L5.83 20.08 3 21z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14 4l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        編集
+                    </a>
+                @endif
                 {{-- ✅ 1回のボタンで全部コピー --}}
                 <button type="button" id="copyAllBtn" class="btn">
                     {{-- copy icon --}}
@@ -752,7 +752,7 @@
                         </div>
                         <div class="min-w-0">
                             <div class="text-xs font-black text-gray-500">企業</div>
-                            <div class="mt-1 font-black text-gray-900 break-words">{{ $corpName }}</div>
+                            <div class="mt-1 font-black text-gray-900 break-words">{{ $companyName }}</div>
                         </div>
                     </div>
 
@@ -768,9 +768,7 @@
                         </div>
                         <div class="min-w-0">
                             <div class="text-xs font-black text-gray-500">法人</div>
-                            <div class="mt-1 font-black text-gray-900 break-words">
-                                {{ $t['freelancer_name'] ?? '山田太郎' }}
-                            </div>
+                            <div class="mt-1 font-black text-gray-900 break-words">{{ $corpName }}</div>
                         </div>
                     </div>
                 </div>

@@ -93,9 +93,9 @@ class CorporateProfileUpdateRequest extends FormRequest
         return [
             'recipient_type.required' => '受注者タイプを選択してください。',
             'recipient_type.in' => '受注者タイプの選択が不正です。',
-            'corporation_name.required_if' => '法人を選んだ場合、法人名は必須です。',
+            'corporation_name.required_if' => '法人名は必須です。',
             'corporation_name.max' => '法人名は255文字以内で入力してください。',
-            'corporation_contact_name.required_if' => '法人を選んだ場合、担当者名は必須です。',
+            'corporation_contact_name.required_if' => '担当者名は必須です。',
             'corporation_contact_name.max' => '担当者名は255文字以内で入力してください。',
             'company_site_url.url' => '会社サイトURLは正しいURL形式で入力してください。',
             'company_site_url.max' => '会社サイトURLは2000文字以内で入力してください。',

@@ -256,11 +256,7 @@
             appearance: none;
             flex: 0 0 auto;
         }
-        /* avatar size responsive */
-        @media (min-width: 640px) { .user-avatar { width: 40px; height: 40px; } }
-        @media (min-width: 768px) { .user-avatar { width: 44px; height: 44px; } }
-        @media (min-width: 1024px) { .user-avatar { width: 48px; height: 48px; } }
-        @media (min-width: 1280px) { .user-avatar { width: 52px; height: 52px; } }
+        /* avatar size fixed (all breakpoints) */
         .user-avatar:hover { transform: scale(1.08); box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
         .user-avatar:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.25), 0 2px 8px rgba(0,0,0,0.1); }
 
